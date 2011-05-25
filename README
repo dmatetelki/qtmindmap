@@ -1,0 +1,16 @@
+Create a backlog list.
+Let's do this project with Scrum.
+
+- Dummy main widget & build system
+- Test system(?)
+- Menu bar: save/open file, quit.
+- canvas with root element
+- element widget
+- connect/disconnect emelent (line widget)
+- move element
+- element, line widget properties (rigth click menu)
+- moving with cursor keys, inserting / deleting with cursor keys
+- icon
+- taskbar app
+
+
