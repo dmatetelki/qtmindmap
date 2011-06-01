@@ -4,15 +4,28 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 TARGET = qtmindmap
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    aboutdialog.cpp \
+    graphwidget.cpp \
+    node.cpp \
+    edge.cpp \
+    systemtray.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    aboutdialog.h \
+    graphwidget.h \
+    node.h \
+    edge.h \
+    systemtray.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    aboutdialog.ui
+
+RESOURCES = qtmindmap.qrc
