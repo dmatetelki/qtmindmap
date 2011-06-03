@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//#include <QPointer>
+#include <QSystemTrayIcon>
 
 #include "aboutdialog.h"
 #include "graphwidget.h"
@@ -16,19 +16,32 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(bool isSystemTray = false, QWidget *parent = 0);
     ~MainWindow();
+    void showSysTray();
 
 public slots:
-    void klakk(void);
+    void klakk();
+    void exportScene();
     void about();
     void aboutDestroyed();
 
 private:
+
+    void setupSystemTray();
+
     Ui::MainWindow *ui;
     AboutDialog* aboutDialog;
-//    QPointer<AboutDialog> aboutDialog;
     GraphWidget *graphicsView;
+
+    QSystemTrayIcon *systemTrayIcon;
+    MainWindow *mainWindow;
+    QMenu *trayIconMenu;
+    QAction *minimizeAction;
+    QAction *maximizeAction;
+    QAction *restoreAction;
+    QAction *quitAction;
+    QIcon *icon;
 };
 
 #endif // MAINWINDOW_H

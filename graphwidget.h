@@ -7,7 +7,6 @@
 
 #include "node.h"
 
-//class Node;
 
 class GraphWidget : public QGraphicsView
 {
@@ -16,9 +15,9 @@ class GraphWidget : public QGraphicsView
 
 public:
     GraphWidget(QWidget *parent = 0);
+    QGraphicsScene *getScene();
 
 protected:
-//    void drawBackground(QPainter *painter, const QRectF &rect);
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void scaleView(qreal scaleFactor);

@@ -15,17 +15,19 @@ SOURCES += main.cpp\
     aboutdialog.cpp \
     graphwidget.cpp \
     node.cpp \
-    edge.cpp \
-    systemtray.cpp
+    edge.cpp
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
     graphwidget.h \
     node.h \
-    edge.h \
-    systemtray.h
+    edge.h
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui
 
 RESOURCES = qtmindmap.qrc
+
+TRANSLATIONS = qtmindmap_hu.ts
+
+CODECFORTR = UTF-8

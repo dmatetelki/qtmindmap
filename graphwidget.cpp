@@ -59,6 +59,10 @@ GraphWidget::GraphWidget(QWidget *parent)
   activeNode->setFocus();
 }
 
+QGraphicsScene *GraphWidget::getScene()
+{
+    return scene;
+}
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {

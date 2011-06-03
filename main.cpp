@@ -2,12 +2,11 @@
 #include <iostream> // cout
 
 #include <QtGui>
-//#include <QtGui/QApplication>
 #include <QDebug>
 #include <QRegExp>
+#include <QTranslator>
 
 #include "mainwindow.h"
-#include "systemtray.h"
 
 
 void printUsage()
@@ -18,12 +17,15 @@ void printUsage()
               << "Options:" << std::endl
               << "-h,  --help\tPrints this help." << std::endl
               << "-t,  --tray\tStarts application in system tray." << std::endl
+              << "-s,  --show-minimized\tHide main window, just show systray icon." << std::endl
               << std::endl
               << "Report bugs to: denes.matetelki@gmail.com" << std::endl;
 }
 
 
-bool parseCmdLineArgs(bool &isSystemTray, QString &filePath)
+bool parseCmdLineArgs(bool &isSystemTray,
+                      bool &isShowMinimized,
+                      QString &filePath)
 {
     QStringList cmdlineArgs = QCoreApplication::arguments();
     cmdlineArgs.removeFirst();
@@ -34,7 +36,13 @@ bool parseCmdLineArgs(bool &isSystemTray, QString &filePath)
     QRegExp tray("^-(t|-tray)$");
     if (!cmdlineArgs.filter(tray).isEmpty()) isSystemTray = true;
 
-    QRegExp all("^-(t|-tray|h|-help)$");
+    QRegExp minimized("^-(s|-show-minimized)$");
+    if (!cmdlineArgs.filter(minimized).isEmpty()) isShowMinimized = true;
+
+    /// @note It is an error? Shall it be handled?
+    // if (isSystemTray && isShowMinimized) return false;
+
+    QRegExp all("^-(t|-tray|h|-help|s|-show-minimized)$");
     QStringList others;
     foreach (QString arg, cmdlineArgs) if (all.indexIn(arg)==-1) others.append(arg);
     if (others.size() > 1) return false;
@@ -51,32 +59,43 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    // translation
+    QString locale = QLocale::system().name();
+    QTranslator translator;
+    if (!translator.load(QString("qtmindmap_") + locale))
+    {
+        std::cout << "No translation file for locale: " << locale.toStdString() << std::endl;
+    }
+    else
+    {
+        a.installTranslator(&translator);
+    }
+
+    // parse args
     bool isSystemTray(false);
+    bool isShowMinimized(false);
     QString filePath;
-    if (!parseCmdLineArgs(isSystemTray,filePath))
+    if (!parseCmdLineArgs(isSystemTray,isShowMinimized,filePath))
     {
         printUsage();
         return EXIT_FAILURE;
     }
 
-    MainWindow w;
-    SystemTray *systemTray;
-    isSystemTray = true;
-    if (isSystemTray)
+    // system tray?
+    MainWindow w(isSystemTray or isShowMinimized);
+    if (isSystemTray or isShowMinimized)
     {
         if (!QSystemTrayIcon::isSystemTrayAvailable())
         {
             QMessageBox::critical(0,
-                                  QObject::tr("Systray"),
+                                  QObject::tr("QtMindMap Error"),
                                   QObject::tr("I couldn't detect any system tray on this system."));
             return EXIT_FAILURE;
         }
         QApplication::setQuitOnLastWindowClosed(false);
-        systemTray = new SystemTray(&w);
-        systemTray->show();
+        w.showSysTray();
     }
 
-
-    w.show();
+    if (!isShowMinimized) w.show();
     return a.exec();
 }
