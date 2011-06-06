@@ -34,11 +34,9 @@ Node *Edge::destNode() const
 
 /// @note This is brute force. Isn't there a simple fv for this?
 QPointF firstNotContainedPoint(const QLineF &line,
-                               const QPointF &pos,
-                               const QRectF &rectangle,
+                               const QRectF &rect,
                                bool reverse = false)
 {
-    QRectF rect(rectangle.topLeft()+pos, rectangle.bottomRight()+pos);
     if (reverse)
     {
         for (qreal t = 1; t!=0; t-=0.01)
@@ -72,14 +70,8 @@ void Edge::adjust()
 
     if (length > qreal(20.)) {
 
-        QPointF sourceOffset(firstNotContainedPoint(line,
-                                                    m_sourceNode->pos(),
-                                                    m_sourceNode->boundingRect()
-                                                    ));
-        QPointF destOffset(firstNotContainedPoint(line,
-                                                  m_destNode->pos(),
-                                                  m_destNode->boundingRect()
-                                                  ,true));
+        QPointF sourceOffset(firstNotContainedPoint(line,m_sourceNode->sceneBoundingRect()));
+        QPointF destOffset(firstNotContainedPoint(line,m_destNode->sceneBoundingRect(),true));
 
         m_sourcePoint = sourceOffset;
         m_destPoint = destOffset;

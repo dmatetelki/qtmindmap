@@ -35,6 +35,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     switch (change) {
         case ItemPositionHasChanged:
+//        if ()
 
             foreach (Edge *edge, m_edgeList) edge->adjust();
             break;

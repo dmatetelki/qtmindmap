@@ -33,8 +33,6 @@ void SystemTray::setup()
 
     m_icon = new QIcon(":/heart.svg");
     m_systemTrayIcon->setIcon(QIcon(":/heart.svg"));
-
-
 }
 
 SystemTray::SystemTray(MainWindow *mainWindow, QWidget *parent) :
@@ -47,5 +45,7 @@ SystemTray::SystemTray(MainWindow *mainWindow, QWidget *parent) :
 
 void SystemTray::show()
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
     m_systemTrayIcon->show();
 }
