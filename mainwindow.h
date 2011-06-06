@@ -30,18 +30,18 @@ private:
 
     void setupSystemTray();
 
-    Ui::MainWindow *ui;
-    AboutDialog* aboutDialog;
-    GraphWidget *graphicsView;
+    Ui::MainWindow *m_ui;
+    AboutDialog *m_aboutDialog;
+    GraphWidget *m_graphicsView;
 
-    QSystemTrayIcon *systemTrayIcon;
-    MainWindow *mainWindow;
-    QMenu *trayIconMenu;
-    QAction *minimizeAction;
-    QAction *maximizeAction;
-    QAction *restoreAction;
-    QAction *quitAction;
-    QIcon *icon;
+    QSystemTrayIcon *m_systemTrayIcon;
+    MainWindow *m_mainWindow;
+    QMenu *m_trayIconMenu;
+    QAction *m_minimizeAction;
+    QAction *m_maximizeAction;
+    QAction *m_restoreAction;
+    QAction *m_quitAction;
+    QIcon *m_icon;
 };
 
 #endif // MAINWINDOW_H

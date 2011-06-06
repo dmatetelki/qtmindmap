@@ -4,7 +4,7 @@
 #include <QStyleOption>
 #include <QDebug>
 
-Node::Node(GraphWidget *parent) : graph(parent), active(false)
+Node::Node(GraphWidget *parent) : m_graph(parent)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
@@ -24,7 +24,7 @@ void Node::addEdge(Edge *edge)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    edgeList << edge;
+    m_edgeList << edge;
     edge->adjust();
 }
 
@@ -36,7 +36,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     switch (change) {
         case ItemPositionHasChanged:
 
-            foreach (Edge *edge, edgeList) edge->adjust();
+            foreach (Edge *edge, m_edgeList) edge->adjust();
             break;
         default:
             break;
@@ -49,8 +49,6 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-//    active = true;
-//    setScale(1.2);
     update();
     QGraphicsTextItem::mousePressEvent(event);
 }
@@ -70,21 +68,8 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
         QGraphicsTextItem::paint(painter, option, w);
 
-        QPen pen(Qt::blue,1);
-//        pen.setJoinStyle(Qt::RoundJoin);
-//        pen.setStyle(Qt::MiterJoin);
-//        pen.setCapStyle(Qt::RoundCap);
-//        pen.setMiterLimit(3);
-        painter->setPen(pen);
-
-//        painter->setPen(QPen(Qt::blue
-//                             , 1, Qt::SolidLine,Qt::SquareCap, Qt::RoundJoin
-//                             ));
-        m_rect = QRect(	boundingRect().topLeft().toPoint()
-//                        - QPoint(4,4)
-                        ,
-                        boundingRect().bottomRight().toPoint()
-                        - QPoint(1,1)
-                        );
-        painter->drawRect(m_rect);
+        painter->setPen(QPen(Qt::blue));
+        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                                boundingRect().bottomRight().toPoint() -
+                                QPoint(1,1)));
 }

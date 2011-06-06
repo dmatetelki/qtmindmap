@@ -6,14 +6,15 @@
 #include "edge.h"
 #include "math.h"
 
-GraphWidget::GraphWidget(QWidget *parent)
+GraphWidget::GraphWidget(QWidget *parent) :
+    QGraphicsView(parent)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    scene = new QGraphicsScene(this);
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-400, -400, 800, 800);
-    setScene(scene);
+    m_scene = new QGraphicsScene(this);
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    m_scene->setSceneRect(-400, -400, 800, 800);
+    setScene(m_scene);
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
@@ -22,47 +23,47 @@ GraphWidget::GraphWidget(QWidget *parent)
 
     Node *node1 = new Node();
     node1->setHtml(QString("me"));
-    scene->addItem(node1);
+    m_scene->addItem(node1);
     node1->setPos(-10, -10);
 
     Node *node2 = new Node();
     node2->setHtml(QString("work"));
-    scene->addItem(node2);
+    m_scene->addItem(node2);
     node2->setPos(60, -10);
 
     Node *node3 = new Node();
     node3->setHtml(QString("read"));
-    scene->addItem(node3);
+    m_scene->addItem(node3);
     node3->setPos(-70, -10);
 
     Node *node4 = new Node();
     node4->setHtml(QString("pragmatic programmer"));
-    scene->addItem(node4);
+    m_scene->addItem(node4);
     node4->setPos(-120, -80);
 
     Node *node5 = new Node();
     node5->setHtml(QString("joy"));
-    scene->addItem(node5);
+    m_scene->addItem(node5);
     node5->setPos(-10, 50);
 
     Node *node6 = new Node();
     node6->setHtml(QString("rape goats"));
-    scene->addItem(node6);
+    m_scene->addItem(node6);
     node6->setPos(-10, 100);
 
-    scene->addItem(new Edge(node1, node2));
-    scene->addItem(new Edge(node1, node3));
-    scene->addItem(new Edge(node3, node4));
-    scene->addItem(new Edge(node1, node5));
-    scene->addItem(new Edge(node5, node6));
+    m_scene->addItem(new Edge(node1, node2));
+    m_scene->addItem(new Edge(node1, node3));
+    m_scene->addItem(new Edge(node3, node4));
+    m_scene->addItem(new Edge(node1, node5));
+    m_scene->addItem(new Edge(node5, node6));
 
-    activeNode = node1;
-    activeNode->setFocus();
+    m_activeNode = node1;
+    m_activeNode->setFocus();
 }
 
 QGraphicsScene *GraphWidget::getScene()
 {
-    return scene;
+    return m_scene;
 }
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)

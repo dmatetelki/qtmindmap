@@ -7,8 +7,6 @@ class Node;
 
 class Edge : public QGraphicsItem
 {
-//    Q_OBJECT
-
 public:
     Edge(Node *sourceNode, Node *destNode);
 
@@ -25,11 +23,12 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
-    Node *source, *dest;
+    Node *m_sourceNode;
+    Node *m_destNode;
 
-    QPointF sourcePoint;
-    QPointF destPoint;
-    qreal arrowSize;
+    QPointF m_sourcePoint;
+    QPointF m_destPoint;
+    qreal m_arrowSize;
 };
 
 #endif

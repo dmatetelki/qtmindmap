@@ -8,11 +8,8 @@
 
 class GraphWidget;
 
-/// @bug no signal when size change
 class Node : public QGraphicsTextItem
 {
-//    Q_OBJECT
-
 public:
     Node(GraphWidget *graphWidget = 0);
 
@@ -27,11 +24,8 @@ protected:
 
 
 private:
-    QList<Edge *> edgeList;
-    GraphWidget *graph;
-    bool active;
-    QRectF m_rect;
-
+    QList<Edge *> m_edgeList;
+    GraphWidget *m_graph;
 };
 
 #endif // NODE_H

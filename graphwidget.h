@@ -24,8 +24,8 @@ protected:
     void drawBackground(QPainter *painter, const QRectF &rect);
 
 private:
-    Node *activeNode;
-    QGraphicsScene *scene;
+    Node *m_activeNode;
+    QGraphicsScene *m_scene;
 
 };
 

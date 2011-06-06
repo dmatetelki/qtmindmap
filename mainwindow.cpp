@@ -32,23 +32,23 @@ extern void exportScaneToPng(QGraphicsScene *scene,
 
 MainWindow::MainWindow(bool isSystemtray, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    aboutDialog(0)
+    m_ui(new Ui::MainWindow),
+    m_aboutDialog(0)
 {
     qDebug() << __PRETTY_FUNCTION__;
-    ui->setupUi(this);
-    connect(ui->actionNew, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(ui->actionOpen, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(ui->actionSave, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(ui->actionClose, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(ui->actionExport, SIGNAL(activated()), this, SLOT(exportScene()));
-    connect(ui->actionQuit, SIGNAL(activated()), QApplication::instance(),
+    m_ui->setupUi(this);
+    connect(m_ui->actionNew, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionOpen, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionSave, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionClose, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionExport, SIGNAL(activated()), this, SLOT(exportScene()));
+    connect(m_ui->actionQuit, SIGNAL(activated()), QApplication::instance(),
             SLOT(quit()));
-    connect(ui->actionAbout_QtMindMap, SIGNAL(activated()), this,
+    connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()), this,
             SLOT(about()));
 
-    graphicsView = new GraphWidget(ui->centralWidget);
-    setCentralWidget(graphicsView);
+    m_graphicsView = new GraphWidget(m_ui->centralWidget);
+    setCentralWidget(m_graphicsView);
 
     if (isSystemtray) setupSystemTray();
 }
@@ -56,8 +56,8 @@ MainWindow::MainWindow(bool isSystemtray, QWidget *parent) :
 MainWindow::~MainWindow()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    delete ui;
-    if (aboutDialog) delete aboutDialog;
+    delete m_ui;
+    if (m_aboutDialog) delete m_aboutDialog;
 }
 
 void MainWindow::klakk()
@@ -87,18 +87,18 @@ void MainWindow::exportScene()
 //                           fileNames.first(),
 //                           ui);
 
-         QImage img(graphicsView->getScene()->sceneRect().width(),
-                    graphicsView->getScene()->sceneRect().height(),
+         QImage img(m_graphicsView->getScene()->sceneRect().width(),
+                    m_graphicsView->getScene()->sceneRect().height(),
                     QImage::Format_ARGB32_Premultiplied);
          QPainter painter(&img);
          painter.setRenderHint(QPainter::Antialiasing);
 
          /// @bug scene background is not rendered
-         graphicsView->getScene()->render(&painter);
+         m_graphicsView->getScene()->render(&painter);
          painter.end();
 
          img.save(fileNames.first());
-         ui->statusBar->showMessage(tr("MindMap exported as ") + fileNames.first(),
+         m_ui->statusBar->showMessage(tr("MindMap exported as ") + fileNames.first(),
                                     5000); // millisec
 
      }
@@ -106,31 +106,31 @@ void MainWindow::exportScene()
 
 void MainWindow::setupSystemTray()
 {
-    systemTrayIcon = new QSystemTrayIcon(0);
+    m_systemTrayIcon = new QSystemTrayIcon(0);
 
-    minimizeAction = new QAction(tr("Mi&nimize"), systemTrayIcon);
-    connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+    m_minimizeAction = new QAction(tr("Mi&nimize"), m_systemTrayIcon);
+    connect(m_minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
 
-    maximizeAction = new QAction(tr("Ma&ximize"), systemTrayIcon);
-    connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+    m_maximizeAction = new QAction(tr("Ma&ximize"), m_systemTrayIcon);
+    connect(m_maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
 
-    restoreAction = new QAction(tr("&Restore"), systemTrayIcon);
-    connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+    m_restoreAction = new QAction(tr("&Restore"), m_systemTrayIcon);
+    connect(m_restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
 
-    quitAction = new QAction(tr("&Quit"), systemTrayIcon);
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    m_quitAction = new QAction(tr("&Quit"), m_systemTrayIcon);
+    connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction(minimizeAction);
-    trayIconMenu->addAction(maximizeAction);
-    trayIconMenu->addAction(restoreAction);
-    trayIconMenu->addSeparator();
-    trayIconMenu->addAction(quitAction);
+    m_trayIconMenu = new QMenu(this);
+    m_trayIconMenu->addAction(m_minimizeAction);
+    m_trayIconMenu->addAction(m_maximizeAction);
+    m_trayIconMenu->addAction(m_restoreAction);
+    m_trayIconMenu->addSeparator();
+    m_trayIconMenu->addAction(m_quitAction);
 
-    systemTrayIcon->setContextMenu(trayIconMenu);
+    m_systemTrayIcon->setContextMenu(m_trayIconMenu);
 
-    icon = new QIcon(":/heart.svg");
-    systemTrayIcon->setIcon(QIcon(":/heart.svg"));
+    m_icon = new QIcon(":/heart.svg");
+    m_systemTrayIcon->setIcon(QIcon(":/heart.svg"));
 }
 
 void MainWindow::about()
@@ -138,21 +138,21 @@ void MainWindow::about()
     qDebug() << __PRETTY_FUNCTION__;
 
     setDisabled(true);
-    if (aboutDialog == 0) aboutDialog = new AboutDialog(this);
-    aboutDialog->setEnabled(true); // children inherits enabled status
-    aboutDialog->show();
+    if (m_aboutDialog == 0) m_aboutDialog = new AboutDialog(this);
+    m_aboutDialog->setEnabled(true); // children inherits enabled status
+    m_aboutDialog->show();
 //    aboutDialog->layout()->setSizeConstraint( QLayout::SetFixedSize );
 }
 
 void MainWindow::aboutDestroyed()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    qDebug() << aboutDialog;
+    qDebug() << m_aboutDialog;
     setEnabled(true);
 
 }
 
 void MainWindow::showSysTray()
 {
-    systemTrayIcon->show();
+    m_systemTrayIcon->show();
 }
