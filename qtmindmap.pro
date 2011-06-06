@@ -15,13 +15,15 @@ SOURCES += main.cpp\
     aboutdialog.cpp \
     graphwidget.cpp \
     node.cpp \
-    edge.cpp
+    edge.cpp \
+    systemtray.cpp
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
     graphwidget.h \
     node.h \
-    edge.h
+    edge.h \
+    systemtray.h
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui

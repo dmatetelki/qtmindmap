@@ -42,66 +42,80 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">Fajl</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="39"/>
+        <location filename="mainwindow.ui" line="41"/>
         <source>&amp;Help</source>
         <translation type="unfinished">Segitseg</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="57"/>
+        <location filename="mainwindow.ui" line="59"/>
         <source>&amp;New</source>
         <translation type="unfinished">Uj</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="65"/>
+        <location filename="mainwindow.ui" line="67"/>
         <source>&amp;Open</source>
         <translation type="unfinished">Megnyitas</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="73"/>
+        <location filename="mainwindow.ui" line="75"/>
         <source>&amp;Save</source>
         <translation type="unfinished">Mentes</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="81"/>
-        <location filename="mainwindow.cpp" line="40"/>
+        <location filename="mainwindow.ui" line="83"/>
         <source>&amp;Quit</source>
         <translation type="unfinished">Kilepes</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="89"/>
+        <location filename="mainwindow.ui" line="91"/>
         <source>&amp;About QtMindMap</source>
         <translation type="unfinished">A QtMindMap-rol</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="94"/>
+        <location filename="mainwindow.ui" line="96"/>
         <source>&amp;Close</source>
         <translation type="unfinished">Bezaras</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="31"/>
-        <source>Mi&amp;nimize</source>
-        <translation type="unfinished">&amp;Talcara</translation>
+        <location filename="mainwindow.ui" line="104"/>
+        <source>E&amp;xport</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="34"/>
-        <source>Ma&amp;ximize</source>
-        <translation type="unfinished">Teljes &amp;meret</translation>
+        <location filename="mainwindow.ui" line="107"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="37"/>
-        <source>&amp;Restore</source>
-        <translation type="unfinished">&amp;Visszaallita</translation>
+        <location filename="mainwindow.ui" line="110"/>
+        <source>Ctrl+X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="71"/>
+        <source>Export MindMap to image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="73"/>
+        <source>PNG image file (*.png)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="99"/>
+        <source>MindMap exported as </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="95"/>
+        <location filename="main.cpp" line="93"/>
         <source>QtMindMap Error</source>
         <translation type="unfinished">QtMindMap hiba</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="96"/>
+        <location filename="main.cpp" line="94"/>
         <source>I couldn&apos;t detect any system tray on this system.</source>
         <translation type="unfinished">Nem talalhato talca a jelenlegi rendszerben.</translation>
     </message>
@@ -109,20 +123,24 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SystemTray</name>
     <message>
+        <location filename="systemtray.cpp" line="13"/>
         <source>Mi&amp;nimize</source>
-        <translation type="obsolete">&amp;Talcara</translation>
+        <translation type="unfinished">&amp;Talcara</translation>
     </message>
     <message>
+        <location filename="systemtray.cpp" line="16"/>
         <source>Ma&amp;ximize</source>
-        <translation type="obsolete">Teljes &amp;meret</translation>
+        <translation type="unfinished">Teljes &amp;meret</translation>
     </message>
     <message>
+        <location filename="systemtray.cpp" line="19"/>
         <source>&amp;Restore</source>
-        <translation type="obsolete">&amp;Visszaallita</translation>
+        <translation type="unfinished">&amp;Visszaallita</translation>
     </message>
     <message>
+        <location filename="systemtray.cpp" line="22"/>
         <source>&amp;Quit</source>
-        <translation type="obsolete">&amp;Kilepes</translation>
+        <translation type="unfinished">&amp;Kilepes</translation>
     </message>
 </context>
 </TS>

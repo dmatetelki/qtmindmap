@@ -7,6 +7,7 @@
 #include <QTranslator>
 
 #include "mainwindow.h"
+#include "systemtray.h"
 
 
 void printUsage()
@@ -82,7 +83,8 @@ int main(int argc, char *argv[])
     }
 
     // system tray?
-    MainWindow w(isSystemTray or isShowMinimized);
+    MainWindow w;
+    SystemTray systemtray(&w);
     if (isSystemTray or isShowMinimized)
     {
         if (!QSystemTrayIcon::isSystemTrayAvailable())
@@ -93,7 +95,9 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
         QApplication::setQuitOnLastWindowClosed(false);
-        w.showSysTray();
+//        w.showSysTray();
+        systemtray.setup();
+        systemtray.show();
     }
 
     if (!isShowMinimized) w.show();
