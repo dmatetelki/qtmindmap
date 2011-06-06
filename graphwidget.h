@@ -21,6 +21,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void scaleView(qreal scaleFactor);
+    void drawBackground(QPainter *painter, const QRectF &rect);
 
 private:
     Node *activeNode;

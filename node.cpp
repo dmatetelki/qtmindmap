@@ -11,10 +11,13 @@ Node::Node(GraphWidget *parent) : graph(parent), active(false)
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
-    setZValue(2);
+//    setZValue(1);
+
+    // shall I use system colors?
+    setDefaultTextColor(QColor(0,0,0));
 
     // shall I set it after some spec key?
-    setTextInteractionFlags(Qt::TextEditorInteraction);
+//    setTextInteractionFlags(Qt::TextEditorInteraction);
 }
 
 void Node::addEdge(Edge *edge)
@@ -32,8 +35,8 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     switch (change) {
         case ItemPositionHasChanged:
+
             foreach (Edge *edge, edgeList) edge->adjust();
-            //         graph->itemMoved();
             break;
         default:
             break;
@@ -56,18 +59,32 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-//    active = false;
-//    setScale(1.0);
     update();
     QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
-//void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    qDebug() << __PRETTY_FUNCTION__;
-//    QGraphicsTextItem::paint(painter, option, widget);
 
-//    qDebug() << "I " << (hasFocus() ? "have " : "don't have ") << "focus.";
-//    setScale(hasFocus() ? 1.2 : 1.0);
-////    setScale(active ? 1.2 : 1.0);
-//}
+void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
+{
+        qDebug() << __PRETTY_FUNCTION__;
+
+        QGraphicsTextItem::paint(painter, option, w);
+
+        QPen pen(Qt::blue,1);
+//        pen.setJoinStyle(Qt::RoundJoin);
+//        pen.setStyle(Qt::MiterJoin);
+//        pen.setCapStyle(Qt::RoundCap);
+//        pen.setMiterLimit(3);
+        painter->setPen(pen);
+
+//        painter->setPen(QPen(Qt::blue
+//                             , 1, Qt::SolidLine,Qt::SquareCap, Qt::RoundJoin
+//                             ));
+        m_rect = QRect(	boundingRect().topLeft().toPoint()
+//                        - QPoint(4,4)
+                        ,
+                        boundingRect().bottomRight().toPoint()
+                        - QPoint(1,1)
+                        );
+        painter->drawRect(m_rect);
+}

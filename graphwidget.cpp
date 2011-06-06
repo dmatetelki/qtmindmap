@@ -12,51 +12,52 @@ GraphWidget::GraphWidget(QWidget *parent)
 
     scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-200, -200, 400, 400);
+    scene->setSceneRect(-400, -400, 800, 800);
     setScene(scene);
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
-    scale(qreal(0.8), qreal(0.8));
     setMinimumSize(400, 400);
 
-
-//    node1 = new Node(this);
-//    scene->addItem(node1);
-//    node1->setPos(0, 0);
     Node *node1 = new Node();
-    node1->setHtml(QString("salalal"));
+    node1->setHtml(QString("me"));
     scene->addItem(node1);
-    node1->setPos(-100, -100);
+    node1->setPos(-10, -10);
 
     Node *node2 = new Node();
-    node2->setHtml(QString("<b>denes</b> is\na really nice person"));
+    node2->setHtml(QString("work"));
     scene->addItem(node2);
-    node2->setPos(100, 100);
+    node2->setPos(60, -10);
 
+    Node *node3 = new Node();
+    node3->setHtml(QString("read"));
+    scene->addItem(node3);
+    node3->setPos(-70, -10);
 
-//    QGraphicsTextItem *item = new QGraphicsTextItem();
-//    item->setPlainText(QString("salalal"));
-//    scene->addItem(item);
-//    item->setPos(20, 20);
-//    item->setFlag(QGraphicsItem::ItemIsMovable);
-//    item->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-//    item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-//    item->setZValue(-1);
+    Node *node4 = new Node();
+    node4->setHtml(QString("pragmatic programmer"));
+    scene->addItem(node4);
+    node4->setPos(-120, -80);
 
-//    QGraphicsTextItem *item2 = new QGraphicsTextItem();
-//    item2->setHtml(QString("<b>denes</b> is\na really nice person"));
-//    scene->addItem(item2);
-//    item2->setPos(10, 10);
-//    item2->setFlag(QGraphicsItem::ItemIsMovable);
-//    item2->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-//    item2->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-//    item2->setZValue(-1);
+    Node *node5 = new Node();
+    node5->setHtml(QString("joy"));
+    scene->addItem(node5);
+    node5->setPos(-10, 50);
 
-  scene->addItem(new Edge(node1, node2));
-  activeNode = node1;
-  activeNode->setFocus();
+    Node *node6 = new Node();
+    node6->setHtml(QString("rape goats"));
+    scene->addItem(node6);
+    node6->setPos(-10, 100);
+
+    scene->addItem(new Edge(node1, node2));
+    scene->addItem(new Edge(node1, node3));
+    scene->addItem(new Edge(node3, node4));
+    scene->addItem(new Edge(node1, node5));
+    scene->addItem(new Edge(node5, node6));
+
+    activeNode = node1;
+    activeNode->setFocus();
 }
 
 QGraphicsScene *GraphWidget::getScene()
@@ -101,6 +102,44 @@ void GraphWidget::wheelEvent(QWheelEvent *event)
 {
     scaleView(pow((double)2, -event->delta() / 240.0));
 }
+
+void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
+ {
+     Q_UNUSED(rect);
+
+     // Shadow
+     QRectF sceneRect = this->sceneRect();
+//     QRectF rightShadow(sceneRect.right(), sceneRect.top() + 5, 5, sceneRect.height());
+//     QRectF bottomShadow(sceneRect.left() + 5, sceneRect.bottom(), sceneRect.width(), 5);
+//     if (rightShadow.intersects(rect) || rightShadow.contains(rect))
+//         painter->fillRect(rightShadow, Qt::darkGray);
+//     if (bottomShadow.intersects(rect) || bottomShadow.contains(rect))
+//         painter->fillRect(bottomShadow, Qt::darkGray);
+
+     // Fill
+     QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
+     gradient.setColorAt(0, Qt::white);
+     gradient.setColorAt(1, Qt::lightGray);
+     painter->fillRect(rect.intersect(sceneRect), gradient);
+     painter->setBrush(Qt::NoBrush);
+     painter->drawRect(sceneRect);
+
+//     // Text
+//     QRectF textRect(sceneRect.left() + 4, sceneRect.top() + 4,
+//                     sceneRect.width() - 4, sceneRect.height() - 4);
+//     QString message(tr("Click and drag the nodes around, and zoom with the mouse "
+//                        "wheel or the '+' and '-' keys"));
+
+//     QFont font = painter->font();
+//     font.setBold(true);
+//     font.setPointSize(14);
+//     painter->setFont(font);
+//     painter->setPen(Qt::lightGray);
+//     painter->drawText(textRect.translated(2, 2), message);
+//     painter->setPen(Qt::black);
+//     painter->drawText(textRect, message);
+ }
+
 
 void GraphWidget::scaleView(qreal scaleFactor)
 {

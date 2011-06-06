@@ -1,4 +1,6 @@
 #include <QPainter>
+#include <QDebug>
+
 
 #include "edge.h"
 #include "node.h"
@@ -17,7 +19,7 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     source->addEdge(this);
     dest->addEdge(this);
     adjust();
-    setZValue(1);
+//    setZValue(1);
 }
 
 Node *Edge::sourceNode() const
@@ -30,28 +32,57 @@ Node *Edge::destNode() const
     return dest;
 }
 
+/// @note This is brute force. Isn't there a simple fv for this?
+QPointF firstNotContainedPoint(const QLineF &line,
+                               const QPointF &pos,
+                               const QRectF &rectangle,
+                               bool reverse = false)
+{
+    QRectF rect(rectangle.topLeft()+pos, rectangle.bottomRight()+pos);
+    if (reverse)
+    {
+        for (qreal t = 1; t!=0; t-=0.01)
+        {
+            if (!rect.contains(line.pointAt(t))) return line.pointAt(t);
+        }
+    }
+    else
+    {
+        for (qreal t = 0; t!=1; t+=0.01)
+        {
+            if (!rect.contains(line.pointAt(t))) return line.pointAt(t);
+        }
+    }
+    return QPoint(0,0);
+}
+
 void Edge::adjust()
 {
     if (!source || !dest)
         return;
 
+
+    prepareGeometryChange();
+
     QLineF line(mapFromItem(source, 0, 0) + source->boundingRect().center(),
                 mapFromItem(dest, 0, 0)  + dest->boundingRect().center());
     qreal length = line.length();
 
-    prepareGeometryChange();
+
 
     if (length > qreal(20.)) {
-//        QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
-//        QPointF sourceOffset( );
-//        if ( source->contains( source->boundingRect().center() + source->boundingRect().height() / 2 / tan(line.angle())),
-//                               source->boundingRect().width() / 2 )
-//        {
-//             sourcePoint = line.p1() +  QPointF(  , tan( line.angle() ) * source->boundingRect().height() / 2 );
-//        }
 
-        sourcePoint = line.p1();
-        destPoint = line.p2();
+        QPointF sourceOffset(firstNotContainedPoint(line,
+                                                    source->pos(),
+                                                    source->boundingRect()
+                                                    ));
+        QPointF destOffset(firstNotContainedPoint(line,
+                                                  dest->pos(),
+                                                  dest->boundingRect()
+                                                  ,true));
+
+        sourcePoint = sourceOffset;
+        destPoint = destOffset;
     } else {
         sourcePoint = destPoint = line.p1();
     }
@@ -77,12 +108,20 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         return;
 
     QLineF line(sourcePoint, destPoint);
-    if (qFuzzyCompare(line.length(), qreal(0.)))
+
+    /// @bug this test does not filter out when the nodes intersect
+//    if (qFuzzyCompare(line.length(), qreal(0.)))
+//        return;
+
+    if (sourceNode()->collidesWithItem(destNode()))
         return;
 
     // Draw the line itself
     painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->drawLine(line);
+
+    if (line.length() < qreal(10.))
+        return;
 
     // Draw the arrows
     double angle = ::acos(line.dx() / line.length());

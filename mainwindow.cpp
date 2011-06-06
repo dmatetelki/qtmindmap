@@ -3,8 +3,31 @@
 #include "aboutdialog.h"
 
 #include <QDebug>
-//#include <QLayout>
 #include <QFileDialog>
+
+//#include <QtConcurrentRun>
+
+/// QPixmap: It is not safe to use pixmaps outside the GUI thread
+/// tr is messy
+/*
+extern void exportScaneToPng(QGraphicsScene *scene,
+                             const QString &fileName,
+                             Ui::MainWindow *ui)
+{
+    // start export in a diff thread
+    QImage img(scene->sceneRect().width(),
+               scene->sceneRect().height(),
+               QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    scene->render(&painter);
+    painter.end();
+
+    img.save(fileName);
+    ui->statusBar->showMessage(tr("MindMap exported as ") + fileName,
+                               5000); // millisec
+}
+*/
 
 
 MainWindow::MainWindow(bool isSystemtray, QWidget *parent) :
@@ -58,18 +81,26 @@ void MainWindow::exportScene()
      {
          QStringList fileNames(dialog.selectedFiles());
 
-         // start export in a diff thread
+         /// @note Shall I start the export in diff thread?
+//         QtConcurrent::run(exportScaneToPng,
+//                           graphicsView->getScene(),
+//                           fileNames.first(),
+//                           ui);
+
          QImage img(graphicsView->getScene()->sceneRect().width(),
                     graphicsView->getScene()->sceneRect().height(),
                     QImage::Format_ARGB32_Premultiplied);
          QPainter painter(&img);
          painter.setRenderHint(QPainter::Antialiasing);
+
+         /// @bug scene background is not rendered
          graphicsView->getScene()->render(&painter);
          painter.end();
 
          img.save(fileNames.first());
          ui->statusBar->showMessage(tr("MindMap exported as ") + fileNames.first(),
-                                    5000);
+                                    5000); // millisec
+
      }
 }
 

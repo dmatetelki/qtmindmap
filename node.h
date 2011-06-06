@@ -8,6 +8,7 @@
 
 class GraphWidget;
 
+/// @bug no signal when size change
 class Node : public QGraphicsTextItem
 {
 //    Q_OBJECT
@@ -22,12 +23,14 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-//    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
 
 private:
     QList<Edge *> edgeList;
     GraphWidget *graph;
     bool active;
+    QRectF m_rect;
 
 };
 
