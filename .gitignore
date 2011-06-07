@@ -1,1 +1,7 @@
 *.qm
+ui_*
+*.o
+Makefile
+moc_*
+qrc_*
+qtmindmap

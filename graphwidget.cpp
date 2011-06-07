@@ -24,9 +24,10 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setMinimumSize(400, 400);
 
     Node *node1 = new Node(this);
-    node1->setHtml(QString("me"));
+    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
     m_scene->addItem(node1);
     node1->setPos(-10, -10);
+    node1->setBorder(false);
     m_nodeList.append(node1);
 
     Node *node2 = new Node(this);

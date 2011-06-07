@@ -9,7 +9,8 @@ Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
     m_activeEdge(0),
-    m_number(-1)
+    m_number(-1),
+    m_hasBorder(true)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
@@ -78,9 +79,10 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     painter->setPen(m_isActive ? Qt::red : Qt::blue);
 
-    painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                            boundingRect().bottomRight().toPoint() -
-                            QPoint(1,1)));
+    if (m_hasBorder)
+        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint() -
+                          QPoint(1,1)));
 
     qDebug() << m_number;
 
@@ -131,4 +133,10 @@ void Node::showNumber(const int &number, const bool& show)
 
     m_number = show ? number : -1;
     update();
+}
+
+void Node::setBorder(const bool &hasBorder)
+{
+   m_hasBorder = hasBorder;
+   update();
 }

@@ -18,6 +18,7 @@ public:
 //    QList<Edge *> edges() const;
     void setActive(const bool &active);
     void showNumber(const int &number, const bool& show);
+    void setBorder(const bool &hasBorder);
 
 
 protected:
@@ -35,6 +36,7 @@ private:
     bool m_isActive;
     Edge *m_activeEdge;
     int m_number;
+    bool m_hasBorder;
 };
 
 #endif // NODE_H
