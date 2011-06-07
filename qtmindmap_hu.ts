@@ -12,7 +12,7 @@
     <message>
         <location filename="aboutdialog.ui" line="54"/>
         <source>QtMindMap 0.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">QtMindMap 0.1</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="67"/>
@@ -30,11 +30,82 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ArgumentParser</name>
+    <message>
+        <location filename="argumentparser.cpp" line="24"/>
+        <source>Usage: </source>
+        <translation type="unfinished">Hasznalat: </translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="25"/>
+        <source>Mindmap program in QT</source>
+        <translation type="unfinished">Agyterkep program QT-ben irva</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="27"/>
+        <source>Options:</source>
+        <translation type="unfinished">Opciok:</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="28"/>
+        <source>Prints this help.</source>
+        <translation type="unfinished">Kiirja ezt a szoveget.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="29"/>
+        <source>Starts application in system tray.</source>
+        <translation type="unfinished">A programot blablabla-ban inditja.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="30"/>
+        <source>Hide main window, just show systray icon.</source>
+        <translation type="unfinished">Nem mutatja a foablakot, csak a balbalba-t.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="32"/>
+        <source>Report bugs to: </source>
+        <translation type="unfinished">Ide jelentsd a bugokat: </translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="65"/>
+        <source>Unkown options: </source>
+        <translation type="unfinished">Ismeretlen opciok:</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="84"/>
+        <location filename="argumentparser.cpp" line="90"/>
+        <location filename="argumentparser.cpp" line="96"/>
+        <location filename="argumentparser.cpp" line="102"/>
+        <source>File: </source>
+        <translation type="unfinished">Fajl: </translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="84"/>
+        <source> does not exists.</source>
+        <translation type="unfinished"> nem letezik.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="90"/>
+        <source> is not a file.</source>
+        <translation type="unfinished"> nem egy fajl.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="96"/>
+        <source> is not readable.</source>
+        <translation type="unfinished"> nem olvashato.</translation>
+    </message>
+    <message>
+        <location filename="argumentparser.cpp" line="102"/>
+        <source> is not writeable.</source>
+        <translation type="unfinished"> nem irhato.</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
         <source>QtMindMap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">QtMindMap</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="28"/>
@@ -79,43 +150,38 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="mainwindow.ui" line="104"/>
         <source>E&amp;xport</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E&amp;xportalas</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="107"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.ui" line="110"/>
-        <source>Ctrl+X</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Exportalas</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="71"/>
         <source>Export MindMap to image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Az agyterkep kepkent exportalasa</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="73"/>
         <source>PNG image file (*.png)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PNG kep file (*.png)</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="99"/>
         <source>MindMap exported as </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Az agyterkep exportalva lett, mint</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="93"/>
+        <location filename="main.cpp" line="51"/>
         <source>QtMindMap Error</source>
         <translation type="unfinished">QtMindMap hiba</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="94"/>
+        <location filename="main.cpp" line="52"/>
         <source>I couldn&apos;t detect any system tray on this system.</source>
         <translation type="unfinished">Nem talalhato talca a jelenlegi rendszerben.</translation>
     </message>

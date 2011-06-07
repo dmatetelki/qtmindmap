@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QStyleOption>
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 
 Node::Node(GraphWidget *parent) : m_graph(parent)
 {
@@ -35,8 +36,6 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     switch (change) {
         case ItemPositionHasChanged:
-//        if ()
-
             foreach (Edge *edge, m_edgeList) edge->adjust();
             break;
         default:
@@ -50,6 +49,8 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
+    prevpt = event->pos();
+
     update();
     QGraphicsTextItem::mousePressEvent(event);
 }
@@ -58,10 +59,21 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
+    if (!scene()->sceneRect().contains(sceneBoundingRect()))
+    {
+        setPos(prevpt);
+    }
+
     update();
     QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
+void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    QGraphicsTextItem::mouseMoveEvent(event);
+}
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
 {
@@ -73,4 +85,6 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
                                 boundingRect().bottomRight().toPoint() -
                                 QPoint(1,1)));
+
+        prevpt = pos();
 }

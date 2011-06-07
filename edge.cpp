@@ -59,22 +59,14 @@ void Edge::adjust()
     if (!m_sourceNode || !m_destNode)
         return;
 
-
     prepareGeometryChange();
 
     QLineF line(mapFromItem(m_sourceNode, 0, 0) + m_sourceNode->boundingRect().center(),
                 mapFromItem(m_destNode, 0, 0)  + m_destNode->boundingRect().center());
-    qreal length = line.length();
 
-
-
-    if (length > qreal(20.)) {
-
-        QPointF sourceOffset(firstNotContainedPoint(line,m_sourceNode->sceneBoundingRect()));
-        QPointF destOffset(firstNotContainedPoint(line,m_destNode->sceneBoundingRect(),true));
-
-        m_sourcePoint = sourceOffset;
-        m_destPoint = destOffset;
+    if (line.length() > qreal(20.)) {
+        m_sourcePoint = firstNotContainedPoint(line,m_sourceNode->sceneBoundingRect());
+        m_destPoint = firstNotContainedPoint(line,m_destNode->sceneBoundingRect(),true);
     } else {
         m_sourcePoint = m_destPoint = line.p1();
     }

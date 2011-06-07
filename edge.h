@@ -15,8 +15,8 @@ public:
 
     void adjust();
 
-    enum { Type = UserType + 2 };
-    int type() const { return Type; }
+//    enum { Type = UserType + 2 };
+//    int type() const { return Type; }
 
 protected:
     QRectF boundingRect() const;

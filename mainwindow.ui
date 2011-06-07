@@ -107,7 +107,7 @@
     <string>Export</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+X</string>
+    <string notr="true">Ctrl+X</string>
    </property>
   </action>
  </widget>

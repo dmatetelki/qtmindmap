@@ -16,14 +16,16 @@ SOURCES += main.cpp\
     graphwidget.cpp \
     node.cpp \
     edge.cpp \
-    systemtray.cpp
+    systemtray.cpp \
+    argumentparser.cpp
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
     graphwidget.h \
     node.h \
     edge.h \
-    systemtray.h
+    systemtray.h \
+    argumentparser.h
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui
