@@ -35,44 +35,34 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     qDebug() << __PRETTY_FUNCTION__;
 
     switch (change) {
-        case ItemPositionHasChanged:
-            foreach (Edge *edge, m_edgeList) edge->adjust();
-            break;
-        default:
-            break;
+
+    case ItemPositionChange:
+
+        if (change == ItemPositionChange && scene()) {
+            // value is the new position.
+            QPointF newPos = value.toPointF();
+            QRectF rect (scene()->sceneRect().topLeft(),
+                         scene()->sceneRect().bottomRight()-boundingRect().bottomRight());
+
+            if (!rect.contains(newPos))
+            {
+                // Keep the item inside the scene rect.
+                newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+                newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+                return newPos;
+            }
+        }
+        break;
+
+    case ItemPositionHasChanged:
+
+        foreach (Edge *edge, m_edgeList) edge->adjust();
+        break;
+    default:
+        break;
     };
 
     return QGraphicsItem::itemChange(change, value);
-}
-
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-
-    prevpt = event->pos();
-
-    update();
-    QGraphicsTextItem::mousePressEvent(event);
-}
-
-void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-
-    if (!scene()->sceneRect().contains(sceneBoundingRect()))
-    {
-        setPos(prevpt);
-    }
-
-    update();
-    QGraphicsTextItem::mouseReleaseEvent(event);
-}
-
-void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << __PRETTY_FUNCTION__;
-
-    QGraphicsTextItem::mouseMoveEvent(event);
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
@@ -85,6 +75,4 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
                                 boundingRect().bottomRight().toPoint() -
                                 QPoint(1,1)));
-
-        prevpt = pos();
 }

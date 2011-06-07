@@ -59,6 +59,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
 
     m_activeNode = node1;
     m_activeNode->setFocus();
+
 }
 
 QGraphicsScene *GraphWidget::getScene()
