@@ -89,6 +89,7 @@ void MainWindow::exportScene()
                     m_graphicsView->getScene()->sceneRect().height(),
                     QImage::Format_ARGB32_Premultiplied);
          QPainter painter(&img);
+
          painter.setRenderHint(QPainter::Antialiasing);
 
          /// @bug scene background is not rendered
@@ -110,7 +111,6 @@ void MainWindow::about()
     if (m_aboutDialog == 0) m_aboutDialog = new AboutDialog(this);
     m_aboutDialog->setEnabled(true); // children inherits enabled status
     m_aboutDialog->show();
-//    aboutDialog->layout()->setSizeConstraint( QLayout::SetFixedSize );
 }
 
 void MainWindow::aboutDestroyed()

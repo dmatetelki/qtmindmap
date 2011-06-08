@@ -5,7 +5,11 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 
-Node::Node(GraphWidget *parent) : m_graph(parent)
+Node::Node(GraphWidget *parent) :
+    m_graph(parent),
+    m_isActive(false),
+    m_activeEdge(0),
+    m_number(-1)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
@@ -38,7 +42,8 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     case ItemPositionChange:
 
-        if (change == ItemPositionChange && scene()) {
+        if (change == ItemPositionChange && scene())
+        {
             // value is the new position.
             QPointF newPos = value.toPointF();
             QRectF rect (scene()->sceneRect().topLeft(),
@@ -67,12 +72,63 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
 {
-        qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << __PRETTY_FUNCTION__;
 
-        QGraphicsTextItem::paint(painter, option, w);
+    QGraphicsTextItem::paint(painter, option, w);
 
-        painter->setPen(QPen(Qt::blue));
-        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                                boundingRect().bottomRight().toPoint() -
-                                QPoint(1,1)));
+    painter->setPen(m_isActive ? Qt::red : Qt::blue);
+
+    painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                            boundingRect().bottomRight().toPoint() -
+                            QPoint(1,1)));
+
+    qDebug() << m_number;
+
+    if (m_number != -1)
+    {
+        painter->setPen(Qt::yellow);
+        painter->setBackground(Qt::black);
+        painter->setBackgroundMode(Qt::OpaqueMode);
+        painter->drawText(boundingRect().topLeft()+QPointF(0,11), QString("%1").arg(m_number));
+    }
+}
+
+void Node::setActive(const bool &active)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    m_isActive = active;
+    update();
+}
+
+
+void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    m_graph->setActiveNode(this);
+
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void Node::showNumber(const int &number, const bool& show)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    m_number = show ? number : -1;
+    update();
 }

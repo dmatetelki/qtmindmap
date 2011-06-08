@@ -8,6 +8,7 @@ class Node;
 class Edge : public QGraphicsItem
 {
 public:
+
     Edge(Node *sourceNode, Node *destNode);
 
     Node *sourceNode() const;
@@ -15,20 +16,20 @@ public:
 
     void adjust();
 
-//    enum { Type = UserType + 2 };
-//    int type() const { return Type; }
-
 protected:
+
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
+
     Node *m_sourceNode;
     Node *m_destNode;
 
     QPointF m_sourcePoint;
     QPointF m_destPoint;
     qreal m_arrowSize;
+
 };
 
 #endif
