@@ -10,9 +10,11 @@ class Edge : public QGraphicsItem
 public:
 
     Edge(Node *sourceNode, Node *destNode);
+    ~Edge();
 
     Node *sourceNode() const;
     Node *destNode() const;
+    double getAngle() const;
 
     void adjust();
 
@@ -29,7 +31,7 @@ private:
     QPointF m_sourcePoint;
     QPointF m_destPoint;
     qreal m_arrowSize;
-
+    double m_angle;
 };
 
 #endif

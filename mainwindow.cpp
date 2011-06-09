@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()), this,
             SLOT(about()));
 
-    m_graphicsView = new GraphWidget(m_ui->centralWidget);
+    m_graphicsView = new GraphWidget(this);
     setCentralWidget(m_graphicsView);
 }
 
@@ -119,4 +119,9 @@ void MainWindow::aboutDestroyed()
     qDebug() << m_aboutDialog;
     setEnabled(true);
 
+}
+
+QStatusBar * MainWindow::getStatusBar()
+{
+    return m_ui->statusBar;
 }
