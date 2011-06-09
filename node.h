@@ -13,8 +13,10 @@ class Node : public QGraphicsTextItem
 public:
 
     Node(GraphWidget *graphWidget = 0);
+    ~Node();
 
     void addEdge(Edge *edge);
+    void removeEdge(Edge *edge);
 //    QList<Edge *> edges() const;
     void setActive(const bool &active = true);
     void showNumber(const int &number, const bool& show = true, const bool &numberIsSpecial = false);

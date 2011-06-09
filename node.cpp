@@ -26,6 +26,12 @@ Node::Node(GraphWidget *parent) :
 //    setTextInteractionFlags(Qt::TextEditorInteraction);
 }
 
+Node::~Node()
+{
+    qDebug() << __PRETTY_FUNCTION__;
+    foreach (Edge *edge, m_edgeList) delete edge;
+}
+
 void Node::addEdge(Edge *edge)
 {
     qDebug() << __PRETTY_FUNCTION__;
@@ -34,6 +40,12 @@ void Node::addEdge(Edge *edge)
     edge->adjust();
 }
 
+void Node::removeEdge(Edge *edge)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    m_edgeList.removeAll(edge);
+}
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {

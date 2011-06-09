@@ -8,7 +8,9 @@
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QGraphicsView(parent),
-    m_showingNodeNumbers(false)
+    m_activeNode(0),
+    m_showingNodeNumbers(false),
+    m_followNode(0)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
@@ -124,16 +126,20 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
      switch (event->key()) {
      case Qt::Key_Up:
-         m_activeNode->moveBy(0, -20);
+         if (m_activeNode)
+            m_activeNode->moveBy(0, -20);
          break;
      case Qt::Key_Down:
-         m_activeNode->moveBy(0, 20);
+         if (m_activeNode)
+            m_activeNode->moveBy(0, 20);
          break;
      case Qt::Key_Left:
-         m_activeNode->moveBy(-20, 0);
+         if (m_activeNode)
+            m_activeNode->moveBy(-20, 0);
          break;
      case Qt::Key_Right:
-         m_activeNode->moveBy(20, 0);
+         if (m_activeNode)
+            m_activeNode->moveBy(20, 0);
          break;
      case Qt::Key_Plus:
          scaleView(qreal(1.2));
@@ -147,6 +153,11 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              m_followNumber.clear();
 
          showingAllNodeNumbers(m_showingNodeNumbers);
+         if (m_showingNodeNumbers)
+         {
+             m_nodeList.first()->showNumber(0,true,true);
+             m_followNode = m_nodeList.first();
+         }
          break;
 
      case Qt::Key_Insert:
@@ -182,6 +193,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             if (m_followNumber.isEmpty())
             {
                 showingAllNodeNumbers(true);
+                m_nodeList.first()->showNumber(0,true,true);
+                m_followNode = m_nodeList.first();
             }
             else
             {
@@ -193,14 +206,38 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
      case Qt::Key_Return:
      case Qt::Key_Enter:
-         if (m_followNode)
+         if (m_followNode && m_showingNodeNumbers)
          {
+             qDebug() << m_activeNode;
+             qDebug() << m_followNode;
              showingAllNodeNumbers(false);
-             m_activeNode->setActive(false);
+             if (m_activeNode)
+                m_activeNode->setActive(false);
              m_activeNode = m_followNode;
              m_activeNode->setActive();
              m_showingNodeNumbers = false;
          }
+         break;
+
+     case Qt::Key_Delete:
+
+         if (m_activeNode)
+         {
+             if (m_followNode==m_activeNode)
+                 m_followNode=0;
+
+             m_nodeList.removeAll(m_activeNode);
+             delete m_activeNode;
+             m_activeNode = 0;
+
+             /// @bug
+             if (m_showingNodeNumbers)
+             {
+                 m_showingNodeNumbers = false;
+                 showingAllNodeNumbers(false);
+             }
+         }
+
          break;
 
      default:
@@ -283,7 +320,9 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number, const boo
     {
         qDebug() << "set active";
         showingAllNodeNumbers(false);
-        m_activeNode->setActive(false);
+        if (m_activeNode)
+            m_activeNode->setActive(false);
+
         m_activeNode = m_followNode;
         m_activeNode->setActive();
         m_showingNodeNumbers = false;
