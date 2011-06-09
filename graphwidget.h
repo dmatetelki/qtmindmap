@@ -17,6 +17,7 @@ public:
     GraphWidget(QWidget *parent = 0);
     QGraphicsScene *getScene();
     void setActiveNode(Node *node);
+    void insertNode();
 
 protected:
 
@@ -28,11 +29,16 @@ protected:
 
 private:
 
+    void showingAllNodeNumbers(const bool &show = true);
+    void showingNodeNumbersBeginWithNumber(const int &number, const bool &show = true);
+    bool numberStartsWithNumber(const int &number, const int &prefix);
+
     QList<Node *> m_nodeList;
     Node *m_activeNode;
     QGraphicsScene *m_scene;
     bool m_showingNodeNumbers;
-
+    QString m_followNumber;
+    Node *m_followNode;
 
 };
 

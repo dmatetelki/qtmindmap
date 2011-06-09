@@ -32,7 +32,10 @@ Node *Edge::destNode() const
     return m_destNode;
 }
 
-/// @note This is brute force. Isn't there a simple fv for this?
+/** @note This is brute force. Isn't there a simple fv for this?
+  * The precision is not the best either
+  */
+
 QPointF firstNotContainedPoint(const QLineF &line,
                                const QRectF &rect,
                                bool reverse = false)

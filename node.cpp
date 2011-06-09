@@ -8,8 +8,9 @@
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
-    m_activeEdge(0),
-    m_number(-1)
+//    m_activeEdge(0),
+    m_number(-1),
+    m_numberIsSpecial(false)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
@@ -72,7 +73,13 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+//    qDebug() << __PRETTY_FUNCTION__;
+
+    if (m_number != -1)
+    {
+        painter->setBackground(m_numberIsSpecial ? Qt::green : Qt::yellow);
+        painter->setBackgroundMode(Qt::OpaqueMode);
+    }
 
     QGraphicsTextItem::paint(painter, option, w);
 
@@ -82,12 +89,10 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
                             boundingRect().bottomRight().toPoint() -
                             QPoint(1,1)));
 
-    qDebug() << m_number;
-
     if (m_number != -1)
     {
-        painter->setPen(Qt::yellow);
-        painter->setBackground(Qt::black);
+        painter->setPen(Qt::white);
+        painter->setBackground(Qt::red);
         painter->setBackgroundMode(Qt::OpaqueMode);
         painter->drawText(boundingRect().topLeft()+QPointF(0,11), QString("%1").arg(m_number));
     }
@@ -102,18 +107,28 @@ void Node::setActive(const bool &active)
 }
 
 
+/// @note who shall set active: press or release?
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
+    m_graph->setActiveNode(this);
+
     QGraphicsItem::mousePressEvent(event);
+}
+
+void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    m_graph->insertNode();
+
+    QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
-
-    m_graph->setActiveNode(this);
 
     QGraphicsItem::mouseReleaseEvent(event);
 }
@@ -125,10 +140,11 @@ void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void Node::showNumber(const int &number, const bool& show)
+void Node::showNumber(const int &number, const bool& show, const bool &numberIsSpecial)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+//    qDebug() << __PRETTY_FUNCTION__;
 
     m_number = show ? number : -1;
+    m_numberIsSpecial = numberIsSpecial;
     update();
 }

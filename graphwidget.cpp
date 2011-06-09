@@ -8,7 +8,6 @@
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QGraphicsView(parent),
-    m_activeNode(0),
     m_showingNodeNumbers(false)
 {
     qDebug() << __PRETTY_FUNCTION__;
@@ -59,14 +58,58 @@ GraphWidget::GraphWidget(QWidget *parent) :
     node6->setPos(-10, 100);
     m_nodeList.append(node6);
 
+    Node *node7 = new Node(this);
+    node7->setHtml(QString("node <h1>important</h1> shit"));
+    m_scene->addItem(node7);
+    node7->setPos(-200, 50);
+    m_nodeList.append(node7);
+
+    Node *node8 = new Node(this);
+    node8->setHtml(QString("more than\none lins"));
+    m_scene->addItem(node8);
+    node8->setPos(50, -80);
+    m_nodeList.append(node8);
+
+    Node *node9 = new Node(this);
+    node9->setHtml(QString("iam a <b>bald</b> and <i>italian</i> guy"));
+    m_scene->addItem(node9);
+    node9->setPos(50, 40);
+    m_nodeList.append(node9);
+
+    Node *node10 = new Node(this);
+    node10->setHtml(QString("no joke"));
+    m_scene->addItem(node10);
+    node10->setPos(-160, -10);
+    m_nodeList.append(node10);
+
+    Node *node11 = new Node(this);
+    node11->setHtml(QString("salalal"));
+    m_scene->addItem(node11);
+    node11->setPos(-120, -120);
+    m_nodeList.append(node11);
+
+    Node *node12 = new Node(this);
+    node12->setHtml(QString("lalalala"));
+    m_scene->addItem(node12);
+    node12->setPos(130, -10);
+    m_nodeList.append(node12);;
+
     m_scene->addItem(new Edge(node1, node2));
     m_scene->addItem(new Edge(node1, node3));
     m_scene->addItem(new Edge(node3, node4));
     m_scene->addItem(new Edge(node1, node5));
     m_scene->addItem(new Edge(node5, node6));
+    m_scene->addItem(new Edge(node4, node11));
+    m_scene->addItem(new Edge(node2, node12));
+    m_scene->addItem(new Edge(node3, node10));
+    m_scene->addItem(new Edge(node10, node7));
+    m_scene->addItem(new Edge(node5, node7));
+    m_scene->addItem(new Edge(node2, node8));
+    m_scene->addItem(new Edge(node2, node9));
+
 
     m_activeNode = m_nodeList.first();
-    m_activeNode->setActive(true);
+    m_activeNode->setActive();
 }
 
 QGraphicsScene *GraphWidget::getScene()
@@ -77,7 +120,7 @@ QGraphicsScene *GraphWidget::getScene()
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {
     qDebug() << __PRETTY_FUNCTION__;
-//    qDebug() << event->key();
+    qDebug() << event->key();
 
      switch (event->key()) {
      case Qt::Key_Up:
@@ -99,12 +142,15 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          scaleView(1 / qreal(1.2));
          break;
      case Qt::Key_F:
-        { // need brackets because of local variable
          m_showingNodeNumbers = !m_showingNodeNumbers;
-         int i =0;
-         for (QList<Node *>::const_iterator it = m_nodeList.begin(); it != m_nodeList.end(); it++, i++)
-             dynamic_cast<Node*>(*it)->showNumber(i,m_showingNodeNumbers);
-        }
+         if (m_showingNodeNumbers)
+             m_followNumber.clear();
+
+         showingAllNodeNumbers(m_showingNodeNumbers);
+         break;
+
+     case Qt::Key_Insert:
+         insertNode();
          break;
 
      case Qt::Key_0:
@@ -117,11 +163,44 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
      case Qt::Key_7:
      case Qt::Key_8:
      case Qt::Key_9:
+         if (!m_showingNodeNumbers)
+             break;
 
-         m_activeNode->setActive(false);
-         m_activeNode = m_nodeList[3];
-         m_activeNode->setActive(true);
+         m_followNumber.append(QString::number(event->key()-48));
+         showingAllNodeNumbers(false);
+         showingNodeNumbersBeginWithNumber(m_followNumber.toInt(), true);
 
+         break;
+
+     case Qt::Key_Backspace:
+         if (!m_showingNodeNumbers)
+             break;
+
+         if (!m_followNumber.isEmpty())
+         {
+            m_followNumber.remove(m_followNumber.length()-1,1);
+            if (m_followNumber.isEmpty())
+            {
+                showingAllNodeNumbers(true);
+            }
+            else
+            {
+                showingAllNodeNumbers(false);
+                showingNodeNumbersBeginWithNumber(m_followNumber.toInt(), true);
+            }
+         }
+         break;
+
+     case Qt::Key_Return:
+     case Qt::Key_Enter:
+         if (m_followNode)
+         {
+             showingAllNodeNumbers(false);
+             m_activeNode->setActive(false);
+             m_activeNode = m_followNode;
+             m_activeNode->setActive();
+             m_showingNodeNumbers = false;
+         }
          break;
 
      default:
@@ -158,7 +237,6 @@ void GraphWidget::scaleView(qreal scaleFactor)
     scale(scaleFactor, scaleFactor);
 }
 
-/// @note this == 0? how is it possible?
 void GraphWidget::setActiveNode(Node *node)
 {
     qDebug() << __PRETTY_FUNCTION__;
@@ -167,5 +245,59 @@ void GraphWidget::setActiveNode(Node *node)
         m_activeNode->setActive(false);
 
     m_activeNode = node;
-    m_activeNode->setActive(true);
+    m_activeNode->setActive();
+}
+
+void GraphWidget::insertNode()
+{
+    qDebug() << __PRETTY_FUNCTION__;
+}
+
+void GraphWidget::showingAllNodeNumbers(const bool &show)
+{
+    int i =0;
+    for (QList<Node *>::const_iterator it = m_nodeList.begin(); it != m_nodeList.end(); it++, i++)
+        dynamic_cast<Node*>(*it)->showNumber(i,show);
+}
+
+void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number, const bool &show)
+{
+    int i(0);
+    int hit(0);
+    for (QList<Node *>::const_iterator it = m_nodeList.begin(); it != m_nodeList.end(); it++, i++)
+    {
+        if (i == number)
+        {
+            hit++;
+            dynamic_cast<Node*>(*it)->showNumber(i,show,true);
+            m_followNode = dynamic_cast<Node*>(*it);
+            continue;
+        }
+        if (numberStartsWithNumber(i, number))
+        {
+            hit++;
+            dynamic_cast<Node*>(*it)->showNumber(i,show);
+        }
+    }
+    if (hit==1)
+    {
+        qDebug() << "set active";
+        showingAllNodeNumbers(false);
+        m_activeNode->setActive(false);
+        m_activeNode = m_followNode;
+        m_activeNode->setActive();
+        m_showingNodeNumbers = false;
+    }
+
+    /// @bug handle this case
+//    else if (hit == 0)
+//    {
+
+
+//    }
+}
+
+bool GraphWidget::numberStartsWithNumber(const int &number, const int &prefix)
+{
+    return (QString::number(number)).startsWith(QString::number(prefix));
 }
