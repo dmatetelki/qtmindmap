@@ -31,6 +31,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void linkActivated(const QString &link);
 
 private:
 

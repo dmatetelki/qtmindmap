@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QKeyEvent>
+#include <QMovie>
 
 #include "node.h"
 
@@ -41,7 +42,6 @@ private:
     bool m_showingNodeNumbers;
     QString m_followNumber;
     Node *m_followNode;
-
 };
 
 #endif // GRAPHWIDGET_H

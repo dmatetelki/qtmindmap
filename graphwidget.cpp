@@ -10,7 +10,6 @@
 #include "mainwindow.h"
 
 
-
 GraphWidget::GraphWidget(QWidget *parent) :
     QGraphicsView(parent),
     m_parent(parent),
@@ -38,7 +37,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_nodeList.append(node1);
 
     Node *node2 = new Node(this);
-    node2->setHtml(QString("work"));
+    node2->setHtml(QString("work: <a href=www.hup.hu>hup.hu</a>"));
     m_scene->addItem(node2);
     node2->setPos(60, -10);
     m_nodeList.append(node2);
@@ -56,7 +55,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_nodeList.append(node4);
 
     Node *node5 = new Node(this);
-    node5->setHtml(QString("joy"));
+    node5->setHtml(QString("semmi kulonos"));
     m_scene->addItem(node5);
     node5->setPos(-10, 50);
     m_nodeList.append(node5);
@@ -82,7 +81,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     Node *node9 = new Node(this);
     node9->setHtml(QString("iam a <b>bald</b> and <i>italian</i> guy"));
     m_scene->addItem(node9);
-    node9->setPos(50, 40);
+    node9->setPos(90, 90);
     m_nodeList.append(node9);
 
     Node *node10 = new Node(this);
@@ -100,7 +99,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     Node *node12 = new Node(this);
     node12->setHtml(QString("lalalala"));
     m_scene->addItem(node12);
-    node12->setPos(130, -10);
+    node12->setPos(170, -10);
     m_nodeList.append(node12);;
 
     m_scene->addItem(new Edge(node1, node2));

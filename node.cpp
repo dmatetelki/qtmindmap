@@ -11,13 +11,16 @@ Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
     m_number(-1),
-    m_hasBorder(true)
+    m_hasBorder(true),
     m_numberIsSpecial(false)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
+    setTextInteractionFlags(Qt::TextBrowserInteraction);
+//    setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+ 
     setCacheMode(DeviceCoordinateCache);
 //    setZValue(1);
 
@@ -230,4 +233,11 @@ double Node::calculateBiggestAngle()
     qDebug() << max_prev;
 
     return max_prev + max / 2 ;
+}
+
+void Node::linkActivated(const QString &link)
+{
+	qDebug() << __PRETTY_FUNCTION__;
+
+	qDebug() << link;
 }
