@@ -234,7 +234,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              delete m_activeNode;
              m_activeNode = 0;
 
-             /// @bug
              if (m_showingNodeNumbers)
              {
                  m_showingNodeNumbers = false;
@@ -337,13 +336,11 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number, const boo
         m_activeNode->setActive();
         m_showingNodeNumbers = false;
     }
-
-    /// @bug handle this case
-//    else if (hit == 0)
-//    {
-
-
-//    }
+    else if (hit == 0)
+    {
+        m_showingNodeNumbers = false;
+        showingAllNodeNumbers(false);
+    }
 }
 
 bool GraphWidget::numberStartsWithNumber(const int &number, const int &prefix)
