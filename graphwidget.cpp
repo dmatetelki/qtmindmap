@@ -17,8 +17,6 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_showingNodeNumbers(false),
     m_followNode(0)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_scene->setSceneRect(-400, -400, 800, 800);
@@ -127,9 +125,6 @@ QGraphicsScene *GraphWidget::getScene()
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {
-    qDebug() << __PRETTY_FUNCTION__;
-    qDebug() << event->key();
-
      switch (event->key()) {
      case Qt::Key_Up:
          if (m_activeNode)
@@ -224,8 +219,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
      case Qt::Key_Enter:
          if (m_followNode && m_showingNodeNumbers)
          {
-             qDebug() << m_activeNode;
-             qDebug() << m_followNode;
              showingAllNodeNumbers(false);
              if (m_activeNode)
                 m_activeNode->setActive(false);
@@ -289,7 +282,8 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
 
 void GraphWidget::scaleView(qreal scaleFactor)
 {
-    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    qreal factor = transform().scale(scaleFactor, scaleFactor).
+            mapRect(QRectF(0, 0, 1, 1)).width();
     if (factor < 0.2 || factor > 10) return;
 
     scale(scaleFactor, scaleFactor);
@@ -297,8 +291,6 @@ void GraphWidget::scaleView(qreal scaleFactor)
 
 void GraphWidget::setActiveNode(Node *node)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_activeNode!=0)
         m_activeNode->setActive(false);
 
@@ -308,26 +300,21 @@ void GraphWidget::setActiveNode(Node *node)
 
 void GraphWidget::insertNode()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     double angle(m_activeNode->calculateBiggestAngle());
+
+    qDebug() << "got angle: " << angle;
 
     qreal length(100);
 
-    qDebug() << "angle: ";
-    qDebug() << angle;
-
     QPointF pos(length * cos(angle), length * sin(angle));
-
-
-    qDebug() << pos;
 
     Node *node = new Node(this);
     node->setHtml(QString("new node"));
     m_scene->addItem(node);
-    node->setPos(m_activeNode->pos() +
-//                 m_activeNode->boundingRect().center() +
-                 pos);
+    node->setPos(m_activeNode->sceneBoundingRect().center() +
+                 pos -
+                 node->boundingRect().center()
+                 );
     m_nodeList.append(node);
 
     m_scene->addItem(new Edge(m_activeNode, node));
@@ -336,15 +323,18 @@ void GraphWidget::insertNode()
 void GraphWidget::showingAllNodeNumbers(const bool &show)
 {
     int i =0;
-    for (QList<Node *>::const_iterator it = m_nodeList.begin(); it != m_nodeList.end(); it++, i++)
+    for (QList<Node *>::const_iterator it = m_nodeList.begin();
+         it != m_nodeList.end(); it++, i++)
         dynamic_cast<Node*>(*it)->showNumber(i,show);
 }
 
-void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number, const bool &show)
+void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
+                                                    const bool &show)
 {
     int i(0);
     int hit(0);
-    for (QList<Node *>::const_iterator it = m_nodeList.begin(); it != m_nodeList.end(); it++, i++)
+    for (QList<Node *>::const_iterator it = m_nodeList.begin();
+         it != m_nodeList.end(); it++, i++)
     {
         if (i == number)
         {

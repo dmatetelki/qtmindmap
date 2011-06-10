@@ -14,11 +14,9 @@ Node::Node(GraphWidget *parent) :
     m_hasBorder(true),
     m_numberIsSpecial(false)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
-    setTextInteractionFlags(Qt::TextBrowserInteraction);
+//    setTextInteractionFlags(Qt::TextBrowserInteraction);
 //    setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
  
     setCacheMode(DeviceCoordinateCache);
@@ -33,34 +31,30 @@ Node::Node(GraphWidget *parent) :
 
 Node::~Node()
 {
-    qDebug() << __PRETTY_FUNCTION__;
     foreach (EdgeElement element, m_edgeList) delete element.edge;
 }
 
 void Node::addEdge(Edge *edge, bool startsFromThisNode)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     m_edgeList.push_back(EdgeElement(edge, startsFromThisNode));
     edge->adjust();
 }
 
 void Node::removeEdge(Edge *edge)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
-    for(QList<EdgeElement>::iterator it = m_edgeList.begin(); it != m_edgeList.end(); it++)
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
+    {
         if (it->edge == edge)
         {
             m_edgeList.erase(it);
             return;
         }
+    }
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-//    qDebug() << __PRETTY_FUNCTION__;
-
     switch (change) {
 
     case ItemPositionChange:
@@ -95,8 +89,6 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
 {
-//    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_number != -1)
     {
         painter->setBackground(m_numberIsSpecial ? Qt::green : Qt::yellow);
@@ -117,14 +109,13 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         painter->setPen(Qt::white);
         painter->setBackground(Qt::red);
         painter->setBackgroundMode(Qt::OpaqueMode);
-        painter->drawText(boundingRect().topLeft()+QPointF(0,11), QString("%1").arg(m_number));
+        painter->drawText(boundingRect().topLeft()+QPointF(0,11),
+                          QString("%1").arg(m_number));
     }
 }
 
 void Node::setActive(const bool &active)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     m_isActive = active;
     update();
 }
@@ -133,8 +124,6 @@ void Node::setActive(const bool &active)
 /// @note who shall set active: press or release?
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     m_graph->setActiveNode(this);
 
     QGraphicsItem::mousePressEvent(event);
@@ -142,8 +131,6 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     m_graph->insertNode();
 
     QGraphicsItem::mouseDoubleClickEvent(event);
@@ -151,22 +138,18 @@ void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    qDebug() << __PRETTY_FUNCTION__;
-
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void Node::showNumber(const int &number, const bool& show, const bool &numberIsSpecial)
+void Node::showNumber(const int &number,
+                      const bool& show,
+                      const bool &numberIsSpecial)
 {
-//    qDebug() << __PRETTY_FUNCTION__;
-
     m_number = show ? number : -1;
     m_numberIsSpecial = numberIsSpecial;
     update();
@@ -180,8 +163,6 @@ void Node::setBorder(const bool &hasBorder)
 
 double Node::calculateBiggestAngle()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_edgeList.empty())
         return 1.5 * Pi;
 
@@ -198,30 +179,23 @@ double Node::calculateBiggestAngle()
     }
 
     QList<double> tmp;
-    for(QList<EdgeElement>::iterator it = m_edgeList.begin(); it != m_edgeList.end(); it++)
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
     {
-        if (it->startsFromThisNode)
-        {
-            tmp.push_back(Pi - it->edge->getAngle());
-        }
-        else
-        {
-            tmp.push_back(2 * Pi - it->edge->getAngle());
-        }
+        tmp.push_back(it->startsFromThisNode ?
+                          it->edge->getAngle() :
+                          doubleModulo(Pi + it->edge->getAngle(), 2 * Pi));
     }
 
     qSort(tmp.begin(), tmp.end());
 
-    qDebug() << tmp;
-
-    double prev(tmp.last());
+    double prev(tmp.first());
     double max_prev(tmp.last());
-    double max(0);
+    double max(2 * Pi - tmp.last() + tmp.first());
 
-    /// @bug algorith is baaad
-    for(QList<double>::const_iterator it = tmp.begin(); it!=tmp.end(); it++)
+    for(QList<double>::const_iterator it = ++tmp.begin(); it!=tmp.end(); it++)
     {
-        if (abs(*it - prev) > abs(max) )
+        if (*it - prev > max )
         {
             max = *it - prev;
             max_prev = prev;
@@ -229,10 +203,7 @@ double Node::calculateBiggestAngle()
         prev = *it;
     }
 
-    qDebug() << max;
-    qDebug() << max_prev;
-
-    return max_prev + max / 2 ;
+    return 2 * Pi - doubleModulo(max_prev + max / 2, 2 * Pi);
 }
 
 void Node::linkActivated(const QString &link)
@@ -240,4 +211,9 @@ void Node::linkActivated(const QString &link)
 	qDebug() << __PRETTY_FUNCTION__;
 
 	qDebug() << link;
+}
+
+double Node::doubleModulo(const double &devided, const double &devisor)
+{
+    return devided - static_cast<double>(devisor * static_cast<int>(devided / devisor));
 }

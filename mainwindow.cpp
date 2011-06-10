@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui(new Ui::MainWindow),
     m_aboutDialog(0)
 {
-    qDebug() << __PRETTY_FUNCTION__;
     m_ui->setupUi(this);
     connect(m_ui->actionNew, SIGNAL(activated()), this, SLOT(klakk()));
     connect(m_ui->actionOpen, SIGNAL(activated()), this, SLOT(klakk()));
@@ -53,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    qDebug() << __PRETTY_FUNCTION__;
     delete m_ui;
     if (m_aboutDialog) delete m_aboutDialog;
 }
@@ -65,8 +63,6 @@ void MainWindow::klakk()
 
 void MainWindow::exportScene()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     QFileDialog dialog(this,
                        tr("Export MindMap to image"),
                        "/home/cs0rbagomba",
@@ -105,8 +101,6 @@ void MainWindow::exportScene()
 
 void MainWindow::about()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     setDisabled(true);
     if (m_aboutDialog == 0) m_aboutDialog = new AboutDialog(this);
     m_aboutDialog->setEnabled(true); // children inherits enabled status
@@ -115,10 +109,7 @@ void MainWindow::about()
 
 void MainWindow::aboutDestroyed()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-    qDebug() << m_aboutDialog;
     setEnabled(true);
-
 }
 
 QStatusBar * MainWindow::getStatusBar()

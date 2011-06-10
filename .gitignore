@@ -5,3 +5,4 @@ Makefile
 moc_*
 qrc_*
 qtmindmap
+*.pro.user

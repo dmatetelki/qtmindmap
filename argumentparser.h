@@ -12,7 +12,7 @@ public:
     explicit ArgumentParser(QObject *parent = 0);
 
     /***
-      * @param successful is true is the program needs to stop but its not an error.
+      * @param successful is true if the program needs to stop but its not error
       * @return true is program can continue
       */
     bool parseCmdLineArgs(bool &successful);

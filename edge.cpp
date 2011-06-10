@@ -11,7 +11,8 @@ static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
 
 Edge::Edge(Node *sourceNode, Node *destNode)
-    : m_arrowSize(7)
+    : m_arrowSize(7),
+      m_angle(-1)
 {
     setAcceptedMouseButtons(0);
     m_sourceNode = sourceNode;
@@ -102,6 +103,10 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
     QLineF line(m_sourcePoint, m_destPoint);
 
+    m_angle = ::acos(line.dx() / line.length());
+    if (line.dy() >= 0)
+        m_angle = TwoPi - m_angle;
+
     if (sourceNode()->collidesWithItem(destNode()))
         return;
 
@@ -113,12 +118,6 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         return;
 
     // Draw the arrows
-    m_angle = ::acos(line.dx() / line.length());
-    if (line.dy() >= 0)
-        m_angle = TwoPi - m_angle;
-
-    qDebug() << m_angle;
-
     QPointF destArrowP1 = m_destPoint + QPointF(sin(m_angle - Pi / 3) * m_arrowSize,
                                               cos(m_angle - Pi / 3) * m_arrowSize);
     QPointF destArrowP2 = m_destPoint + QPointF(sin(m_angle - Pi + Pi / 3) * m_arrowSize,
@@ -130,9 +129,5 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
 double Edge::getAngle() const
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
-    qDebug() << m_angle;
-
     return m_angle;
 }

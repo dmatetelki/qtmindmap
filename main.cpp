@@ -2,7 +2,6 @@
 #include <iostream> // cout
 
 #include <QtGui>
-#include <QDebug>
 #include <QRegExp>
 #include <QTranslator>
 
@@ -25,7 +24,9 @@ int main(int argc, char *argv[])
     QTranslator translator;
     if (!translator.load(QString("qtmindmap_") + locale))
     {
-        std::cerr << "No translation file for locale: " << locale.toStdString() << std::endl;
+        std::cerr << "No translation file for locale: "
+                  << locale.toStdString()
+                  << std::endl;
     }
     else
     {
