@@ -32,6 +32,7 @@ private:
     void showingAllNodeNumbers(const bool &show = true);
     void showingNodeNumbersBeginWithNumber(const int &number, const bool &show = true);
     bool numberStartsWithNumber(const int &number, const int &prefix);
+    qreal calculateBiggestAngle(Node *node);
 
     QList<Node *> m_nodeList;
     QWidget *m_parent;

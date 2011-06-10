@@ -15,12 +15,12 @@ public:
     Node(GraphWidget *graphWidget = 0);
     ~Node();
 
-    void addEdge(Edge *edge);
+    void addEdge(Edge *edge, bool startsFromThisNode);
     void removeEdge(Edge *edge);
 //    QList<Edge *> edges() const;
     void setActive(const bool &active = true);
     void showNumber(const int &number, const bool& show = true, const bool &numberIsSpecial = false);
-
+    double calculateBiggestAngle();
 
 protected:
 
@@ -33,7 +33,22 @@ protected:
 
 private:
 
-    QList<Edge *> m_edgeList;
+    struct EdgeElement
+    {
+        Edge *edge;
+        bool startsFromThisNode;
+        EdgeElement(Edge *e, bool s) : edge(e), startsFromThisNode(s) {}
+    };
+//    class EdgeList : public QList<EdgeElement>
+//    {
+//    public:
+//        int compareItems(QCollection::Item a, QCollection::Item b)
+//        {
+//            return (EdgeElement)a.edge = (EdgeElement)b.edge;
+//        }
+//    };
+
+    QList<EdgeElement> m_edgeList;
     GraphWidget *m_graph;
     bool m_isActive;
 //    Edge *m_activeEdge;

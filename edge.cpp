@@ -16,8 +16,8 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     setAcceptedMouseButtons(0);
     m_sourceNode = sourceNode;
     m_destNode = destNode;
-    m_sourceNode->addEdge(this);
-    m_destNode->addEdge(this);
+    m_sourceNode->addEdge(this,true);
+    m_destNode->addEdge(this,false);
     adjust();
 //    setZValue(1);
 }
@@ -113,15 +113,26 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         return;
 
     // Draw the arrows
-    double angle = ::acos(line.dx() / line.length());
+    m_angle = ::acos(line.dx() / line.length());
     if (line.dy() >= 0)
-        angle = TwoPi - angle;
+        m_angle = TwoPi - m_angle;
 
-    QPointF destArrowP1 = m_destPoint + QPointF(sin(angle - Pi / 3) * m_arrowSize,
-                                              cos(angle - Pi / 3) * m_arrowSize);
-    QPointF destArrowP2 = m_destPoint + QPointF(sin(angle - Pi + Pi / 3) * m_arrowSize,
-                                              cos(angle - Pi + Pi / 3) * m_arrowSize);
+    qDebug() << m_angle;
+
+    QPointF destArrowP1 = m_destPoint + QPointF(sin(m_angle - Pi / 3) * m_arrowSize,
+                                              cos(m_angle - Pi / 3) * m_arrowSize);
+    QPointF destArrowP2 = m_destPoint + QPointF(sin(m_angle - Pi + Pi / 3) * m_arrowSize,
+                                              cos(m_angle - Pi + Pi / 3) * m_arrowSize);
 
     painter->setBrush(Qt::black);
     painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
+}
+
+double Edge::getAngle() const
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    qDebug() << m_angle;
+
+    return m_angle;
 }

@@ -9,6 +9,8 @@
 #include "math.h"
 #include "mainwindow.h"
 
+
+
 GraphWidget::GraphWidget(QWidget *parent) :
     QGraphicsView(parent),
     m_parent(parent),
@@ -165,7 +167,17 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          break;
 
      case Qt::Key_Insert:
-         insertNode();
+         if (!m_activeNode)
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("No active node."),
+                         5000); // millisec
+
+         }
+         else
+         {
+            insertNode();
+         }
          break;
 
      case Qt::Key_0:
@@ -243,7 +255,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          else
          {
              dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("No active node "),
+                         tr("No active node."),
                          5000); // millisec
          }
 
@@ -297,6 +309,28 @@ void GraphWidget::setActiveNode(Node *node)
 void GraphWidget::insertNode()
 {
     qDebug() << __PRETTY_FUNCTION__;
+
+    double angle(m_activeNode->calculateBiggestAngle());
+
+    qreal length(100);
+
+    qDebug() << "angle: ";
+    qDebug() << angle;
+
+    QPointF pos(length * cos(angle), length * sin(angle));
+
+
+    qDebug() << pos;
+
+    Node *node = new Node(this);
+    node->setHtml(QString("new node"));
+    m_scene->addItem(node);
+    node->setPos(m_activeNode->pos() +
+//                 m_activeNode->boundingRect().center() +
+                 pos);
+    m_nodeList.append(node);
+
+    m_scene->addItem(new Edge(m_activeNode, node));
 }
 
 void GraphWidget::showingAllNodeNumbers(const bool &show)
@@ -327,7 +361,6 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number, const boo
     }
     if (hit==1)
     {
-        qDebug() << "set active";
         showingAllNodeNumbers(false);
         if (m_activeNode)
             m_activeNode->setActive(false);

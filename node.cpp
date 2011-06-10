@@ -5,10 +5,11 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 
+static const double Pi = 3.14159265358979323846264338327950288419717;
+
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
-//    m_activeEdge(0),
     m_number(-1),
     m_numberIsSpecial(false)
 {
@@ -29,14 +30,14 @@ Node::Node(GraphWidget *parent) :
 Node::~Node()
 {
     qDebug() << __PRETTY_FUNCTION__;
-    foreach (Edge *edge, m_edgeList) delete edge;
+    foreach (EdgeElement element, m_edgeList) delete element.edge;
 }
 
-void Node::addEdge(Edge *edge)
+void Node::addEdge(Edge *edge, bool startsFromThisNode)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    m_edgeList << edge;
+    m_edgeList.push_back(EdgeElement(edge, startsFromThisNode));
     edge->adjust();
 }
 
@@ -44,12 +45,17 @@ void Node::removeEdge(Edge *edge)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    m_edgeList.removeAll(edge);
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin(); it != m_edgeList.end(); it++)
+        if (it->edge == edge)
+        {
+            m_edgeList.erase(it);
+            return;
+        }
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+//    qDebug() << __PRETTY_FUNCTION__;
 
     switch (change) {
 
@@ -74,7 +80,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     case ItemPositionHasChanged:
 
-        foreach (Edge *edge, m_edgeList) edge->adjust();
+        foreach (EdgeElement element, m_edgeList) element.edge->adjust();
         break;
     default:
         break;
@@ -147,7 +153,7 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+//    qDebug() << __PRETTY_FUNCTION__;
 
     QGraphicsItem::mouseMoveEvent(event);
 }
@@ -159,4 +165,61 @@ void Node::showNumber(const int &number, const bool& show, const bool &numberIsS
     m_number = show ? number : -1;
     m_numberIsSpecial = numberIsSpecial;
     update();
+}
+
+double Node::calculateBiggestAngle()
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    if (m_edgeList.empty())
+        return 1.5 * Pi;
+
+    if (m_edgeList.size()==1)
+    {
+        if (m_edgeList.first().startsFromThisNode)
+        {
+            return Pi - m_edgeList.first().edge->getAngle();
+        }
+        else
+        {
+            return 2 * Pi - m_edgeList.first().edge->getAngle();
+        }
+    }
+
+    QList<double> tmp;
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin(); it != m_edgeList.end(); it++)
+    {
+        if (it->startsFromThisNode)
+        {
+            tmp.push_back(Pi - it->edge->getAngle());
+        }
+        else
+        {
+            tmp.push_back(2 * Pi - it->edge->getAngle());
+        }
+    }
+
+    qSort(tmp.begin(), tmp.end());
+
+    qDebug() << tmp;
+
+    double prev(tmp.last());
+    double max_prev(tmp.last());
+    double max(0);
+
+    /// @bug algorith is baaad
+    for(QList<double>::const_iterator it = tmp.begin(); it!=tmp.end(); it++)
+    {
+        if (abs(*it - prev) > abs(max) )
+        {
+            max = *it - prev;
+            max_prev = prev;
+        }
+        prev = *it;
+    }
+
+    qDebug() << max;
+    qDebug() << max_prev;
+
+    return max_prev + max / 2 ;
 }
