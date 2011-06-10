@@ -18,6 +18,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+     QStatusBar * getStatusBar();
 
 public slots:
     void klakk();

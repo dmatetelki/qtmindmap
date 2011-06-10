@@ -34,6 +34,7 @@ private:
     bool numberStartsWithNumber(const int &number, const int &prefix);
 
     QList<Node *> m_nodeList;
+    QWidget *m_parent;
     Node *m_activeNode;
     QGraphicsScene *m_scene;
     bool m_showingNodeNumbers;

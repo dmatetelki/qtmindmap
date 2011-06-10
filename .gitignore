@@ -1,1 +1,4 @@
 *.qm
+*.o
+Makefile
+ui_*

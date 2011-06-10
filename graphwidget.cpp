@@ -1,13 +1,17 @@
 #include "graphwidget.h"
-#include <QDebug>
-#include "node.h"
 
-//#include <QGraphicsTextItem>
+#include <QDebug>
+#include <QStatusBar>
+
+
+#include "node.h"
 #include "edge.h"
 #include "math.h"
+#include "mainwindow.h"
 
 GraphWidget::GraphWidget(QWidget *parent) :
     QGraphicsView(parent),
+    m_parent(parent),
     m_activeNode(0),
     m_showingNodeNumbers(false),
     m_followNode(0)
@@ -236,6 +240,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                  m_showingNodeNumbers = false;
                  showingAllNodeNumbers(false);
              }
+         }
+         else
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("No active node "),
+                         5000); // millisec
          }
 
          break;
