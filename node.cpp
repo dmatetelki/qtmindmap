@@ -15,6 +15,7 @@ Node::Node(GraphWidget *parent) :
     m_numberIsSpecial(false)
 {
     setFlag(ItemIsMovable);
+
     setFlag(ItemSendsGeometryChanges);
 //    setTextInteractionFlags(Qt::TextBrowserInteraction);
 //    setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
@@ -27,6 +28,8 @@ Node::Node(GraphWidget *parent) :
 
     // shall I set it after some spec key?
 //    setTextInteractionFlags(Qt::TextEditorInteraction);
+
+        setOpenExternalLinks(true);
 }
 
 Node::~Node()
@@ -129,12 +132,12 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
 }
 
-void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    m_graph->insertNode();
+//void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+//{
+//    m_graph->insertNode();
 
-    QGraphicsItem::mouseDoubleClickEvent(event);
-}
+//    QGraphicsItem::mouseDoubleClickEvent(event);
+//}
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -216,4 +219,21 @@ void Node::linkActivated(const QString &link)
 double Node::doubleModulo(const double &devided, const double &devisor)
 {
     return devided - static_cast<double>(devisor * static_cast<int>(devided / devisor));
+}
+
+void Node::setEditable(const bool &editable)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    //setFocusPolicy(Qt::StrongFocus);
+    setTextInteractionFlags(editable ? Qt::TextEditable : Qt::NoTextInteraction);
+}
+
+void Node::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    QGraphicsTextItem::keyPressEvent(event);
+
+    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
 }

@@ -15,7 +15,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_parent(parent),
     m_activeNode(0),
     m_showingNodeNumbers(false),
-    m_followNode(0)
+    m_followNode(0),
+    m_editingNode(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -83,7 +84,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_nodeList.append(node9);
 
     Node *node10 = new Node(this);
-    node10->setHtml(QString("no joke"));
+    node10->setHtml(QString("no joke <br> anotehr line"));
     m_scene->addItem(node10);
     node10->setPos(-160, -10);
     m_nodeList.append(node10);
@@ -99,6 +100,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_scene->addItem(node12);
     node12->setPos(170, -10);
     m_nodeList.append(node12);;
+    node12->setTextInteractionFlags(Qt::TextEditable);
 
     m_scene->addItem(new Edge(node1, node2));
     m_scene->addItem(new Edge(node1, node3));
@@ -123,31 +125,65 @@ QGraphicsScene *GraphWidget::getScene()
     return m_scene;
 }
 
+
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {
+    qDebug() << __PRETTY_FUNCTION__;
+    qDebug() << event->key();
+
+    // esc leaves node editing mode
+    if (event->key() == Qt::Key_Escape && m_editingNode)
+    {
+        m_activeNode->setEditable(false);
+        m_editingNode = false;
+        return;
+    }
+    // in node editing mode forward every key (except esc) to node
+    else if (m_editingNode)
+    {
+        m_activeNode->keyPressEvent(event);
+        return;
+    }
+
+
      switch (event->key()) {
+
+     // move sceve, or move node if modkey is ctrl
      case Qt::Key_Up:
-         if (m_activeNode)
-            m_activeNode->moveBy(0, -20);
-         break;
      case Qt::Key_Down:
-         if (m_activeNode)
-            m_activeNode->moveBy(0, 20);
-         break;
      case Qt::Key_Left:
-         if (m_activeNode)
-            m_activeNode->moveBy(-20, 0);
-         break;
      case Qt::Key_Right:
-         if (m_activeNode)
-            m_activeNode->moveBy(20, 0);
+         if (event->modifiers() ==  Qt::ControlModifier)
+         {
+            if (m_activeNode)
+            {
+                if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
+                else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
+                else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
+                else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
+            }
+            else
+            {
+                dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                            tr("No active node."),
+                            5000); // millisec
+            }
+         }
+         else
+         {
+             QGraphicsView::keyPressEvent(event);
+         }
          break;
+
+     // zoom in/out
      case Qt::Key_Plus:
          scaleView(qreal(1.2));
          break;
      case Qt::Key_Minus:
          scaleView(1 / qreal(1.2));
          break;
+
+     // follow: select a node vimperator style
      case Qt::Key_F:
          m_showingNodeNumbers = !m_showingNodeNumbers;
          if (m_showingNodeNumbers)
@@ -161,6 +197,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          }
          break;
 
+     // insert new node
      case Qt::Key_Insert:
          if (!m_activeNode)
          {
@@ -175,6 +212,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          }
          break;
 
+     // used in node selection mode, to select node with numbers/enter
      case Qt::Key_0:
      case Qt::Key_1:
      case Qt::Key_2:
@@ -194,6 +232,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
          break;
 
+     // delete one letter back in node selection
      case Qt::Key_Backspace:
          if (!m_showingNodeNumbers)
              break;
@@ -215,19 +254,41 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          }
          break;
 
+     // in node selection select node if nudenum = enterednum
      case Qt::Key_Return:
      case Qt::Key_Enter:
+
          if (m_followNode && m_showingNodeNumbers)
          {
              showingAllNodeNumbers(false);
              if (m_activeNode)
-                m_activeNode->setActive(false);
+                 m_activeNode->setActive(false);
              m_activeNode = m_followNode;
              m_activeNode->setActive();
              m_showingNodeNumbers = false;
          }
+
          break;
 
+     // edit node
+     case Qt::Key_F2:
+
+         if (m_activeNode)
+         {
+             m_editingNode = true;
+             m_activeNode->setEditable();
+             m_scene->setFocusItem(m_activeNode);
+         }
+         else
+         {
+           dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                     tr("No active node."),
+                     5000); // millisec
+         }
+
+         break;
+
+     // delete node
      case Qt::Key_Delete:
 
          if (m_activeNode)
@@ -258,6 +319,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          QGraphicsView::keyPressEvent(event);
      }
  }
+
+
 
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
@@ -302,7 +365,6 @@ void GraphWidget::insertNode()
 {
     double angle(m_activeNode->calculateBiggestAngle());
 
-    qDebug() << "got angle: " << angle;
 
     qreal length(100);
 

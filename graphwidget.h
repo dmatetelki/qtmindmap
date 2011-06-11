@@ -43,6 +43,7 @@ private:
     bool m_showingNodeNumbers;
     QString m_followNumber;
     Node *m_followNode;
+    bool m_editingNode;
 };
 
 #endif // GRAPHWIDGET_H

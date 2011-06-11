@@ -22,6 +22,10 @@ public:
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
     double calculateBiggestAngle();
+    void setEditable(const bool &editable = true);
+
+    // changing visibility from prot to pub
+    void keyPressEvent(QKeyEvent *event);
 
 protected:
 
@@ -29,7 +33,7 @@ protected:
                QWidget *widget);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    //void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void linkActivated(const QString &link);
