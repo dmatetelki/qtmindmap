@@ -132,12 +132,11 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
 }
 
-//void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-//{
-//    m_graph->insertNode();
-
-//    QGraphicsItem::mouseDoubleClickEvent(event);
-//}
+void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    m_graph->setActiveNodeEditable();
+}
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {

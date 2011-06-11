@@ -19,6 +19,7 @@ public:
     QGraphicsScene *getScene();
     void setActiveNode(Node *node);
     void insertNode();
+    void setActiveNodeEditable();
 
 protected:
 

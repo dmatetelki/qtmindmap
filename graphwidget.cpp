@@ -275,9 +275,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
          if (m_activeNode)
          {
-             m_editingNode = true;
-             m_activeNode->setEditable();
-             m_scene->setFocusItem(m_activeNode);
+             setActiveNodeEditable();
          }
          else
          {
@@ -380,6 +378,9 @@ void GraphWidget::insertNode()
     m_nodeList.append(node);
 
     m_scene->addItem(new Edge(m_activeNode, node));
+
+    setActiveNode(node);
+    setActiveNodeEditable();
 }
 
 void GraphWidget::showingAllNodeNumbers(const bool &show)
@@ -431,4 +432,11 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
 bool GraphWidget::numberStartsWithNumber(const int &number, const int &prefix)
 {
     return (QString::number(number)).startsWith(QString::number(prefix));
+}
+
+void GraphWidget::setActiveNodeEditable()
+{
+    m_editingNode = true;
+    m_activeNode->setEditable();
+    m_scene->setFocusItem(m_activeNode);
 }
