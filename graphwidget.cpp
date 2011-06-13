@@ -16,7 +16,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_activeNode(0),
     m_showingNodeNumbers(false),
     m_hintNode(0),
-    m_editingNode(false)
+    m_editingNode(false),
+    m_edgeAdding(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -145,7 +146,26 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     }
 
 
-     switch (event->key()) {
+     switch (event->key())
+     {
+
+     case Qt::Key_Escape:
+
+     if (m_edgeAdding)
+     {
+         m_edgeAdding = false;
+         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                     tr("Edge adding cancelled"),
+                     5000); // millisec
+     }
+     else if(m_showingNodeNumbers)
+     {
+        m_hintNumber.clear();
+        showingAllNodeNumbers(false);
+        m_showingNodeNumbers = false;
+     }
+
+     break;
 
      // move sceve, or move node if modkey is ctrl
      case Qt::Key_Up:
@@ -260,10 +280,18 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          if (m_hintNode && m_showingNodeNumbers)
          {
              showingAllNodeNumbers(false);
-             if (m_activeNode)
-                 m_activeNode->setActive(false);
-             m_activeNode = m_hintNode;
-             m_activeNode->setActive();
+
+             if (m_edgeAdding)
+             {
+                m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+             }
+             else // selecting
+             {
+                 if (m_activeNode)
+                     m_activeNode->setActive(false);
+                 m_activeNode = m_hintNode;
+                 m_activeNode->setActive();
+             }
              m_showingNodeNumbers = false;
          }
 
@@ -318,6 +346,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
                          tr("Add node: select destination node"),
                          5000); // millisec
+
+             m_edgeAdding = true;
          }
          else
          {
@@ -430,11 +460,20 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
     if (hit==1)
     {
         showingAllNodeNumbers(false);
-        if (m_activeNode)
-            m_activeNode->setActive(false);
 
-        m_activeNode = m_hintNode;
-        m_activeNode->setActive();
+        if (m_edgeAdding)
+        {
+            m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+            m_edgeAdding = false;
+        }
+        else // selecting
+        {
+            if (m_activeNode)
+                m_activeNode->setActive(false);
+
+            m_activeNode = m_hintNode;
+            m_activeNode->setActive();
+        }
         m_showingNodeNumbers = false;
     }
     else if (hit == 0)
@@ -454,4 +493,17 @@ void GraphWidget::setActiveNodeEditable()
     m_editingNode = true;
     m_activeNode->setEditable();
     m_scene->setFocusItem(m_activeNode);
+}
+
+void GraphWidget::nodeSelected(Node *node)
+{
+    if (m_edgeAdding)
+    {
+       m_scene->addItem(new Edge(m_activeNode, node));
+       m_edgeAdding = false;
+    }
+    else
+    {
+       setActiveNode(node);
+    }
 }

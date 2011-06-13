@@ -20,6 +20,7 @@ public:
     void setActiveNode(Node *node);
     void insertNode();
     void setActiveNodeEditable();
+    void nodeSelected(Node *node);
 
 protected:
 
@@ -45,6 +46,7 @@ private:
     QString m_hintNumber;
     Node *m_hintNode;
     bool m_editingNode;
+    bool m_edgeAdding;
 };
 
 #endif // GRAPHWIDGET_H

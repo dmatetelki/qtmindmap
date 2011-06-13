@@ -125,7 +125,7 @@ void Node::setActive(const bool &active)
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_graph->setActiveNode(this);
+    m_graph->nodeSelected(this);
 
     QGraphicsItem::mousePressEvent(event);
 }
