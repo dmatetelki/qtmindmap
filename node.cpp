@@ -226,6 +226,10 @@ void Node::setEditable(const bool &editable)
                 editable ?
                     Qt::TextEditable :
                     Qt::NoTextInteraction);
+
+    QTextCursor c = textCursor();
+    c.setPosition(c.document()->toPlainText().length());
+    setTextCursor(c);
 }
 
 void Node::keyPressEvent(QKeyEvent *event)

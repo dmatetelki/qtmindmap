@@ -384,7 +384,7 @@ void GraphWidget::insertNode()
     QPointF pos(length * cos(angle), length * sin(angle));
 
     Node *node = new Node(this);
-    node->setHtml(QString("new node"));
+    node->setHtml(QString(""));
     m_scene->addItem(node);
     node->setPos(m_activeNode->sceneBoundingRect().center() +
                  pos -
