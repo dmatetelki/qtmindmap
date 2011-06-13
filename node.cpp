@@ -48,6 +48,22 @@ void Node::removeEdge(Edge *edge)
     }
 }
 
+void Node::removeEdge(Node *otherEnd)
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
+    {
+        if ((it->edge->sourceNode() == otherEnd && it->edge->destNode() == this)
+         || (it->edge->sourceNode() == this && it->edge->destNode() == otherEnd))
+        {
+            delete it->edge;
+            return;
+        }
+    }
+}
+
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {

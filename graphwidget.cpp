@@ -17,7 +17,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_showingNodeNumbers(false),
     m_hintNode(0),
     m_editingNode(false),
-    m_edgeAdding(false)
+    m_edgeAdding(false),
+    m_edgeDeleting(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -158,6 +159,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                      tr("Edge adding cancelled"),
                      5000); // millisec
      }
+     else if (m_edgeDeleting)
+     {
+         m_edgeDeleting = false;
+         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                     tr("Edge deleting cancelled"),
+                     5000); // millisec
+     }
      else if(m_showingNodeNumbers)
      {
         m_hintNumber.clear();
@@ -284,6 +292,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              if (m_edgeAdding)
              {
                 m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+                m_edgeAdding = false;
+             }
+             if (m_edgeDeleting)
+             {
+                m_activeNode->removeEdge(m_hintNode);
+                m_edgeDeleting = false;
              }
              else // selecting
              {
@@ -344,10 +358,30 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          if (m_activeNode)
          {
              dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("Add node: select destination node"),
+                         tr("Add edge: select destination node"),
                          5000); // millisec
 
              m_edgeAdding = true;
+         }
+         else
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("No active node."),
+                         5000); // millisec
+         }
+
+         break;
+
+         // add edge to active node
+         case Qt::Key_D:
+
+         if (m_activeNode)
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("Delete edge: select destination node"),
+                         5000); // millisec
+
+             m_edgeDeleting = true;
          }
          else
          {
@@ -466,6 +500,11 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
             m_scene->addItem(new Edge(m_activeNode, m_hintNode));
             m_edgeAdding = false;
         }
+        if (m_edgeDeleting)
+        {
+            m_activeNode->removeEdge(m_hintNode);
+            m_edgeDeleting = false;
+        }
         else // selecting
         {
             if (m_activeNode)
@@ -501,6 +540,11 @@ void GraphWidget::nodeSelected(Node *node)
     {
        m_scene->addItem(new Edge(m_activeNode, node));
        m_edgeAdding = false;
+    }
+    if (m_edgeDeleting)
+    {
+       m_activeNode->removeEdge(node);
+       m_edgeDeleting = false;
     }
     else
     {

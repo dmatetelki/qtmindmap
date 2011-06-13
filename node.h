@@ -18,6 +18,7 @@ public:
 
     void addEdge(Edge *edge, bool startsFromThisNode);
     void removeEdge(Edge *edge);
+    void removeEdge(Node *otherEnd);
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
     void showNumber(const int &number, const bool& show = true,

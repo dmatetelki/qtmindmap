@@ -47,6 +47,7 @@ private:
     Node *m_hintNode;
     bool m_editingNode;
     bool m_edgeAdding;
+    bool m_edgeDeleting;
 };
 
 #endif // GRAPHWIDGET_H
