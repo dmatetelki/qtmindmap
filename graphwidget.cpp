@@ -129,7 +129,6 @@ QGraphicsScene *GraphWidget::getScene()
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {
     qDebug() << __PRETTY_FUNCTION__;
-    qDebug() << event->key();
 
     // esc leaves node editing mode
     if (event->key() == Qt::Key_Escape && m_editingNode)

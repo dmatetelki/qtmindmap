@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include <QGraphicsTextItem>
+#include <QTextCursor>
 
 #include "edge.h"
 #include "graphwidget.h"
@@ -55,6 +56,8 @@ private:
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;
+//    QTextCursor m_cursor;
+
 };
 
 #endif // NODE_H

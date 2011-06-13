@@ -4,6 +4,7 @@
 #include <QStyleOption>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
+#include <QTextDocument>
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 
@@ -15,21 +16,12 @@ Node::Node(GraphWidget *parent) :
     m_numberIsSpecial(false)
 {
     setFlag(ItemIsMovable);
-
     setFlag(ItemSendsGeometryChanges);
-//    setTextInteractionFlags(Qt::TextBrowserInteraction);
-//    setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
- 
+
     setCacheMode(DeviceCoordinateCache);
-//    setZValue(1);
 
     // shall I use system colors?
     setDefaultTextColor(QColor(0,0,0));
-
-    // shall I set it after some spec key?
-//    setTextInteractionFlags(Qt::TextEditorInteraction);
-
-        setOpenExternalLinks(true);
 }
 
 Node::~Node()
@@ -124,7 +116,6 @@ void Node::setActive(const bool &active)
 }
 
 
-/// @note who shall set active: press or release?
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     m_graph->setActiveNode(this);
@@ -224,15 +215,57 @@ void Node::setEditable(const bool &editable)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    //setFocusPolicy(Qt::StrongFocus);
-    setTextInteractionFlags(editable ? Qt::TextEditable : Qt::NoTextInteraction);
+    setTextInteractionFlags(
+                editable ?
+                    Qt::TextEditable :
+                    Qt::NoTextInteraction);
 }
 
 void Node::keyPressEvent(QKeyEvent *event)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    QGraphicsTextItem::keyPressEvent(event);
+    // cursor movements
+    switch (event->key()) {
 
-    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+    case Qt::Key_Left:
+    {
+        QTextCursor c = textCursor();
+        c.movePosition(
+                    event->modifiers() == Qt::ControlModifier ?
+                    QTextCursor::PreviousWord :
+                    QTextCursor::PreviousCharacter);
+        setTextCursor(c);
+        break;
+    }
+    case Qt::Key_Right:
+    {
+        QTextCursor c = textCursor();
+        c.movePosition(
+                    event->modifiers() == Qt::ControlModifier ?
+                    QTextCursor::NextWord :
+                    QTextCursor::NextCharacter);
+        setTextCursor(c);
+        break;
+    }
+    case Qt::Key_Up:
+    {
+        QTextCursor c = textCursor();
+        c.movePosition(QTextCursor::Up);
+        setTextCursor(c);
+        break;
+    }
+    case Qt::Key_Down:
+    {
+        QTextCursor c = textCursor();
+        c.movePosition(QTextCursor::Down);
+        setTextCursor(c);
+        break;
+    }
+
+    default:
+
+        QGraphicsTextItem::keyPressEvent(event);
+        foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+    }
 }
