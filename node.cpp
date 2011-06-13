@@ -84,10 +84,15 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
 {
+    // draw background in hint mode
+    /// @bug is there a 1pixel wide yellow line at the bottom of borderless item?
     if (m_number != -1)
     {
-        painter->setBackground(m_numberIsSpecial ? Qt::green : Qt::yellow);
-        painter->setBackgroundMode(Qt::OpaqueMode);
+        painter->setPen(Qt::transparent);
+        painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
+        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint()));
+        painter->setBrush(Qt::NoBrush);
     }
 
     QGraphicsTextItem::paint(painter, option, w);
@@ -108,6 +113,8 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
                           QString("%1").arg(m_number));
     }
 }
+
+
 
 void Node::setActive(const bool &active)
 {
@@ -223,14 +230,12 @@ void Node::setEditable(const bool &editable)
 
 void Node::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     // cursor movements
     switch (event->key()) {
 
     case Qt::Key_Left:
     {
-        QTextCursor c = textCursor();
+        QTextCursor c = textCursor(); // textcursor() return just a copy
         c.movePosition(
                     event->modifiers() == Qt::ControlModifier ?
                     QTextCursor::PreviousWord :
@@ -265,7 +270,10 @@ void Node::keyPressEvent(QKeyEvent *event)
 
     default:
 
+        // not cursor movement
         QGraphicsTextItem::keyPressEvent(event);
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
     }
+
+    ///@note leaving editing mode is done with esc, handled by graphwidget
 }

@@ -42,8 +42,8 @@ private:
     Node *m_activeNode;
     QGraphicsScene *m_scene;
     bool m_showingNodeNumbers;
-    QString m_followNumber;
-    Node *m_followNode;
+    QString m_hintNumber;
+    Node *m_hintNode;
     bool m_editingNode;
 };
 

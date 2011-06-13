@@ -15,7 +15,7 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_parent(parent),
     m_activeNode(0),
     m_showingNodeNumbers(false),
-    m_followNode(0),
+    m_hintNode(0),
     m_editingNode(false)
 {
     m_scene = new QGraphicsScene(this);
@@ -182,17 +182,17 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          scaleView(1 / qreal(1.2));
          break;
 
-     // follow: select a node vimperator style
+     // Hint mode: select a node vimperator style
      case Qt::Key_F:
          m_showingNodeNumbers = !m_showingNodeNumbers;
          if (m_showingNodeNumbers)
-             m_followNumber.clear();
+             m_hintNumber.clear();
 
          showingAllNodeNumbers(m_showingNodeNumbers);
          if (m_showingNodeNumbers)
          {
              m_nodeList.first()->showNumber(0,true,true);
-             m_followNode = m_nodeList.first();
+             m_hintNode = m_nodeList.first();
          }
          break;
 
@@ -225,9 +225,9 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          if (!m_showingNodeNumbers)
              break;
 
-         m_followNumber.append(QString::number(event->key()-48));
+         m_hintNumber.append(QString::number(event->key()-48));
          showingAllNodeNumbers(false);
-         showingNodeNumbersBeginWithNumber(m_followNumber.toInt(), true);
+         showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
 
          break;
 
@@ -236,19 +236,19 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          if (!m_showingNodeNumbers)
              break;
 
-         if (!m_followNumber.isEmpty())
+         if (!m_hintNumber.isEmpty())
          {
-            m_followNumber.remove(m_followNumber.length()-1,1);
-            if (m_followNumber.isEmpty())
+            m_hintNumber.remove(m_hintNumber.length()-1,1);
+            if (m_hintNumber.isEmpty())
             {
                 showingAllNodeNumbers(true);
                 m_nodeList.first()->showNumber(0,true,true);
-                m_followNode = m_nodeList.first();
+                m_hintNode = m_nodeList.first();
             }
             else
             {
                 showingAllNodeNumbers(false);
-                showingNodeNumbersBeginWithNumber(m_followNumber.toInt(), true);
+                showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
             }
          }
          break;
@@ -257,12 +257,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
      case Qt::Key_Return:
      case Qt::Key_Enter:
 
-         if (m_followNode && m_showingNodeNumbers)
+         if (m_hintNode && m_showingNodeNumbers)
          {
              showingAllNodeNumbers(false);
              if (m_activeNode)
                  m_activeNode->setActive(false);
-             m_activeNode = m_followNode;
+             m_activeNode = m_hintNode;
              m_activeNode->setActive();
              m_showingNodeNumbers = false;
          }
@@ -290,8 +290,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
          if (m_activeNode)
          {
-             if (m_followNode==m_activeNode)
-                 m_followNode=0;
+             if (m_hintNode==m_activeNode)
+                 m_hintNode=0;
 
              m_nodeList.removeAll(m_activeNode);
              delete m_activeNode;
@@ -302,6 +302,22 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                  m_showingNodeNumbers = false;
                  showingAllNodeNumbers(false);
              }
+         }
+         else
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("No active node."),
+                         5000); // millisec
+         }
+
+         // add edge to active node
+         case Qt::Key_A:
+
+         if (m_activeNode)
+         {
+             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                         tr("Add node: select destination node"),
+                         5000); // millisec
          }
          else
          {
@@ -402,7 +418,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
         {
             hit++;
             dynamic_cast<Node*>(*it)->showNumber(i,show,true);
-            m_followNode = dynamic_cast<Node*>(*it);
+            m_hintNode = dynamic_cast<Node*>(*it);
             continue;
         }
         if (numberStartsWithNumber(i, number))
@@ -417,7 +433,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
         if (m_activeNode)
             m_activeNode->setActive(false);
 
-        m_activeNode = m_followNode;
+        m_activeNode = m_hintNode;
         m_activeNode->setActive();
         m_showingNodeNumbers = false;
     }
