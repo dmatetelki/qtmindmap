@@ -38,6 +38,7 @@ private:
     bool numberStartsWithNumber(const int &number, const int &prefix);
     qreal calculateBiggestAngle(Node *node);
     void addEdge(const Node *source, const Node *destination);
+    void removeEdge(Node* source, Node *destination);
 
     QList<Node *> m_nodeList;
     QWidget *m_parent;

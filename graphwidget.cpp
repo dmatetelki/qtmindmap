@@ -295,7 +295,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              }
              if (m_edgeDeleting)
              {
-                m_activeNode->removeEdge(m_hintNode);
+                removeEdge(m_activeNode, m_hintNode);
                 m_edgeDeleting = false;
              }
              else // selecting
@@ -511,7 +511,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
         }
         if (m_edgeDeleting)
         {
-            m_activeNode->removeEdge(m_hintNode);
+            removeEdge(m_activeNode, m_hintNode);
             m_edgeDeleting = false;
         }
         else // selecting
@@ -552,7 +552,7 @@ void GraphWidget::nodeSelected(Node *node)
     }
     if (m_edgeDeleting)
     {
-       m_activeNode->removeEdge(node);
+       removeEdge(m_activeNode, node);
        m_edgeDeleting = false;
     }
     else
@@ -572,5 +572,19 @@ void GraphWidget::addEdge(const Node *source, const Node *destination)
     else
     {
         m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+    }
+}
+
+void GraphWidget::removeEdge(Node *source, Node *destination)
+{
+    if (!source->isConnected(destination))
+    {
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("There no edge between these two nodes."),
+                    5000); // millisec
+    }
+    else
+    {
+        source->removeEdge(destination);
     }
 }
