@@ -331,6 +331,14 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
          if (m_activeNode)
          {
+             if (m_nodeList.size()==1)
+             {
+                 dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                             tr("Last node cannot be deleted."),
+                             5000); // millisec
+                  break;
+             }
+
              if (m_hintNode==m_activeNode)
                  m_hintNode=0;
 
