@@ -129,7 +129,7 @@ QGraphicsScene *GraphWidget::getScene()
 
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
- {
+{
     // esc leaves node editing mode
     if (event->key() == Qt::Key_Escape && m_editingNode)
     {
@@ -144,256 +144,193 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         return;
     }
 
+    // certain actions need an active node
+    if (!m_activeNode &&
+            (event->key() == Qt::Key_Insert ||      // add new node
+             event->key() == Qt::Key_F2 ||          // edit node
+             event->key() == Qt::Key_Delete ||      // delete node
+             event->key() == Qt::Key_A ||           // add edge
+             event->key() == Qt::Key_D ||           // remove edge
+             ( event->modifiers() ==  Qt::ControlModifier &&  // moving node
+               ( event->key() == Qt::Key_Up ||
+                 event->key() == Qt::Key_Down ||
+                 event->key() == Qt::Key_Left ||
+                 event->key() == Qt::Key_Right))))
+    {
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("No active node."),
+                    3000); // millisec
+        return;
+    }
 
-     switch (event->key())
-     {
+    switch (event->key())
+    {
 
-     case Qt::Key_Escape:
+    case Qt::Key_Escape:
 
-     if (m_edgeAdding)
-     {
-         m_edgeAdding = false;
-         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                     tr("Edge adding cancelled"),
-                     5000); // millisec
-     }
-     else if (m_edgeDeleting)
-     {
-         m_edgeDeleting = false;
-         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                     tr("Edge deleting cancelled"),
-                     5000); // millisec
-     }
-     else if(m_showingNodeNumbers)
-     {
+        if (m_edgeAdding)
+        {
+            m_edgeAdding = false;
+            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                        tr("Edge adding cancelled"),
+                        3000); // millisec
+        }
+        else if (m_edgeDeleting)
+        {
+            m_edgeDeleting = false;
+            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                        tr("Edge deleting cancelled"),
+                        3000); // millisec
+        }
+        else if(m_showingNodeNumbers)
+        {
+            m_hintNumber.clear();
+            showingAllNodeNumbers(false);
+            m_showingNodeNumbers = false;
+        }
+
+        break;
+
+        // move sceve, or move node if modkey is ctrl
+    case Qt::Key_Up:
+    case Qt::Key_Down:
+    case Qt::Key_Left:
+    case Qt::Key_Right:
+        if (event->modifiers() ==  Qt::ControlModifier)
+        {
+            if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
+            else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
+            else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
+            else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
+        }
+        else // move scene
+        {
+            QGraphicsView::keyPressEvent(event);
+        }
+        break;
+
+        // zoom in/out
+    case Qt::Key_Plus:
+        scaleView(qreal(1.2));
+        break;
+    case Qt::Key_Minus:
+        scaleView(1 / qreal(1.2));
+        break;
+
+        // Hint mode: select a node vimperator style
+    case Qt::Key_F:
+        m_showingNodeNumbers = !m_showingNodeNumbers;
+        if (!m_showingNodeNumbers)
+        {
+            showingAllNodeNumbers(false);
+            break;
+        }
+
         m_hintNumber.clear();
+        showNodeNumbers();
+        break;
+
+        // insert new node
+    case Qt::Key_Insert:
+        insertNode();
+        if (m_showingNodeNumbers)
+            showNodeNumbers();
+
+        break;
+
+        // used in node selection mode, to select node with numbers/enter
+    case Qt::Key_0:
+    case Qt::Key_1:
+    case Qt::Key_2:
+    case Qt::Key_3:
+    case Qt::Key_4:
+    case Qt::Key_5:
+    case Qt::Key_6:
+    case Qt::Key_7:
+    case Qt::Key_8:
+    case Qt::Key_9:
+        if (!m_showingNodeNumbers)
+            break;
+
+        m_hintNumber.append(QString::number(event->key()-48));
         showingAllNodeNumbers(false);
-        m_showingNodeNumbers = false;
-     }
+        showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
 
-     break;
+        break;
 
-     // move sceve, or move node if modkey is ctrl
-     case Qt::Key_Up:
-     case Qt::Key_Down:
-     case Qt::Key_Left:
-     case Qt::Key_Right:
-         if (event->modifiers() ==  Qt::ControlModifier)
-         {
-            if (m_activeNode)
-            {
-                if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
-                else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
-                else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
-                else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
-            }
-            else
-            {
-                dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                            tr("No active node."),
-                            5000); // millisec
-            }
-         }
-         else
-         {
-             QGraphicsView::keyPressEvent(event);
-         }
-         break;
+        // delete one letter back in node selection
+    case Qt::Key_Backspace:
+        if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
+            break;
 
-     // zoom in/out
-     case Qt::Key_Plus:
-         scaleView(qreal(1.2));
-         break;
-     case Qt::Key_Minus:
-         scaleView(1 / qreal(1.2));
-         break;
+        m_hintNumber.remove(m_hintNumber.length()-1,1);
+        showNodeNumbers();
+        break;
 
-     // Hint mode: select a node vimperator style
-     case Qt::Key_F:
-         m_showingNodeNumbers = !m_showingNodeNumbers;
-         if (m_showingNodeNumbers)
-             m_hintNumber.clear();
+        // in node selection select node if nudenum = enterednum
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
 
-         showingAllNodeNumbers(m_showingNodeNumbers);
-         if (m_showingNodeNumbers)
-         {
-             m_nodeList.first()->showNumber(0,true,true);
-             m_hintNode = m_nodeList.first();
-         }
-         break;
+        if (m_hintNode && m_showingNodeNumbers)
+            nodeSelected(m_hintNode);
 
-     // insert new node
-     case Qt::Key_Insert:
-         if (!m_activeNode)
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("No active node."),
-                         5000); // millisec
-         }
-         else
-         {
-            insertNode();
-         }
-         break;
+        break;
 
-     // used in node selection mode, to select node with numbers/enter
-     case Qt::Key_0:
-     case Qt::Key_1:
-     case Qt::Key_2:
-     case Qt::Key_3:
-     case Qt::Key_4:
-     case Qt::Key_5:
-     case Qt::Key_6:
-     case Qt::Key_7:
-     case Qt::Key_8:
-     case Qt::Key_9:
-         if (!m_showingNodeNumbers)
-             break;
+        // edit node
+    case Qt::Key_F2:
+        setActiveNodeEditable();
+        break;
 
-         m_hintNumber.append(QString::number(event->key()-48));
-         showingAllNodeNumbers(false);
-         showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
+        // delete node
+    case Qt::Key_Delete:
 
-         break;
+        if (m_nodeList.size()==1)
+        {
+            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                        tr("Last node cannot be deleted."),
+                        3000); // millisec
+            break;
+        }
 
-     // delete one letter back in node selection
-     case Qt::Key_Backspace:
-         if (!m_showingNodeNumbers)
-             break;
+        if (m_hintNode==m_activeNode)
+            m_hintNode=0;
 
-         if (!m_hintNumber.isEmpty())
-         {
-            m_hintNumber.remove(m_hintNumber.length()-1,1);
-            if (m_hintNumber.isEmpty())
-            {
-                showingAllNodeNumbers(true);
-                m_nodeList.first()->showNumber(0,true,true);
-                m_hintNode = m_nodeList.first();
-            }
-            else
-            {
-                showingAllNodeNumbers(false);
-                showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
-            }
-         }
-         break;
+        m_nodeList.removeAll(m_activeNode);
+        delete m_activeNode;
+        m_activeNode = 0;
 
-     // in node selection select node if nudenum = enterednum
-     case Qt::Key_Return:
-     case Qt::Key_Enter:
+        if (m_showingNodeNumbers)
+            showNodeNumbers();
 
-         if (m_hintNode && m_showingNodeNumbers)
-         {
-             nodeSelected(m_hintNode);
-         }
+        break;
 
-         break;
+        // add edge to active node
+    case Qt::Key_A:
 
-     // edit node
-     case Qt::Key_F2:
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("Add edge: select destination node"),
+                    4000); // millisec
 
-         if (m_activeNode)
-         {
-             setActiveNodeEditable();
-         }
-         else
-         {
-           dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                     tr("No active node."),
-                     5000); // millisec
-         }
+        m_edgeAdding = true;
 
-         break;
+        break;
 
-     // delete node
-     case Qt::Key_Delete:
+        // add edge to active node
+    case Qt::Key_D:
 
-         if (m_activeNode)
-         {
-             if (m_nodeList.size()==1)
-             {
-                 dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                             tr("Last node cannot be deleted."),
-                             5000); // millisec
-                  break;
-             }
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("Delete edge: select other end-node"),
+                    4000); // millisec
 
-             if (m_hintNode==m_activeNode)
-                 m_hintNode=0;
+        m_edgeDeleting = true;
 
-             m_nodeList.removeAll(m_activeNode);
-             delete m_activeNode;
-             m_activeNode = 0;
 
-             if (m_showingNodeNumbers)
-             {
-                 showingAllNodeNumbers(false);
-                 if (m_hintNumber.isEmpty())
-                 {
-                    showingAllNodeNumbers(true);
-                    m_nodeList.first()->showNumber(0,true,true);
-                    m_hintNode = m_nodeList.first();
-                 }
-                 else
-                 {
-                    showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(),
-                                                      true);
-                 }
-             }
-         }
-         else
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("No active node."),
-                         5000); // millisec
-         }
+        break;
 
-         break;
-
-         // add edge to active node
-         case Qt::Key_A:
-
-         if (m_activeNode)
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("Add edge: select destination node"),
-                         5000); // millisec
-
-             m_edgeAdding = true;
-         }
-         else
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("No active node."),
-                         5000); // millisec
-         }
-
-         break;
-
-         // add edge to active node
-         case Qt::Key_D:
-
-         if (m_activeNode)
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("Delete edge: select other end-node"),
-                         5000); // millisec
-
-             m_edgeDeleting = true;
-         }
-         else
-         {
-             dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("No active node."),
-                         5000); // millisec
-         }
-
-         break;
-
-     default:
-         QGraphicsView::keyPressEvent(event);
-     }
- }
+    default:
+        QGraphicsView::keyPressEvent(event);
+    }
+}
 
 
 
@@ -403,19 +340,19 @@ void GraphWidget::wheelEvent(QWheelEvent *event)
 }
 
 void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
- {
-     Q_UNUSED(rect);
+{
+    Q_UNUSED(rect);
 
-     QRectF sceneRect = this->sceneRect();
+    QRectF sceneRect = this->sceneRect();
 
-     // Fill
-     QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
-     gradient.setColorAt(0, Qt::white);
-     gradient.setColorAt(1, Qt::lightGray);
-     painter->fillRect(rect.intersect(sceneRect), gradient);
-     painter->setBrush(Qt::NoBrush);
-     painter->drawRect(sceneRect);
- }
+    // Fill
+    QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
+    gradient.setColorAt(0, Qt::white);
+    gradient.setColorAt(1, Qt::lightGray);
+    painter->fillRect(rect.intersect(sceneRect), gradient);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(sceneRect);
+}
 
 
 void GraphWidget::scaleView(qreal scaleFactor)
@@ -517,21 +454,21 @@ void GraphWidget::nodeSelected(Node *node)
 
     if (m_edgeAdding)
     {
-       addEdge(m_activeNode, node);
-       m_edgeAdding = false;
+        addEdge(m_activeNode, node);
+        m_edgeAdding = false;
     }
-    if (m_edgeDeleting)
+    else if (m_edgeDeleting)
     {
-       removeEdge(m_activeNode, node);
-       m_edgeDeleting = false;
+        removeEdge(m_activeNode, node);
+        m_edgeDeleting = false;
     }
     else
     {
-       setActiveNode(node);
+        setActiveNode(node);
     }
 }
 
-void GraphWidget::addEdge(const Node *source, const Node *destination)
+void GraphWidget::addEdge(Node *source, Node *destination)
 {
     if (source->isConnected(destination))
     {
@@ -541,7 +478,7 @@ void GraphWidget::addEdge(const Node *source, const Node *destination)
     }
     else
     {
-        m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+        m_scene->addItem(new Edge(source, destination));
     }
 }
 
@@ -551,10 +488,25 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
     {
         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
                     tr("There no edge between these two nodes."),
-                    5000); // millisec
+                    3000); // millisec
     }
     else
     {
         source->removeEdge(destination);
     }
+}
+
+void GraphWidget::showNodeNumbers()
+{
+    if (m_hintNumber.isEmpty())
+     {
+         showingAllNodeNumbers(true);
+         m_nodeList.first()->showNumber(0,true,true);
+         m_hintNode = m_nodeList.first();
+     }
+     else
+     {
+         showingAllNodeNumbers(false);
+         showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
+     }
 }
