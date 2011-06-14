@@ -231,7 +231,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
                          tr("No active node."),
                          5000); // millisec
-
          }
          else
          {
@@ -291,7 +290,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
              if (m_edgeAdding)
              {
-                m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+                addEdge(m_activeNode, m_hintNode);
                 m_edgeAdding = false;
              }
              if (m_edgeDeleting)
@@ -341,8 +340,18 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
              if (m_showingNodeNumbers)
              {
-                 m_showingNodeNumbers = false;
                  showingAllNodeNumbers(false);
+                 if (m_hintNumber.isEmpty())
+                 {
+                    showingAllNodeNumbers(true);
+                    m_nodeList.first()->showNumber(0,true,true);
+                    m_hintNode = m_nodeList.first();
+                 }
+                 else
+                 {
+                    showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(),
+                                                      true);
+                 }
              }
          }
          else
@@ -351,6 +360,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                          tr("No active node."),
                          5000); // millisec
          }
+
+         break;
 
          // add edge to active node
          case Qt::Key_A:
@@ -378,7 +389,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
          if (m_activeNode)
          {
              dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                         tr("Delete edge: select destination node"),
+                         tr("Delete edge: select other end-node"),
                          5000); // millisec
 
              m_edgeDeleting = true;
@@ -442,7 +453,6 @@ void GraphWidget::insertNode()
 {
     double angle(m_activeNode->calculateBiggestAngle());
 
-
     qreal length(100);
 
     QPointF pos(length * cos(angle), length * sin(angle));
@@ -452,11 +462,10 @@ void GraphWidget::insertNode()
     m_scene->addItem(node);
     node->setPos(m_activeNode->sceneBoundingRect().center() +
                  pos -
-                 node->boundingRect().center()
-                 );
+                 node->boundingRect().center());
     m_nodeList.append(node);
 
-    m_scene->addItem(new Edge(m_activeNode, node));
+    addEdge(m_activeNode, node);
 
     setActiveNode(node);
     setActiveNodeEditable();
@@ -497,7 +506,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
 
         if (m_edgeAdding)
         {
-            m_scene->addItem(new Edge(m_activeNode, m_hintNode));
+            addEdge(m_activeNode, m_hintNode);
             m_edgeAdding = false;
         }
         if (m_edgeDeleting)
@@ -538,7 +547,7 @@ void GraphWidget::nodeSelected(Node *node)
 {
     if (m_edgeAdding)
     {
-       m_scene->addItem(new Edge(m_activeNode, node));
+       addEdge(m_activeNode, node);
        m_edgeAdding = false;
     }
     if (m_edgeDeleting)
@@ -549,5 +558,19 @@ void GraphWidget::nodeSelected(Node *node)
     else
     {
        setActiveNode(node);
+    }
+}
+
+void GraphWidget::addEdge(const Node *source, const Node *destination)
+{
+    if (source->isConnected(destination))
+    {
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("There is already an edge between these two nodes."),
+                    5000); // millisec
+    }
+    else
+    {
+        m_scene->addItem(new Edge(m_activeNode, m_hintNode));
     }
 }

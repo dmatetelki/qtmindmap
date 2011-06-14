@@ -7,6 +7,8 @@
 #include <QTextDocument>
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
+static double TwoPi = 2.0 * Pi;
+static double OneAndHalfPi = 1.5 * Pi;
 
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
@@ -20,12 +22,12 @@ Node::Node(GraphWidget *parent) :
 
     setCacheMode(DeviceCoordinateCache);
 
-    // shall I use system colors?
     setDefaultTextColor(QColor(0,0,0));
 }
 
 Node::~Node()
 {
+    // dtor of Edge will call removeEdgeFromList on booth nodes.
     foreach (EdgeElement element, m_edgeList) delete element.edge;
 }
 
@@ -35,7 +37,7 @@ void Node::addEdge(Edge *edge, bool startsFromThisNode)
     edge->adjust();
 }
 
-void Node::removeEdge(Edge *edge)
+void Node::removeEdgeFromList(Edge *edge)
 {
     for(QList<EdgeElement>::iterator it = m_edgeList.begin();
         it != m_edgeList.end(); it++)
@@ -50,13 +52,13 @@ void Node::removeEdge(Edge *edge)
 
 void Node::removeEdge(Node *otherEnd)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     for(QList<EdgeElement>::iterator it = m_edgeList.begin();
         it != m_edgeList.end(); it++)
     {
-        if ((it->edge->sourceNode() == otherEnd && it->edge->destNode() == this)
-         || (it->edge->sourceNode() == this && it->edge->destNode() == otherEnd))
+        if ((it->edge->sourceNode() == otherEnd &&
+             it->edge->destNode() == this)
+         || (it->edge->sourceNode() == this &&
+             it->edge->destNode() == otherEnd))
         {
             delete it->edge;
             return;
@@ -74,8 +76,11 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
         {
             // value is the new position.
             QPointF newPos = value.toPointF();
+
+            // the fence is reduced with the size of the node
             QRectF rect (scene()->sceneRect().topLeft(),
-                         scene()->sceneRect().bottomRight()-boundingRect().bottomRight());
+                         scene()->sceneRect().bottomRight() -
+                            boundingRect().bottomRight());
 
             if (!rect.contains(newPos))
             {
@@ -98,28 +103,36 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     return QGraphicsItem::itemChange(change, value);
 }
 
-void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
+void Node::paint(QPainter *painter,
+                 const QStyleOptionGraphicsItem *option,
+                 QWidget *w)
 {
-    // draw background in hint mode
-    /// @bug is there a 1pixel wide yellow line at the bottom of borderless item?
+    // draw background in hint mode. num == -1 : not in hint mode
+    // if m_numberIsSpecial (can be selected with enter) bg is green, not yellow
     if (m_number != -1)
     {
         painter->setPen(Qt::transparent);
         painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
+
+        /// @bug is there a 1pixel wide yellow line at the
+        /// bottom of borderless items?
         painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
                           boundingRect().bottomRight().toPoint()));
         painter->setBrush(Qt::NoBrush);
     }
 
+    // the text itself
     QGraphicsTextItem::paint(painter, option, w);
 
-    painter->setPen(m_isActive ? Qt::red : Qt::blue);
-
     if (m_hasBorder)
+    {
+        painter->setPen(m_isActive ? Qt::red : Qt::blue);
         painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
                           boundingRect().bottomRight().toPoint() -
                           QPoint(1,1)));
+    }
 
+    // print num to topleft corner in hint mode.
     if (m_number != -1)
     {
         painter->setPen(Qt::white);
@@ -135,6 +148,7 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 void Node::setActive(const bool &active)
 {
     m_isActive = active;
+    // update border color
     update();
 }
 
@@ -180,7 +194,7 @@ void Node::setBorder(const bool &hasBorder)
 double Node::calculateBiggestAngle()
 {
     if (m_edgeList.empty())
-        return 1.5 * Pi;
+        return OneAndHalfPi;
 
     if (m_edgeList.size()==1)
     {
@@ -190,7 +204,7 @@ double Node::calculateBiggestAngle()
         }
         else
         {
-            return 2 * Pi - m_edgeList.first().edge->getAngle();
+            return TwoPi - m_edgeList.first().edge->getAngle();
         }
     }
 
@@ -200,14 +214,13 @@ double Node::calculateBiggestAngle()
     {
         tmp.push_back(it->startsFromThisNode ?
                           it->edge->getAngle() :
-                          doubleModulo(Pi + it->edge->getAngle(), 2 * Pi));
+                          doubleModulo(Pi + it->edge->getAngle(), TwoPi));
     }
-
     qSort(tmp.begin(), tmp.end());
 
     double prev(tmp.first());
     double max_prev(tmp.last());
-    double max(2 * Pi - tmp.last() + tmp.first());
+    double max(TwoPi - tmp.last() + tmp.first());
 
     for(QList<double>::const_iterator it = ++tmp.begin(); it!=tmp.end(); it++)
     {
@@ -219,7 +232,7 @@ double Node::calculateBiggestAngle()
         prev = *it;
     }
 
-    return 2 * Pi - doubleModulo(max_prev + max / 2, 2 * Pi);
+    return TwoPi - doubleModulo(max_prev + max / 2, TwoPi);
 }
 
 void Node::linkActivated(const QString &link)
@@ -231,13 +244,12 @@ void Node::linkActivated(const QString &link)
 
 double Node::doubleModulo(const double &devided, const double &devisor)
 {
-    return devided - static_cast<double>(devisor * static_cast<int>(devided / devisor));
+    return devided - static_cast<double>(devisor * static_cast<int>(devided
+                                                                    / devisor));
 }
 
 void Node::setEditable(const bool &editable)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     setTextInteractionFlags(
                 editable ?
                     Qt::TextEditable :
@@ -290,10 +302,20 @@ void Node::keyPressEvent(QKeyEvent *event)
 
     default:
 
-        // not cursor movement
+        // not cursor movement: editing
         QGraphicsTextItem::keyPressEvent(event);
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
     }
 
     ///@note leaving editing mode is done with esc, handled by graphwidget
+}
+
+bool Node::isConnected(const Node *node) const
+{
+    foreach (EdgeElement element, m_edgeList)
+        if (element.edge->sourceNode() == node ||
+                element.edge->destNode() == node)
+            return true;
+
+    return false;
 }

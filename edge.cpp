@@ -20,13 +20,12 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     m_sourceNode->addEdge(this,true);
     m_destNode->addEdge(this,false);
     adjust();
-//    setZValue(1);
 }
 
 Edge::~Edge()
 {
-    m_sourceNode->removeEdge(this);
-    m_destNode->removeEdge(this);
+    m_sourceNode->removeEdgeFromList(this);
+    m_destNode->removeEdgeFromList(this);
 }
 
 Node *Edge::sourceNode() const
@@ -42,7 +41,6 @@ Node *Edge::destNode() const
 /** @note This is brute force. Isn't there a simple fv for this?
   * The precision is not the best either
   */
-
 QPointF firstNotContainedPoint(const QLineF &line,
                                const QRectF &rect,
                                bool reverse = false)
@@ -71,12 +69,16 @@ void Edge::adjust()
 
     prepareGeometryChange();
 
-    QLineF line(mapFromItem(m_sourceNode, 0, 0) + m_sourceNode->boundingRect().center(),
-                mapFromItem(m_destNode, 0, 0)  + m_destNode->boundingRect().center());
+    QLineF line(mapFromItem(m_sourceNode, 0, 0) +
+                m_sourceNode->boundingRect().center(),
+                mapFromItem(m_destNode, 0, 0)  +
+                m_destNode->boundingRect().center());
 
     if (line.length() > qreal(20.)) {
-        m_sourcePoint = firstNotContainedPoint(line,m_sourceNode->sceneBoundingRect());
-        m_destPoint = firstNotContainedPoint(line,m_destNode->sceneBoundingRect(),true);
+        m_sourcePoint = firstNotContainedPoint(line,
+                            m_sourceNode->sceneBoundingRect());
+        m_destPoint = firstNotContainedPoint(line,
+                            m_destNode->sceneBoundingRect(),true);
     } else {
         m_sourcePoint = m_destPoint = line.p1();
     }
@@ -92,12 +94,15 @@ QRectF Edge::boundingRect() const
 
     return QRectF(m_sourcePoint, QSizeF(m_destPoint.x() - m_sourcePoint.x(),
                                       m_destPoint.y() - m_sourcePoint.y()))
-        .normalized()
-        .adjusted(-extra, -extra, extra, extra);
+        .normalized().adjusted(-extra, -extra, extra, extra);
 }
 
-void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void Edge::paint(QPainter *painter,
+                 const QStyleOptionGraphicsItem *,
+                 QWidget *w)
 {
+    Q_UNUSED(w);
+
     if (!m_sourceNode || !m_destNode)
         return;
 
@@ -111,20 +116,28 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         return;
 
     // Draw the line itself
-    painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setPen(QPen(Qt::black,
+                         1,
+                         Qt::SolidLine,
+                         Qt::RoundCap,
+                         Qt::RoundJoin));
     painter->drawLine(line);
 
     if (line.length() < m_arrowSize)
         return;
 
     // Draw the arrows
-    QPointF destArrowP1 = m_destPoint + QPointF(sin(m_angle - Pi / 3) * m_arrowSize,
-                                              cos(m_angle - Pi / 3) * m_arrowSize);
-    QPointF destArrowP2 = m_destPoint + QPointF(sin(m_angle - Pi + Pi / 3) * m_arrowSize,
-                                              cos(m_angle - Pi + Pi / 3) * m_arrowSize);
+    QPointF destArrowP1 = m_destPoint +
+                             QPointF(sin(m_angle - Pi / 3) * m_arrowSize,
+                                     cos(m_angle - Pi / 3) * m_arrowSize);
+    QPointF destArrowP2 = m_destPoint +
+                             QPointF(sin(m_angle - Pi + Pi / 3) * m_arrowSize,
+                                     cos(m_angle - Pi + Pi / 3) * m_arrowSize);
 
     painter->setBrush(Qt::black);
-    painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
+    painter->drawPolygon(QPolygonF() << line.p2()
+                                     << destArrowP1
+                                     << destArrowP2);
 }
 
 double Edge::getAngle() const

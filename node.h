@@ -17,7 +17,7 @@ public:
     ~Node();
 
     void addEdge(Edge *edge, bool startsFromThisNode);
-    void removeEdge(Edge *edge);
+    void removeEdgeFromList(Edge *edge);
     void removeEdge(Node *otherEnd);
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
@@ -28,6 +28,7 @@ public:
 
     // changing visibility from prot to pub
     void keyPressEvent(QKeyEvent *event);
+    bool isConnected(const Node *node) const;
 
 protected:
 
