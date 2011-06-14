@@ -130,8 +130,6 @@ QGraphicsScene *GraphWidget::getScene()
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
  {
-    qDebug() << __PRETTY_FUNCTION__;
-
     // esc leaves node editing mode
     if (event->key() == Qt::Key_Escape && m_editingNode)
     {
@@ -286,26 +284,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
          if (m_hintNode && m_showingNodeNumbers)
          {
-             showingAllNodeNumbers(false);
-
-             if (m_edgeAdding)
-             {
-                addEdge(m_activeNode, m_hintNode);
-                m_edgeAdding = false;
-             }
-             if (m_edgeDeleting)
-             {
-                removeEdge(m_activeNode, m_hintNode);
-                m_edgeDeleting = false;
-             }
-             else // selecting
-             {
-                 if (m_activeNode)
-                     m_activeNode->setActive(false);
-                 m_activeNode = m_hintNode;
-                 m_activeNode->setActive();
-             }
-             m_showingNodeNumbers = false;
+             nodeSelected(m_hintNode);
          }
 
          break;
@@ -510,27 +489,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
     }
     if (hit==1)
     {
-        showingAllNodeNumbers(false);
-
-        if (m_edgeAdding)
-        {
-            addEdge(m_activeNode, m_hintNode);
-            m_edgeAdding = false;
-        }
-        if (m_edgeDeleting)
-        {
-            removeEdge(m_activeNode, m_hintNode);
-            m_edgeDeleting = false;
-        }
-        else // selecting
-        {
-            if (m_activeNode)
-                m_activeNode->setActive(false);
-
-            m_activeNode = m_hintNode;
-            m_activeNode->setActive();
-        }
-        m_showingNodeNumbers = false;
+        nodeSelected(m_hintNode);
     }
     else if (hit == 0)
     {
@@ -553,6 +512,9 @@ void GraphWidget::setActiveNodeEditable()
 
 void GraphWidget::nodeSelected(Node *node)
 {
+    showingAllNodeNumbers(false);
+    m_showingNodeNumbers = false;
+
     if (m_edgeAdding)
     {
        addEdge(m_activeNode, node);
