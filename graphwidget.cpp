@@ -4,6 +4,7 @@
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QtXml>
 
 #include "node.h"
 #include "edge.h"
@@ -162,7 +163,7 @@ void GraphWidget::closeFile()
                         this,
                         tr("Save File"),
                         QDir::homePath(),
-                        tr("Images (*.png *.xpm *.jpg)"));
+                        tr("QtMindMap (*.qmm)"));
 
             qDebug() << fileName;
 
@@ -197,7 +198,36 @@ void GraphWidget::saveFile()
 
 void GraphWidget::saveFileAs()
 {
+    QString fileName = QFileDialog::getSaveFileName(
+                this,
+                tr("Save File"),
+                QDir::homePath(),
+                tr("QtMindMap (*.qmm)"));
 
+    QDomDocument doc("QtMindMap");
+
+    QDomElement root = doc.createElement("qtmindmap");
+    doc.appendChild( root );
+
+    foreach(Node *node, m_nodeList)
+        root.appendChild(node->createXMLNode(doc));
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                    tr("Couldn't open file to write."),
+                    3000); // millisec
+        return;
+    }
+
+    QTextStream ts( &file );
+    ts << doc.toString();
+    file.close();
+
+    dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
+                tr("Saved."),
+                3000); // millisec
 }
 
 void GraphWidget::openFile()
@@ -549,6 +579,11 @@ void GraphWidget::nodeSelected(Node *node)
     {
         setActiveNode(node);
     }
+}
+
+int GraphWidget::nodeId(Node *node)
+{
+    return m_nodeList.indexOf(node);
 }
 
 void GraphWidget::addEdge(Node *source, Node *destination)

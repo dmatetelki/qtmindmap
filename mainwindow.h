@@ -22,7 +22,7 @@ public:
      void setFileName(QString fileName) { m_fileName = fileName; }
 
 public slots:
-    void klakk();
+
     void exportScene();
     void about();
 

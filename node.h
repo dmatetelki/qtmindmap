@@ -3,6 +3,7 @@
 
 #include <QGraphicsTextItem>
 #include <QTextCursor>
+#include <QDomElement>
 
 #include "edge.h"
 #include "graphwidget.h"
@@ -29,6 +30,7 @@ public:
     // changing visibility from prot to pub
     void keyPressEvent(QKeyEvent *event);
     bool isConnected(const Node *node) const;
+    QDomElement createXMLNode( QDomDocument &d );
 
 protected:
 

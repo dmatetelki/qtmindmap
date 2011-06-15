@@ -23,6 +23,7 @@ public:
     void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
+    int nodeId(Node *node);
 
 public slots:
 

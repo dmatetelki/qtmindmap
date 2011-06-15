@@ -37,16 +37,23 @@ MainWindow::MainWindow(QWidget *parent) :
     m_graphicsView = new GraphWidget(this);
 
     m_ui->setupUi(this);
-    connect(m_ui->actionNew, SIGNAL(activated()), m_graphicsView, SLOT(newFile()));
-    connect(m_ui->actionOpen, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(m_ui->actionSave, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(m_ui->actionClose, SIGNAL(activated()), m_graphicsView, SLOT(closeFile()));
-    connect(m_ui->actionExport, SIGNAL(activated()), this, SLOT(exportScene()));
-    connect(m_ui->actionQuit, SIGNAL(activated()), QApplication::instance(),
-            SLOT(quit()));
-    connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()), this,
-            SLOT(about()));
+    connect(m_ui->actionNew, SIGNAL(activated()),
+            m_graphicsView, SLOT(newFile()));
+    connect(m_ui->actionOpen, SIGNAL(activated()),
+            m_graphicsView, SLOT(openFile()));
+    connect(m_ui->actionSave, SIGNAL(activated()),
+            m_graphicsView, SLOT(saveFile()));
+    connect(m_ui->actionSaveAs, SIGNAL(activated()),
+            m_graphicsView, SLOT(saveFileAs()));
 
+    connect(m_ui->actionClose, SIGNAL(activated()),
+            m_graphicsView, SLOT(closeFile()));
+    connect(m_ui->actionExport, SIGNAL(activated()),
+            this, SLOT(exportScene()));
+    connect(m_ui->actionQuit, SIGNAL(activated()),
+            QApplication::instance(), SLOT(quit()));
+    connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
+            this, SLOT(about()));
 
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
@@ -55,11 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete m_ui;
-}
-
-void MainWindow::klakk()
-{
-    qDebug() << __PRETTY_FUNCTION__;
 }
 
 void MainWindow::exportScene()
