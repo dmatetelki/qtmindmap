@@ -35,19 +35,22 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui(new Ui::MainWindow),
     m_aboutDialog(0)
 {
+    m_graphicsView = new GraphWidget(this);
+
     m_ui->setupUi(this);
-    connect(m_ui->actionNew, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionNew, SIGNAL(activated()), m_graphicsView, SLOT(newFile()));
     connect(m_ui->actionOpen, SIGNAL(activated()), this, SLOT(klakk()));
     connect(m_ui->actionSave, SIGNAL(activated()), this, SLOT(klakk()));
-    connect(m_ui->actionClose, SIGNAL(activated()), this, SLOT(klakk()));
+    connect(m_ui->actionClose, SIGNAL(activated()), m_graphicsView, SLOT(closeFile()));
     connect(m_ui->actionExport, SIGNAL(activated()), this, SLOT(exportScene()));
     connect(m_ui->actionQuit, SIGNAL(activated()), QApplication::instance(),
             SLOT(quit()));
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()), this,
             SLOT(about()));
 
-    m_graphicsView = new GraphWidget(this);
+
     setCentralWidget(m_graphicsView);
+    m_graphicsView->hide();
 }
 
 MainWindow::~MainWindow()

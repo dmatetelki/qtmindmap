@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     // translation
     QString locale = QLocale::system().name();
     QTranslator translator;
-    if (!translator.load(QString("qtmindmap_") + locale))
+    if (locale != "C" && !translator.load(QString("qtmindmap_") + locale))
     {
         std::cerr << "No translation file for locale: "
                   << locale.toStdString()
@@ -57,6 +57,9 @@ int main(int argc, char *argv[])
         systemtray.setup();
         systemtray.show();
     }
+
+    if (!argParser.filePath().isEmpty())
+        w.setFileName(argParser.filePath());
 
     if (!argParser.isShowMinimized()) w.show();
     return a.exec();

@@ -2,7 +2,8 @@
 
 #include <QDebug>
 #include <QStatusBar>
-
+#include <QMessageBox>
+#include <QFileDialog>
 
 #include "node.h"
 #include "edge.h"
@@ -10,7 +11,7 @@
 #include "mainwindow.h"
 
 
-GraphWidget::GraphWidget(QWidget *parent) :
+GraphWidget::GraphWidget(MainWindow *parent) :
     QGraphicsView(parent),
     m_parent(parent),
     m_activeNode(0),
@@ -18,7 +19,8 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_hintNode(0),
     m_editingNode(false),
     m_edgeAdding(false),
-    m_edgeDeleting(false)
+    m_edgeDeleting(false),
+    m_contentChanged(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -30,13 +32,14 @@ GraphWidget::GraphWidget(QWidget *parent) :
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
 
-    Node *node1 = new Node(this);
-    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
-    m_scene->addItem(node1);
-    node1->setPos(-10, -10);
-    node1->setBorder(false);
-    m_nodeList.append(node1);
+//    Node *node1 = new Node(this);
+//    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
+//    m_scene->addItem(node1);
+//    node1->setPos(-10, -10);
+//    node1->setBorder(false);
+//    m_nodeList.append(node1);
 
+    /*
     Node *node2 = new Node(this);
     node2->setHtml(QString("work: <a href=www.hup.hu>hup.hu</a>"));
     m_scene->addItem(node2);
@@ -116,10 +119,90 @@ GraphWidget::GraphWidget(QWidget *parent) :
     m_scene->addItem(new Edge(node5, node7));
     m_scene->addItem(new Edge(node2, node8));
     m_scene->addItem(new Edge(node2, node9));
+    */
 
+//    m_activeNode = m_nodeList.first();
+//    m_activeNode->setActive();
 
-    m_activeNode = m_nodeList.first();
-    m_activeNode->setActive();
+    //addFirstNode();
+
+    /// @todo open file somewhere
+}
+
+void GraphWidget::newFile()
+{
+    removeAllNodes();
+
+    addFirstNode();
+
+    this->show();
+}
+
+void GraphWidget::closeFile()
+{
+    m_contentChanged = true;
+
+    if (m_contentChanged)
+    {
+
+        int ret = QMessageBox::warning(
+                    this,
+                    tr("QtMindMap - The document has been modified"),
+                    m_parent->getFileName().
+                    append("\n\n").
+                    append(tr("Do you want to save your changes?")),
+                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                    QMessageBox::Save);
+
+        switch (ret) {
+        case QMessageBox::Save:
+            // Save was clicked
+        {
+            QString fileName = QFileDialog::getSaveFileName(
+                        this,
+                        tr("Save File"),
+                        QDir::homePath(),
+                        tr("Images (*.png *.xpm *.jpg)"));
+
+            qDebug() << fileName;
+
+            /// @todo save content to file
+
+            break;
+        }
+        case QMessageBox::Discard:
+            // Don't Save was clicked
+            removeAllNodes();
+            this->hide();
+            break;
+        case QMessageBox::Cancel:
+            // Cancel was clicked
+            return;
+        default:
+            // should never be reached
+            break;
+        }
+    }
+    else
+    {
+        removeAllNodes();
+        this->hide();
+    }
+}
+
+void GraphWidget::saveFile()
+{
+
+}
+
+void GraphWidget::saveFileAs()
+{
+
+}
+
+void GraphWidget::openFile()
+{
+
 }
 
 QGraphicsScene *GraphWidget::getScene()
@@ -509,4 +592,25 @@ void GraphWidget::showNodeNumbers()
          showingAllNodeNumbers(false);
          showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
      }
+}
+
+void GraphWidget::removeAllNodes()
+{
+    foreach(Node *node, m_nodeList) delete node;
+    m_nodeList.clear();
+    m_activeNode = 0;
+    m_hintNode = 0;
+}
+
+void GraphWidget::addFirstNode()
+{
+    Node *node1 = new Node(this);
+    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
+    m_scene->addItem(node1);
+    node1->setPos(-10, -10);
+    node1->setBorder(false);
+    m_nodeList.append(node1);
+
+    m_activeNode = m_nodeList.first();
+    m_activeNode->setActive();
 }

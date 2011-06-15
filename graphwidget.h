@@ -6,21 +6,31 @@
 #include <QKeyEvent>
 #include <QMovie>
 
+//#include "mainwindow.h"
 #include "node.h"
 
+class MainWindow;
 
 class GraphWidget : public QGraphicsView
 {
     Q_OBJECT
 
-
 public:
-    GraphWidget(QWidget *parent = 0);
+    GraphWidget(MainWindow *parent = 0);
+
     QGraphicsScene *getScene();
     void setActiveNode(Node *node);
     void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
+
+public slots:
+
+    void newFile();
+    void closeFile();
+    void saveFile();
+    void saveFileAs();
+    void openFile();
 
 protected:
 
@@ -40,9 +50,11 @@ private:
     qreal calculateBiggestAngle(Node *node);
     void addEdge(Node *source, Node *destination);
     void removeEdge(Node* source, Node *destination);
+    void removeAllNodes();
+    void addFirstNode();
 
     QList<Node *> m_nodeList;
-    QWidget *m_parent;
+    MainWindow *m_parent;
     Node *m_activeNode;
     QGraphicsScene *m_scene;
     bool m_showingNodeNumbers;
@@ -51,6 +63,7 @@ private:
     bool m_editingNode;
     bool m_edgeAdding;
     bool m_edgeDeleting;
+    bool m_contentChanged;
 };
 
 #endif // GRAPHWIDGET_H

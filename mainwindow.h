@@ -19,6 +19,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
      QStatusBar * getStatusBar();
+     QString getFileName() { return m_fileName; }
+     void setFileName(QString fileName) { m_fileName = fileName; }
 
 public slots:
     void klakk();
@@ -31,6 +33,7 @@ private:
     Ui::MainWindow *m_ui;
     AboutDialog *m_aboutDialog;
     GraphWidget *m_graphicsView;
+    QString m_fileName;
 
 };
 
