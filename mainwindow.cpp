@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "aboutdialog.h"
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QMessageBox>
 
 //#include <QtConcurrentRun>
 
@@ -32,8 +32,7 @@ extern void exportScaneToPng(QGraphicsScene *scene,
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    m_ui(new Ui::MainWindow),
-    m_aboutDialog(0)
+    m_ui(new Ui::MainWindow)
 {
     m_graphicsView = new GraphWidget(this);
 
@@ -56,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete m_ui;
-    if (m_aboutDialog) delete m_aboutDialog;
 }
 
 void MainWindow::klakk()
@@ -104,15 +102,13 @@ void MainWindow::exportScene()
 
 void MainWindow::about()
 {
-    setDisabled(true);
-    if (m_aboutDialog == 0) m_aboutDialog = new AboutDialog(this);
-    m_aboutDialog->setEnabled(true); // children inherits enabled status
-    m_aboutDialog->show();
-}
-
-void MainWindow::aboutDestroyed()
-{
-    setEnabled(true);
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("About QtMindMap"));
+    msgBox.setText(tr("MindMap software written in Qt."));
+    msgBox.setInformativeText(tr("Homepage: https://gitorious.org/qtmindmap\n\nReport bugs to: denes.matetelki@gmail.com"));
+    QPixmap pixMap(":/heart.svg");
+    msgBox.setIconPixmap(pixMap.scaled(50,50));
+    msgBox.exec();
 }
 
 QStatusBar * MainWindow::getStatusBar()

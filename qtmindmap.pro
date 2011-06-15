@@ -10,9 +10,8 @@ TARGET = qtmindmap
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
         mainwindow.cpp \
-    aboutdialog.cpp \
     graphwidget.cpp \
     node.cpp \
     edge.cpp \
@@ -20,15 +19,13 @@ SOURCES += main.cpp\
     argumentparser.cpp
 
 HEADERS  += mainwindow.h \
-    aboutdialog.h \
     graphwidget.h \
     node.h \
     edge.h \
     systemtray.h \
     argumentparser.h
 
-FORMS    += mainwindow.ui \
-    aboutdialog.ui
+FORMS    += mainwindow.ui
 
 RESOURCES = qtmindmap.qrc
 
