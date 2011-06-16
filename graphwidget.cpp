@@ -209,8 +209,29 @@ void GraphWidget::saveFileAs()
     QDomElement root = doc.createElement("qtmindmap");
     doc.appendChild( root );
 
+    // nodes
+    QDomElement nodes_root = doc.createElement("nodes");
+    root.appendChild(nodes_root);
     foreach(Node *node, m_nodeList)
-        root.appendChild(node->createXMLNode(doc));
+    {
+        QDomElement cn = doc.createElement("nodes");
+        cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
+        cn.setAttribute( "x", QString::number(node->pos().x()));
+        cn.setAttribute( "y", QString::number(node->pos().y()));
+        cn.setAttribute( "htmlContent", node->toHtml());
+        nodes_root.appendChild(cn);
+    }
+
+    //edges
+    QDomElement edges_root = doc.createElement("edges");
+    root.appendChild(edges_root);
+    foreach(Edge *edge, edges())
+    {
+        QDomElement cn = doc.createElement("edge");
+        cn.setAttribute( "source", QString::number(m_nodeList.indexOf(edge->sourceNode())));
+        cn.setAttribute( "destination", QString::number(m_nodeList.indexOf(edge->destNode())));
+        edges_root.appendChild(cn);
+    }
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
@@ -581,10 +602,10 @@ void GraphWidget::nodeSelected(Node *node)
     }
 }
 
-int GraphWidget::nodeId(Node *node)
-{
-    return m_nodeList.indexOf(node);
-}
+//int GraphWidget::nodeId(Node *node)
+//{
+//    return m_nodeList.indexOf(node);
+//}
 
 void GraphWidget::addEdge(Node *source, Node *destination)
 {
@@ -648,4 +669,14 @@ void GraphWidget::addFirstNode()
 
     m_activeNode = m_nodeList.first();
     m_activeNode->setActive();
+}
+
+QList<Edge *> GraphWidget::edges() const
+{
+    QList<Edge *> list;
+
+    foreach(Node * node, m_nodeList)
+        list.append(node->edgesFrom());
+
+    return list;
 }

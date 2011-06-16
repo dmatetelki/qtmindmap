@@ -320,29 +320,13 @@ bool Node::isConnected(const Node *node) const
     return false;
 }
 
-QDomElement Node::createXMLNode( QDomDocument &d )
+QList<Edge *> Node::edgesFrom() const
 {
-    QDomElement cn = d.createElement("node");
-
-    cn.setAttribute( "id", QString::number(m_graph->nodeId(this)));
-    cn.setAttribute( "pos_x", QString::number(pos().x()));
-    cn.setAttribute( "pos_y", QString::number(pos().y()));
-    cn.setAttribute( "content", toHtml());
+    QList<Edge *> list;
 
     foreach(EdgeElement element, m_edgeList)
-    {
-        QDomElement edge = d.createElement("edge");
         if (element.startsFromThisNode)
-        {
-            edge.setAttribute("to",
-                  QString::number(m_graph->nodeId(element.edge->destNode())));
-        } else
-        {
-            edge.setAttribute("from",
-                  QString::number(m_graph->nodeId(element.edge->sourceNode())));
-        }
-        cn.appendChild(edge);
-    }
+            list.push_back(element.edge);
 
-    return cn;
+    return list;
 }

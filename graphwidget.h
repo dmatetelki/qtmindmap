@@ -23,7 +23,8 @@ public:
     void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
-    int nodeId(Node *node);
+//    int nodeId(Node *node);
+    QList<Edge *> edges() const;
 
 public slots:
 
