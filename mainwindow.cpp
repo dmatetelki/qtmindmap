@@ -225,7 +225,7 @@ void MainWindow::about()
     msgBox.setWindowTitle(tr("About QtMindMap"));
     msgBox.setText(tr("MindMap software written in Qt."));
     msgBox.setInformativeText(tr("Homepage: https://gitorious.org/qtmindmap\n\nReport bugs to: denes.matetelki@gmail.com"));
-    QPixmap pixMap(":/heart.svg");
+    QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();
 }

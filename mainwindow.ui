@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="qtmindmap.qrc">
-    <normaloff>:/heart.svg</normaloff>:/heart.svg</iconset>
+    <normaloff>:/qtmindmap.svg</normaloff>:/qtmindmap.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QMenuBar" name="menuBar">
@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>438</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -527,7 +527,7 @@ void GraphWidget::removeAllNodes()
 void GraphWidget::addFirstNode()
 {
     Node *node1 = new Node(this);
-    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
+    node1->setHtml(QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
     m_scene->addItem(node1);
     node1->setPos(-10, -10);
     node1->setBorder(false);

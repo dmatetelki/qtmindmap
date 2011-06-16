@@ -1,5 +1,5 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/">
-   <file>heart.svg</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>qtmindmap.svg</file>
+    </qresource>
 </RCC>
