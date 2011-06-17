@@ -45,6 +45,7 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionKeys"/>
     <addaction name="actionAbout_QtMindMap"/>
    </widget>
    <addaction name="menuFile"/>
@@ -136,6 +137,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionKeys">
+   <property name="text">
+    <string>&amp;Keys</string>
    </property>
   </action>
  </widget>

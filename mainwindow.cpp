@@ -23,13 +23,17 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(saveFileAs()));
     connect(m_ui->actionClose, SIGNAL(activated()),
             this, SLOT(closeFile()));
-
     connect(m_ui->actionExport, SIGNAL(activated()),
             this, SLOT(exportScene()));
+
     connect(m_ui->actionQuit, SIGNAL(activated()),
             QApplication::instance(), SLOT(quit()));
+
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
             this, SLOT(about()));
+    connect(m_ui->actionKeys, SIGNAL(activated()),
+            this, SLOT(keys()));
+
 
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
@@ -89,7 +93,7 @@ void MainWindow::openFile(const QString &fileName)
         QFileDialog dialog(this,
                            tr("Open MindMap"),
                            QDir::homePath(),
-                           tr("QtMindMap (*.qmm)"));
+                           QString("QtMindMap (*.qmm)"));
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
         dialog.setDefaultSuffix("qmm");
 
@@ -127,7 +131,7 @@ bool MainWindow::saveFileAs()
     QFileDialog dialog(this,
                        tr("Save MindMap as"),
                        QDir::homePath(),
-                       tr("QtMindMap (*.qmm)"));
+                       QString("QtMindMap (*.qmm)"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("qmm");
 
@@ -205,15 +209,81 @@ void MainWindow::exportScene()
      }
 }
 
+void MainWindow::keys()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Keys of QtMindMap"));
+    msgBox.setText(tr("Usage of keys & mouse buttons"));
+    msgBox.setInformativeText(
+
+                QString("<table><tr><td><b>").
+
+                append(tr("Keys")).
+                append("</b></td><td></td></tr><tr><td>+,-</td><td>").
+                append(tr("zoom in/out of the view")).
+                append("</td></tr></tr><tr><td>").
+                append(tr("cursors")).
+                append("</td><td>").
+                append(tr("move view scrollbars")).
+                append("</td></tr></tr><tr><td>").
+                append(tr("ctrl + cursors")).
+                append("</td><td>").
+                append(tr("move active node")).
+                append("</td></tr></tr><tr><td>Delete</td><td>").
+                append(tr("remove active node")).
+                append("</td></tr></tr><tr><td>Insert</td><td>").
+                append(tr("add new node to active node")).
+                append("</td></tr></tr><tr><td>f</td><td>").
+                append(tr("enter/leave hint mode (vimperator style select)")).
+                append("</td></tr></tr><tr><td>").
+                append(tr("numbers, backspace, enter")).
+                append("</td><td>").
+                append(tr("select numbers in hint mode")).
+                append("</td></tr></tr><tr><td>F2</td><td>").
+                append(tr("edit active node")).
+                append("</td></tr></tr><tr><td>Esc</td><td>").
+                append(tr("leaving node editing/adding/deleting mode")).
+                append("</td></tr></tr><tr><td>").
+                append(tr("editing mode: ctrl+cursors")).
+                append("</td><td>").
+                append(tr("jump to beginning of next/prev word")).
+                append("</td></tr></tr><tr><td>a</td><td>").
+                append(tr("add new edge to active node (select the destination)")).
+                append("</td></tr></tr><tr><td>d</td><td>").
+                append(tr("delete edge of active node (select other end)")).
+                append("</td></tr><tr><td><b>").
+                append(tr("Mouse")).
+                append("</b></td><td></td></tr><tr><td>").
+                append(tr("scroll")).
+                append("</td><td>").
+                append(tr("zoom in/out of the view")).
+                append("</td></tr><tr><td>").
+                append(tr("click")).
+                append("</td><td>").
+                append(tr("select node")).
+                append("</td></tr><tr><td>").
+                append(tr("double clikk")).
+                append("</td><td>").
+                append(tr("set node editable")).
+                append("</td></tr><tr><td>").
+                append(tr("drag")).
+                append("</td><td>").
+                append(tr("move node")).
+                append("</td></tr></table>"));
+
+    msgBox.exec();
+}
+
 void MainWindow::about()
 {
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("About QtMindMap"));
     msgBox.setText(tr("MindMap software written in Qt."));
-    msgBox.setInformativeText(tr("Homepage: ").
-                              append("https://gitorious.org/qtmindmap\n\n").
-                              append(tr("Report bugs to: ")).
-                              append("denes.matetelki@gmail.com"));
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setInformativeText(tr("Homepage:").
+                              append(" <a href=\"https://gitorious.org/qtmindmap\">https://gitorious.org/qtmindmap</a><br><br>").
+                              append(tr("Report bugs to:")).
+                              append(" <a href=\"mailto:denes.matetelki@gmail.com\">denes.matetelki@gmail.com</a>"));
     QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();

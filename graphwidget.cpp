@@ -63,7 +63,7 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
 
     if (!doc.setContent(&file))
     {
-        m_parent->statusBarMsg(tr("Couldn't parse XML file"));
+        m_parent->statusBarMsg(tr("Couldn't parse XML file."));
         file.close();
         return;
     }
@@ -217,12 +217,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         if (m_edgeAdding)
         {
             m_edgeAdding = false;
-             m_parent->statusBarMsg(tr("Edge adding cancelled"));
+             m_parent->statusBarMsg(tr("Edge adding cancelled."));
         }
         else if (m_edgeDeleting)
         {
             m_edgeDeleting = false;
-            m_parent->statusBarMsg(tr("Edge deleting cancelled"));
+            m_parent->statusBarMsg(tr("Edge deleting cancelled."));
         }
         else if(m_showingNodeNumbers)
         {

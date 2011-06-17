@@ -29,8 +29,9 @@ public slots:
     void saveFile();
     bool saveFileAs();
     bool closeFile();
-
     void exportScene();
+
+    void keys();
     void about();
 
 private:

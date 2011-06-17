@@ -31,8 +31,8 @@ void SystemTray::setup()
 
     m_systemTrayIcon->setContextMenu(m_trayIconMenu);
 
-    m_icon = new QIcon(":/heart.svg");
-    m_systemTrayIcon->setIcon(QIcon(":/heart.svg"));
+    m_icon = new QIcon(":/qtmindmap.svg");
+    m_systemTrayIcon->setIcon(QIcon(":/qtmindmap.svg"));
 }
 
 SystemTray::SystemTray(MainWindow *mainWindow, QWidget *parent) :
