@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     }
 
     if (!argParser.filePath().isEmpty())
-        w.setFileName(argParser.filePath());
+        w.openFile(argParser.filePath());
 
     if (!argParser.isShowMinimized()) w.show();
     return a.exec();

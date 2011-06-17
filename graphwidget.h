@@ -32,6 +32,7 @@ public slots:
     void closeFile();
     void saveFile();
     void saveFileAs();
+    void openFile(const QString &fileName);
     void openFile();
 
 protected:
@@ -66,6 +67,7 @@ private:
     bool m_edgeAdding;
     bool m_edgeDeleting;
     bool m_contentChanged;
+    QString m_fileName;
 };
 
 #endif // GRAPHWIDGET_H

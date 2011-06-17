@@ -19,7 +19,12 @@ public:
     ~MainWindow();
      QStatusBar * getStatusBar();
      QString getFileName() { return m_fileName; }
-     void setFileName(QString fileName) { m_fileName = fileName; }
+     void openFile(QString fileName);
+     void enableSave(const bool &enable = true);
+     void enableSaveAs(const bool &enable = true);
+     void enableCloseFile(const bool &enable = true);
+     void setTitle(const QString &title);
+//     void setModifiedTitle(const bool &modified = true);
 
 public slots:
 

@@ -137,6 +137,11 @@ void GraphWidget::newFile()
     addFirstNode();
 
     this->show();
+
+    m_parent->enableCloseFile(true);
+    m_parent->enableSave(false);
+    m_parent->enableSaveAs(true);
+    m_parent->setTitle("untitled");
 }
 
 void GraphWidget::closeFile()
@@ -189,21 +194,31 @@ void GraphWidget::closeFile()
         removeAllNodes();
         this->hide();
     }
-}
 
-void GraphWidget::saveFile()
-{
-
+    m_parent->enableCloseFile(false);
+    m_parent->enableSave(false);
+    m_parent->enableSaveAs(false);
+    m_parent->setTitle("");
 }
 
 void GraphWidget::saveFileAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(
-                this,
-                tr("Save File"),
-                QDir::homePath(),
-                tr("QtMindMap (*.qmm)"));
+    QFileDialog dialog(this,
+                       tr("Save MindMap as"),
+                       QDir::homePath(),
+                       tr("QtMindMap (*.qmm)"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix("qmm");
 
+    if (dialog.exec())
+    {
+        m_fileName = dialog.selectedFiles().first();
+        saveFile();
+    }
+}
+
+void GraphWidget::saveFile()
+{
     QDomDocument doc("QtMindMap");
 
     QDomElement root = doc.createElement("qtmindmap");
@@ -233,7 +248,7 @@ void GraphWidget::saveFileAs()
         edges_root.appendChild(cn);
     }
 
-    QFile file(fileName);
+    QFile file(m_fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
         dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
@@ -249,12 +264,94 @@ void GraphWidget::saveFileAs()
     dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
                 tr("Saved."),
                 3000); // millisec
+
+    m_parent->enableCloseFile(true);
+    m_parent->enableSave(true);
+    m_parent->enableSaveAs(true);
+
+    m_parent->setTitle(m_fileName);
 }
 
 void GraphWidget::openFile()
 {
+    qDebug() << __PRETTY_FUNCTION__;
 
+    QFileDialog dialog(this,
+                       tr("Open MindMap"),
+                       QDir::homePath(),
+                       tr("QtMindMap (*.qmm)"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setDefaultSuffix("qmm");
+
+    if (dialog.exec())
+    {
+        m_fileName = dialog.selectedFiles().first();
+        openFile(m_fileName);
+    }
 }
+
+void GraphWidget::openFile(const QString &fileName)
+{
+    m_fileName = fileName;
+    m_parent->enableCloseFile(true);
+    m_parent->enableSave(true);
+    m_parent->enableSaveAs(true);
+
+    m_parent->setTitle(fileName);
+
+    QDomDocument doc("QtMindMap");
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "faszom cannot read file";
+        return;
+    }
+
+    if (!doc.setContent(&file))
+    {
+        qDebug() << "cannot parse file";
+        file.close();
+        return;
+    }
+    file.close();
+
+    removeAllNodes();
+
+    QDomElement docElem = doc.documentElement();
+
+    QDomNodeList nodes = docElem.childNodes().item(0).childNodes();
+    for (unsigned int i = 0; i < nodes.length(); i++)
+    {
+        QDomElement e = nodes.item(i).toElement();
+        if(!e.isNull())
+        {
+            Node *node = new Node(this);
+            node->setHtml(e.attribute("htmlContent"));
+            m_scene->addItem(node);
+            node->setPos(e.attribute("x").toFloat(),
+                         e.attribute("y").toFloat());
+            m_nodeList.append(node);
+        }
+    }
+
+    QDomNodeList edges = docElem.childNodes().item(1).childNodes();
+    for (unsigned int i = 0; i < edges.length(); i++)
+    {
+        QDomElement e = edges.item(i).toElement();
+        if(!e.isNull())
+        {
+            m_scene->addItem(new Edge(m_nodeList[e.attribute("source").toInt()],
+
+                                      m_nodeList[e.attribute("destination").toInt()]));
+        }
+    }
+
+    m_activeNode = m_nodeList.first();
+    m_activeNode->setActive();
+
+    this->show();
+}
+
 
 QGraphicsScene *GraphWidget::getScene()
 {

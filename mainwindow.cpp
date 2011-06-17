@@ -68,7 +68,7 @@ void MainWindow::exportScene()
 {
     QFileDialog dialog(this,
                        tr("Export MindMap to image"),
-                       "/home/cs0rbagomba",
+                       QDir::homePath(),
                        tr("PNG image file (*.png)"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("png");
@@ -117,3 +117,45 @@ QStatusBar * MainWindow::getStatusBar()
 {
     return m_ui->statusBar;
 }
+
+void MainWindow::openFile(QString fileName)
+{
+    m_fileName = fileName;
+    m_graphicsView->openFile(m_fileName);
+}
+
+void MainWindow::enableSave(const bool &enable)
+{
+    m_ui->actionSave->setEnabled(enable);
+}
+
+void MainWindow::enableSaveAs(const bool &enable)
+{
+    m_ui->actionSaveAs->setEnabled(enable);
+}
+
+void MainWindow::enableCloseFile(const bool &enable)
+{
+    m_ui->actionClose->setEnabled(enable);
+}
+
+void MainWindow::setTitle(const QString &title)
+{
+    if (title.isEmpty())
+    {
+        setWindowTitle("QtMindMap");
+    }
+    else
+    {
+        QString t(title);
+        t.append(" - QtMindMap");
+        setWindowTitle(t);
+    }
+}
+
+//void MainWindow::setModifiedTitle(const bool &modified)
+//{
+//    modified ?
+//       setWindowTitle(windowTitle().remove(0,2)) :
+//                setWindowTitle(windowTitle().prepend("* "));
+//}
