@@ -94,8 +94,10 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
     case ItemPositionHasChanged:
 
+        m_graph->contentChanged();
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
         break;
+
     default:
         break;
     };
@@ -304,6 +306,7 @@ void Node::keyPressEvent(QKeyEvent *event)
 
         // not cursor movement: editing
         QGraphicsTextItem::keyPressEvent(event);
+        m_graph->contentChanged();
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
     }
 

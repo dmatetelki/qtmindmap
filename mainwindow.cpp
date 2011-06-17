@@ -8,8 +8,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::MainWindow),
-    m_graphicsView(0),
-    m_fileName(""),
     m_contentChanged(false)
 {
     m_graphicsView = new GraphWidget(this);
@@ -42,11 +40,6 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
-//QStatusBar * MainWindow::getStatusBar()
-//{
-//    return m_ui->statusBar;
-//}
-
 void MainWindow::statusBarMsg(const QString &msg)
 {
     m_ui->statusBar->showMessage(msg, 5000);
@@ -58,7 +51,8 @@ void MainWindow::contentChanged(const bool& changed)
     {
         setWindowTitle(windowTitle().prepend("* "));
         m_contentChanged = true;
-        m_ui->actionSave->setEnabled(true);
+        if (m_fileName != "untitled")
+            m_ui->actionSave->setEnabled(true);
     }
     else if (m_contentChanged == true && changed == false)
     {
@@ -70,22 +64,23 @@ void MainWindow::contentChanged(const bool& changed)
 
 void MainWindow::newFile()
 {
-    closeFile();
+    if (!closeFile())
+        return;
 
     m_graphicsView->newScene();
 
     m_ui->actionSave->setEnabled(false);
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
-
+    contentChanged(false);
     m_fileName = "untitled";
     setTitle(m_fileName);
-    contentChanged(false);
 }
 
 void MainWindow::openFile(const QString &fileName)
 {
-    closeFile();
+    if (!closeFile())
+        return;
 
     if (fileName.isEmpty())
     {
@@ -110,23 +105,22 @@ void MainWindow::openFile(const QString &fileName)
         m_fileName = fileName;
     }
 
-    m_graphicsView->readContentFromFile(m_fileName);
+    m_graphicsView->readContentFromXmlFile(m_fileName);
 
     m_ui->actionSave->setEnabled(true);
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
-
-    setTitle(m_fileName);
     contentChanged(false);
+    setTitle(m_fileName);
 }
 
 void MainWindow::saveFile()
 {
-    m_graphicsView->writeContentToFile(m_fileName);
+    m_graphicsView->writeContentToXmlFile(m_fileName);
     contentChanged(false);
 }
 
-void MainWindow::saveFileAs()
+bool MainWindow::saveFileAs()
 {
     QFileDialog dialog(this,
                        tr("Save MindMap as"),
@@ -140,50 +134,58 @@ void MainWindow::saveFileAs()
         m_fileName = dialog.selectedFiles().first();
         setTitle(m_fileName);
         saveFile();
+        return true;
+    }
+    else
+    {
+        return false; // cancelled
     }
 }
 
-void MainWindow::closeFile()
+bool MainWindow::closeFile()
 {
     if (m_contentChanged)
     {
         QMessageBox msgBox(this);
         msgBox.setText("The document has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setStandardButtons(QMessageBox::Save |
+                                  QMessageBox::Discard |
+                                  QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
         int ret = msgBox.exec();
 
         switch (ret) {
         case QMessageBox::Save:
         {
-            m_fileName.isEmpty() ? saveFileAs() : saveFile();
-
-            /// @todo handle cancel
+            if (m_fileName == "untitled")
+            {
+                if (!saveFileAs())
+                        return false;
+            }
+            else
+            {
+                saveFile();
+            }
 
             break;
         }
         case QMessageBox::Discard:
-            m_graphicsView->closeScene();
-            m_fileName = "";
-            setTitle(m_fileName);
-            m_contentChanged = false;
-            return;
+            break;
         case QMessageBox::Cancel:
-            return;
+            return false;
         default:
-            return;
+            break;
         }
     }
-    else
-    {
-        m_ui->actionSave->setEnabled(false);
-        m_ui->actionSaveAs->setEnabled(false);
-        m_ui->actionClose->setEnabled(false);
 
-        setTitle("");
-        m_graphicsView->closeScene();
-    }
+    m_ui->actionSave->setEnabled(false);
+    m_ui->actionSaveAs->setEnabled(false);
+    m_ui->actionClose->setEnabled(false);
+    m_contentChanged = false;
+    setTitle("");
+    m_graphicsView->closeScene();
+    return true;
 }
 
 void MainWindow::exportScene()
@@ -195,27 +197,9 @@ void MainWindow::exportScene()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("png");
 
-
      if (dialog.exec())
      {
-         QStringList fileNames(dialog.selectedFiles());
-
-         QImage img(m_graphicsView->getScene()->sceneRect().width(),
-                    m_graphicsView->getScene()->sceneRect().height(),
-                    QImage::Format_ARGB32_Premultiplied);
-         QPainter painter(&img);
-
-         painter.setRenderHint(QPainter::Antialiasing);
-
-         /// @bug scene background is not rendered
-         m_graphicsView->getScene()->render(&painter);
-         painter.end();
-
-         img.save(fileNames.first());
-//         m_ui->statusBar->showMessage(tr("MindMap exported as ") +
-//                                        fileNames.first(),
-//                                      5000);
-         statusBarMsg(tr("MindMap exported as ") + fileNames.first());
+         m_graphicsView->writeContentToPngFile(dialog.selectedFiles().first());
      }
 }
 
@@ -224,20 +208,14 @@ void MainWindow::about()
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("About QtMindMap"));
     msgBox.setText(tr("MindMap software written in Qt."));
-    msgBox.setInformativeText(tr("Homepage: https://gitorious.org/qtmindmap\n\nReport bugs to: denes.matetelki@gmail.com"));
+    msgBox.setInformativeText(tr("Homepage: ").
+                              append("https://gitorious.org/qtmindmap\n\n").
+                              append(tr("Report bugs to: ")).
+                              append("denes.matetelki@gmail.com"));
     QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();
 }
-
-
-
-//void MainWindow::setModifiedTitle(const bool &modified)
-//{
-//    modified ?
-//       setWindowTitle(windowTitle().remove(0,2)) :
-//                setWindowTitle(windowTitle().prepend("* "));
-//}
 
 void MainWindow::setTitle(const QString &title)
 {

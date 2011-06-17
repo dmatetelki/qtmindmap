@@ -1,5 +1,5 @@
 #include <stdlib.h> // EXIT_SUCCESS
-#include <iostream> // cout
+#include <iostream> // cerr
 
 #include <QtGui>
 #include <QRegExp>
@@ -8,10 +8,6 @@
 #include "mainwindow.h"
 #include "systemtray.h"
 #include "argumentparser.h"
-
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -49,8 +45,8 @@ int main(int argc, char *argv[])
         if (!QSystemTrayIcon::isSystemTrayAvailable())
         {
             QMessageBox::critical(0,
-                                  QObject::tr("QtMindMap Error"),
-                                  QObject::tr("I couldn't detect any system tray on this system."));
+              QObject::tr("QtMindMap Error"),
+              QObject::tr("I couldn't detect any system tray on this system."));
             return EXIT_FAILURE;
         }
         QApplication::setQuitOnLastWindowClosed(false);

@@ -7,12 +7,12 @@
 
 #include <math.h>
 
-static const double Pi = 3.14159265358979323846264338327950288419717;
-static double TwoPi = 2.0 * Pi;
+const double Edge::m_pi = 3.14159265358979323846264338327950288419717;
+const double Edge::m_twoPi = 2.0 * Edge::m_pi;
+const qreal Edge::m_arrowSize = 7;
 
 Edge::Edge(Node *sourceNode, Node *destNode)
-    : m_arrowSize(7),
-      m_angle(-1)
+    : m_angle(-1)
 {
     setAcceptedMouseButtons(0);
     m_sourceNode = sourceNode;
@@ -60,6 +60,11 @@ QPointF firstNotContainedPoint(const QLineF &line,
         }
     }
     return QPoint(0,0);
+}
+
+double Edge::getAngle() const
+{
+    return m_angle;
 }
 
 void Edge::adjust()
@@ -110,7 +115,7 @@ void Edge::paint(QPainter *painter,
 
     m_angle = ::acos(line.dx() / line.length());
     if (line.dy() >= 0)
-        m_angle = TwoPi - m_angle;
+        m_angle = Edge::m_twoPi - m_angle;
 
     if (sourceNode()->collidesWithItem(destNode()))
         return;
@@ -128,19 +133,14 @@ void Edge::paint(QPainter *painter,
 
     // Draw the arrows
     QPointF destArrowP1 = m_destPoint +
-                             QPointF(sin(m_angle - Pi / 3) * m_arrowSize,
-                                     cos(m_angle - Pi / 3) * m_arrowSize);
+                          QPointF(sin(m_angle - Edge::m_pi / 3) * m_arrowSize,
+                                  cos(m_angle - Edge::m_pi / 3) * m_arrowSize);
     QPointF destArrowP2 = m_destPoint +
-                             QPointF(sin(m_angle - Pi + Pi / 3) * m_arrowSize,
-                                     cos(m_angle - Pi + Pi / 3) * m_arrowSize);
+              QPointF(sin(m_angle - Edge::m_pi + Edge::m_pi / 3) * m_arrowSize,
+                      cos(m_angle - Edge::m_pi + Edge::m_pi / 3) * m_arrowSize);
 
     painter->setBrush(Qt::black);
     painter->drawPolygon(QPolygonF() << line.p2()
                                      << destArrowP1
                                      << destArrowP2);
-}
-
-double Edge::getAngle() const
-{
-    return m_angle;
 }

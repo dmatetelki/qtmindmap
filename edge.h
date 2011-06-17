@@ -21,7 +21,8 @@ public:
 protected:
 
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+    void paint(QPainter *painter,
+               const QStyleOptionGraphicsItem *option,
                QWidget *widget);
 
 private:
@@ -31,8 +32,11 @@ private:
 
     QPointF m_sourcePoint;
     QPointF m_destPoint;
-    qreal m_arrowSize;
     double m_angle;
+
+    static const qreal m_arrowSize;
+    static const double m_pi;
+    static const double m_twoPi;
 };
 
 #endif

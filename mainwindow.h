@@ -18,18 +18,17 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-//    QStatusBar * getStatusBar(); /// rewrite as a message slot?
+
     void statusBarMsg(const QString &msg);
+    void contentChanged(const bool &changed = true);
 
 public slots:
-
-    void contentChanged(const bool &changed = true);
 
     void newFile();
     void openFile(const QString &fileName = "");
     void saveFile();
-    void saveFileAs();
-    void closeFile();
+    bool saveFileAs();
+    bool closeFile();
 
     void exportScene();
     void about();

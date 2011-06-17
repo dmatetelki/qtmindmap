@@ -18,7 +18,6 @@ class GraphWidget : public QGraphicsView
 public:
     GraphWidget(MainWindow *parent = 0);
 
-    QGraphicsScene *getScene();
     void setActiveNode(Node *node);
     void insertNode();
     void setActiveNodeEditable();
@@ -26,12 +25,15 @@ public:
 //    int nodeId(Node *node);
     QList<Edge *> edges() const;
 
+    void contentChanged(const bool &changed = true);
+
 //public slots:
 
     void newScene();
     void closeScene();
-    void readContentFromFile(const QString &fileName);
-    void writeContentToFile(const QString &fileName);
+    void readContentFromXmlFile(const QString &fileName);
+    void writeContentToXmlFile(const QString &fileName);
+    void writeContentToPngFile(const QString &fileName);
 
 //    void savetoFile();
 //    void saveFileAs();

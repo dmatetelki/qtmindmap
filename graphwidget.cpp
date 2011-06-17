@@ -33,8 +33,8 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
 
-    connect(m_scene, SIGNAL(changed(const QList<QRectF> &)),
-            m_parent, SLOT(contentChanged()));
+//    connect(m_scene, SIGNAL(changed(const QList<QRectF> &)),
+//            m_parent, SLOT(contentChanged()));
 }
 
 void GraphWidget::newScene()
@@ -50,7 +50,7 @@ void GraphWidget::closeScene()
     this->hide();
 }
 
-void GraphWidget::readContentFromFile(const QString &fileName)
+void GraphWidget::readContentFromXmlFile(const QString &fileName)
 {
     QDomDocument doc("QtMindMap");
     QFile file(fileName);
@@ -105,7 +105,7 @@ void GraphWidget::readContentFromFile(const QString &fileName)
     this->show();
 }
 
-void GraphWidget::writeContentToFile(const QString &fileName)
+void GraphWidget::writeContentToXmlFile(const QString &fileName)
 {
     QDomDocument doc("QtMindMap");
 
@@ -150,11 +150,23 @@ void GraphWidget::writeContentToFile(const QString &fileName)
     m_parent->statusBarMsg(tr("Saved."));
 }
 
-QGraphicsScene *GraphWidget::getScene()
+void GraphWidget::writeContentToPngFile(const QString &fileName)
 {
-    return m_scene;
-}
+    QImage img(m_scene->sceneRect().width(),
+               m_scene->sceneRect().height(),
+               QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&img);
 
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    /// @bug scene background is not rendered
+    m_scene->render(&painter);
+    painter.end();
+
+    img.save(fileName);
+
+    m_parent->statusBarMsg(tr("MindMap exported as ") + fileName);
+}
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -174,16 +186,16 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     // certain actions need an active node
     if (!m_activeNode &&
-            (event->key() == Qt::Key_Insert ||      // add new node
+            ( event->key() == Qt::Key_Insert ||      // add new node
              event->key() == Qt::Key_F2 ||          // edit node
              event->key() == Qt::Key_Delete ||      // delete node
              event->key() == Qt::Key_A ||           // add edge
              event->key() == Qt::Key_D ||           // remove edge
              ( event->modifiers() ==  Qt::ControlModifier &&  // moving node
-               ( event->key() == Qt::Key_Up ||
-                 event->key() == Qt::Key_Down ||
-                 event->key() == Qt::Key_Left ||
-                 event->key() == Qt::Key_Right))))
+              ( event->key() == Qt::Key_Up ||
+               event->key() == Qt::Key_Down ||
+               event->key() == Qt::Key_Left ||
+               event->key() == Qt::Key_Right))))
     {
         m_parent->statusBarMsg(tr("No active node."));
         return;
@@ -224,6 +236,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
             else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
             else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
+            contentChanged();
         }
         else // move scene
         {
@@ -255,6 +268,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         // insert new node
     case Qt::Key_Insert:
         insertNode();
+        contentChanged();
         if (m_showingNodeNumbers)
             showNodeNumbers();
 
@@ -318,6 +332,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         m_nodeList.removeAll(m_activeNode);
         delete m_activeNode;
         m_activeNode = 0;
+        contentChanged();
 
         if (m_showingNodeNumbers)
             showNodeNumbers();
@@ -486,6 +501,7 @@ void GraphWidget::addEdge(Node *source, Node *destination)
     else
     {
         m_scene->addItem(new Edge(source, destination));
+        contentChanged();
     }
 }
 
@@ -498,6 +514,7 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
     else
     {
         source->removeEdge(destination);
+        contentChanged();
     }
 }
 
@@ -545,4 +562,9 @@ QList<Edge *> GraphWidget::edges() const
         list.append(node->edgesFrom());
 
     return list;
+}
+
+void GraphWidget::contentChanged(const bool &changed)
+{
+    m_parent->contentChanged(changed);
 }
