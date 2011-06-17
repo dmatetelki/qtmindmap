@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>QtMindMap</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="qtmindmap.qrc">
+    <normaloff>:/heart.svg</normaloff>:/heart.svg</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -136,7 +140,9 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="qtmindmap.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <signal>cica()</signal>

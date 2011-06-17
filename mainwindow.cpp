@@ -5,49 +5,27 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-//#include <QtConcurrentRun>
-
-/// QPixmap: It is not safe to use pixmaps outside the GUI thread
-/// tr is messy
-/*
-extern void exportScaneToPng(QGraphicsScene *scene,
-                             const QString &fileName,
-                             Ui::MainWindow *ui)
-{
-    // start export in a diff thread
-    QImage img(scene->sceneRect().width(),
-               scene->sceneRect().height(),
-               QImage::Format_ARGB32_Premultiplied);
-    QPainter painter(&img);
-    painter.setRenderHint(QPainter::Antialiasing);
-    scene->render(&painter);
-    painter.end();
-
-    img.save(fileName);
-    ui->statusBar->showMessage(tr("MindMap exported as ") + fileName,
-                               5000); // millisec
-}
-*/
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    m_ui(new Ui::MainWindow)
+    m_ui(new Ui::MainWindow),
+    m_graphicsView(0),
+    m_fileName(""),
+    m_contentChanged(false)
 {
     m_graphicsView = new GraphWidget(this);
 
     m_ui->setupUi(this);
     connect(m_ui->actionNew, SIGNAL(activated()),
-            m_graphicsView, SLOT(newFile()));
+            this, SLOT(newFile()));
     connect(m_ui->actionOpen, SIGNAL(activated()),
-            m_graphicsView, SLOT(openFile()));
+            this, SLOT(openFile()));
     connect(m_ui->actionSave, SIGNAL(activated()),
-            m_graphicsView, SLOT(saveFile()));
+            this, SLOT(saveFile()));
     connect(m_ui->actionSaveAs, SIGNAL(activated()),
-            m_graphicsView, SLOT(saveFileAs()));
-
+            this, SLOT(saveFileAs()));
     connect(m_ui->actionClose, SIGNAL(activated()),
-            m_graphicsView, SLOT(closeFile()));
+            this, SLOT(closeFile()));
+
     connect(m_ui->actionExport, SIGNAL(activated()),
             this, SLOT(exportScene()));
     connect(m_ui->actionQuit, SIGNAL(activated()),
@@ -64,6 +42,150 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
+//QStatusBar * MainWindow::getStatusBar()
+//{
+//    return m_ui->statusBar;
+//}
+
+void MainWindow::statusBarMsg(const QString &msg)
+{
+    m_ui->statusBar->showMessage(msg, 5000);
+}
+
+void MainWindow::contentChanged(const bool& changed)
+{
+    if (m_contentChanged == false && changed == true)
+    {
+        setWindowTitle(windowTitle().prepend("* "));
+        m_contentChanged = true;
+        m_ui->actionSave->setEnabled(true);
+    }
+    else if (m_contentChanged == true && changed == false)
+    {
+        setWindowTitle(windowTitle().remove(0,2));
+        m_contentChanged = false;
+        m_ui->actionSave->setEnabled(false);
+    }
+}
+
+void MainWindow::newFile()
+{
+    closeFile();
+
+    m_graphicsView->newScene();
+
+    m_ui->actionSave->setEnabled(false);
+    m_ui->actionSaveAs->setEnabled(true);
+    m_ui->actionClose->setEnabled(true);
+
+    m_fileName = "untitled";
+    setTitle(m_fileName);
+    contentChanged(false);
+}
+
+void MainWindow::openFile(const QString &fileName)
+{
+    closeFile();
+
+    if (fileName.isEmpty())
+    {
+        QFileDialog dialog(this,
+                           tr("Open MindMap"),
+                           QDir::homePath(),
+                           tr("QtMindMap (*.qmm)"));
+        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setDefaultSuffix("qmm");
+
+        if (dialog.exec())
+        {
+            m_fileName = dialog.selectedFiles().first();
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        m_fileName = fileName;
+    }
+
+    m_graphicsView->readContentFromFile(m_fileName);
+
+    m_ui->actionSave->setEnabled(true);
+    m_ui->actionSaveAs->setEnabled(true);
+    m_ui->actionClose->setEnabled(true);
+
+    setTitle(m_fileName);
+    contentChanged(false);
+}
+
+void MainWindow::saveFile()
+{
+    m_graphicsView->writeContentToFile(m_fileName);
+    contentChanged(false);
+}
+
+void MainWindow::saveFileAs()
+{
+    QFileDialog dialog(this,
+                       tr("Save MindMap as"),
+                       QDir::homePath(),
+                       tr("QtMindMap (*.qmm)"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix("qmm");
+
+    if (dialog.exec())
+    {
+        m_fileName = dialog.selectedFiles().first();
+        setTitle(m_fileName);
+        saveFile();
+    }
+}
+
+void MainWindow::closeFile()
+{
+    if (m_contentChanged)
+    {
+        QMessageBox msgBox(this);
+        msgBox.setText("The document has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+
+        switch (ret) {
+        case QMessageBox::Save:
+        {
+            m_fileName.isEmpty() ? saveFileAs() : saveFile();
+
+            /// @todo handle cancel
+
+            break;
+        }
+        case QMessageBox::Discard:
+            m_graphicsView->closeScene();
+            m_fileName = "";
+            setTitle(m_fileName);
+            m_contentChanged = false;
+            return;
+        case QMessageBox::Cancel:
+            return;
+        default:
+            return;
+        }
+    }
+    else
+    {
+        m_ui->actionSave->setEnabled(false);
+        m_ui->actionSaveAs->setEnabled(false);
+        m_ui->actionClose->setEnabled(false);
+
+        setTitle("");
+        m_graphicsView->closeScene();
+    }
+}
+
 void MainWindow::exportScene()
 {
     QFileDialog dialog(this,
@@ -78,12 +200,6 @@ void MainWindow::exportScene()
      {
          QStringList fileNames(dialog.selectedFiles());
 
-         /// @note Shall I start the export in diff thread?
-//         QtConcurrent::run(exportScaneToPng,
-//                           graphicsView->getScene(),
-//                           fileNames.first(),
-//                           ui);
-
          QImage img(m_graphicsView->getScene()->sceneRect().width(),
                     m_graphicsView->getScene()->sceneRect().height(),
                     QImage::Format_ARGB32_Premultiplied);
@@ -96,9 +212,10 @@ void MainWindow::exportScene()
          painter.end();
 
          img.save(fileNames.first());
-         m_ui->statusBar->showMessage(tr("MindMap exported as ") + fileNames.first(),
-                                    5000); // millisec
-
+//         m_ui->statusBar->showMessage(tr("MindMap exported as ") +
+//                                        fileNames.first(),
+//                                      5000);
+         statusBarMsg(tr("MindMap exported as ") + fileNames.first());
      }
 }
 
@@ -113,31 +230,14 @@ void MainWindow::about()
     msgBox.exec();
 }
 
-QStatusBar * MainWindow::getStatusBar()
-{
-    return m_ui->statusBar;
-}
 
-void MainWindow::openFile(QString fileName)
-{
-    m_fileName = fileName;
-    m_graphicsView->openFile(m_fileName);
-}
 
-void MainWindow::enableSave(const bool &enable)
-{
-    m_ui->actionSave->setEnabled(enable);
-}
-
-void MainWindow::enableSaveAs(const bool &enable)
-{
-    m_ui->actionSaveAs->setEnabled(enable);
-}
-
-void MainWindow::enableCloseFile(const bool &enable)
-{
-    m_ui->actionClose->setEnabled(enable);
-}
+//void MainWindow::setModifiedTitle(const bool &modified)
+//{
+//    modified ?
+//       setWindowTitle(windowTitle().remove(0,2)) :
+//                setWindowTitle(windowTitle().prepend("* "));
+//}
 
 void MainWindow::setTitle(const QString &title)
 {
@@ -152,10 +252,3 @@ void MainWindow::setTitle(const QString &title)
         setWindowTitle(t);
     }
 }
-
-//void MainWindow::setModifiedTitle(const bool &modified)
-//{
-//    modified ?
-//       setWindowTitle(windowTitle().remove(0,2)) :
-//                setWindowTitle(windowTitle().prepend("* "));
-//}

@@ -33,283 +33,36 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
 
-//    Node *node1 = new Node(this);
-//    node1->setHtml(QString("<img src=:/heart.svg width=40 height=40></img>"));
-//    m_scene->addItem(node1);
-//    node1->setPos(-10, -10);
-//    node1->setBorder(false);
-//    m_nodeList.append(node1);
-
-    /*
-    Node *node2 = new Node(this);
-    node2->setHtml(QString("work: <a href=www.hup.hu>hup.hu</a>"));
-    m_scene->addItem(node2);
-    node2->setPos(60, -10);
-    m_nodeList.append(node2);
-
-    Node *node3 = new Node(this);
-    node3->setHtml(QString("read"));
-    m_scene->addItem(node3);
-    node3->setPos(-70, -10);
-    m_nodeList.append(node3);
-
-    Node *node4 = new Node(this);
-    node4->setHtml(QString("pragmatic programmer"));
-    m_scene->addItem(node4);
-    node4->setPos(-120, -80);
-    m_nodeList.append(node4);
-
-    Node *node5 = new Node(this);
-    node5->setHtml(QString("semmi kulonos"));
-    m_scene->addItem(node5);
-    node5->setPos(-10, 50);
-    m_nodeList.append(node5);
-
-    Node *node6 = new Node(this);
-    node6->setHtml(QString("rape goats"));
-    m_scene->addItem(node6);
-    node6->setPos(-10, 100);
-    m_nodeList.append(node6);
-
-    Node *node7 = new Node(this);
-    node7->setHtml(QString("node <h1>important</h1> shit"));
-    m_scene->addItem(node7);
-    node7->setPos(-200, 50);
-    m_nodeList.append(node7);
-
-    Node *node8 = new Node(this);
-    node8->setHtml(QString("more than\none lins"));
-    m_scene->addItem(node8);
-    node8->setPos(50, -80);
-    m_nodeList.append(node8);
-
-    Node *node9 = new Node(this);
-    node9->setHtml(QString("iam a <b>bald</b> and <i>italian</i> guy"));
-    m_scene->addItem(node9);
-    node9->setPos(90, 90);
-    m_nodeList.append(node9);
-
-    Node *node10 = new Node(this);
-    node10->setHtml(QString("no joke <br> anotehr line"));
-    m_scene->addItem(node10);
-    node10->setPos(-160, -10);
-    m_nodeList.append(node10);
-
-    Node *node11 = new Node(this);
-    node11->setHtml(QString("salalal"));
-    m_scene->addItem(node11);
-    node11->setPos(-120, -120);
-    m_nodeList.append(node11);
-
-    Node *node12 = new Node(this);
-    node12->setHtml(QString("lalalala"));
-    m_scene->addItem(node12);
-    node12->setPos(170, -10);
-    m_nodeList.append(node12);;
-    node12->setTextInteractionFlags(Qt::TextEditable);
-
-    m_scene->addItem(new Edge(node1, node2));
-    m_scene->addItem(new Edge(node1, node3));
-    m_scene->addItem(new Edge(node3, node4));
-    m_scene->addItem(new Edge(node1, node5));
-    m_scene->addItem(new Edge(node5, node6));
-    m_scene->addItem(new Edge(node4, node11));
-    m_scene->addItem(new Edge(node2, node12));
-    m_scene->addItem(new Edge(node3, node10));
-    m_scene->addItem(new Edge(node10, node7));
-    m_scene->addItem(new Edge(node5, node7));
-    m_scene->addItem(new Edge(node2, node8));
-    m_scene->addItem(new Edge(node2, node9));
-    */
-
-//    m_activeNode = m_nodeList.first();
-//    m_activeNode->setActive();
-
-    //addFirstNode();
-
-    /// @todo open file somewhere
+    connect(m_scene, SIGNAL(changed(const QList<QRectF> &)),
+            m_parent, SLOT(contentChanged()));
 }
 
-void GraphWidget::newFile()
+void GraphWidget::newScene()
 {
     removeAllNodes();
-
     addFirstNode();
-
     this->show();
-
-    m_parent->enableCloseFile(true);
-    m_parent->enableSave(false);
-    m_parent->enableSaveAs(true);
-    m_parent->setTitle("untitled");
 }
 
-void GraphWidget::closeFile()
+void GraphWidget::closeScene()
 {
-    m_contentChanged = true;
-
-    if (m_contentChanged)
-    {
-
-        int ret = QMessageBox::warning(
-                    this,
-                    tr("QtMindMap - The document has been modified"),
-                    m_parent->getFileName().
-                    append("\n\n").
-                    append(tr("Do you want to save your changes?")),
-                    QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                    QMessageBox::Save);
-
-        switch (ret) {
-        case QMessageBox::Save:
-            // Save was clicked
-        {
-            QString fileName = QFileDialog::getSaveFileName(
-                        this,
-                        tr("Save File"),
-                        QDir::homePath(),
-                        tr("QtMindMap (*.qmm)"));
-
-            qDebug() << fileName;
-
-            /// @todo save content to file
-
-            break;
-        }
-        case QMessageBox::Discard:
-            // Don't Save was clicked
-            removeAllNodes();
-            this->hide();
-            break;
-        case QMessageBox::Cancel:
-            // Cancel was clicked
-            return;
-        default:
-            // should never be reached
-            break;
-        }
-    }
-    else
-    {
-        removeAllNodes();
-        this->hide();
-    }
-
-    m_parent->enableCloseFile(false);
-    m_parent->enableSave(false);
-    m_parent->enableSaveAs(false);
-    m_parent->setTitle("");
+    removeAllNodes();
+    this->hide();
 }
 
-void GraphWidget::saveFileAs()
+void GraphWidget::readContentFromFile(const QString &fileName)
 {
-    QFileDialog dialog(this,
-                       tr("Save MindMap as"),
-                       QDir::homePath(),
-                       tr("QtMindMap (*.qmm)"));
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("qmm");
-
-    if (dialog.exec())
-    {
-        m_fileName = dialog.selectedFiles().first();
-        saveFile();
-    }
-}
-
-void GraphWidget::saveFile()
-{
-    QDomDocument doc("QtMindMap");
-
-    QDomElement root = doc.createElement("qtmindmap");
-    doc.appendChild( root );
-
-    // nodes
-    QDomElement nodes_root = doc.createElement("nodes");
-    root.appendChild(nodes_root);
-    foreach(Node *node, m_nodeList)
-    {
-        QDomElement cn = doc.createElement("nodes");
-        cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
-        cn.setAttribute( "x", QString::number(node->pos().x()));
-        cn.setAttribute( "y", QString::number(node->pos().y()));
-        cn.setAttribute( "htmlContent", node->toHtml());
-        nodes_root.appendChild(cn);
-    }
-
-    //edges
-    QDomElement edges_root = doc.createElement("edges");
-    root.appendChild(edges_root);
-    foreach(Edge *edge, edges())
-    {
-        QDomElement cn = doc.createElement("edge");
-        cn.setAttribute( "source", QString::number(m_nodeList.indexOf(edge->sourceNode())));
-        cn.setAttribute( "destination", QString::number(m_nodeList.indexOf(edge->destNode())));
-        edges_root.appendChild(cn);
-    }
-
-    QFile file(m_fileName);
-    if (!file.open(QIODevice::WriteOnly))
-    {
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("Couldn't open file to write."),
-                    3000); // millisec
-        return;
-    }
-
-    QTextStream ts( &file );
-    ts << doc.toString();
-    file.close();
-
-    dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                tr("Saved."),
-                3000); // millisec
-
-    m_parent->enableCloseFile(true);
-    m_parent->enableSave(true);
-    m_parent->enableSaveAs(true);
-
-    m_parent->setTitle(m_fileName);
-}
-
-void GraphWidget::openFile()
-{
-    qDebug() << __PRETTY_FUNCTION__;
-
-    QFileDialog dialog(this,
-                       tr("Open MindMap"),
-                       QDir::homePath(),
-                       tr("QtMindMap (*.qmm)"));
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setDefaultSuffix("qmm");
-
-    if (dialog.exec())
-    {
-        m_fileName = dialog.selectedFiles().first();
-        openFile(m_fileName);
-    }
-}
-
-void GraphWidget::openFile(const QString &fileName)
-{
-    m_fileName = fileName;
-    m_parent->enableCloseFile(true);
-    m_parent->enableSave(true);
-    m_parent->enableSaveAs(true);
-
-    m_parent->setTitle(fileName);
-
     QDomDocument doc("QtMindMap");
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "faszom cannot read file";
+        m_parent->statusBarMsg(tr("Couldn't read file."));
         return;
     }
 
     if (!doc.setContent(&file))
     {
-        qDebug() << "cannot parse file";
+        m_parent->statusBarMsg(tr("Couldn't parse XML file"));
         file.close();
         return;
     }
@@ -352,6 +105,50 @@ void GraphWidget::openFile(const QString &fileName)
     this->show();
 }
 
+void GraphWidget::writeContentToFile(const QString &fileName)
+{
+    QDomDocument doc("QtMindMap");
+
+    QDomElement root = doc.createElement("qtmindmap");
+    doc.appendChild( root );
+
+    // nodes
+    QDomElement nodes_root = doc.createElement("nodes");
+    root.appendChild(nodes_root);
+    foreach(Node *node, m_nodeList)
+    {
+        QDomElement cn = doc.createElement("nodes");
+//        cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
+        cn.setAttribute( "x", QString::number(node->pos().x()));
+        cn.setAttribute( "y", QString::number(node->pos().y()));
+        cn.setAttribute( "htmlContent", node->toHtml());
+        nodes_root.appendChild(cn);
+    }
+
+    //edges
+    QDomElement edges_root = doc.createElement("edges");
+    root.appendChild(edges_root);
+    foreach(Edge *edge, edges())
+    {
+        QDomElement cn = doc.createElement("edge");
+        cn.setAttribute( "source", QString::number(m_nodeList.indexOf(edge->sourceNode())));
+        cn.setAttribute( "destination", QString::number(m_nodeList.indexOf(edge->destNode())));
+        edges_root.appendChild(cn);
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        m_parent->statusBarMsg(tr("Couldn't open file to write."));
+        return;
+    }
+
+    QTextStream ts( &file );
+    ts << doc.toString();
+    file.close();
+
+    m_parent->statusBarMsg(tr("Saved."));
+}
 
 QGraphicsScene *GraphWidget::getScene()
 {
@@ -388,9 +185,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                  event->key() == Qt::Key_Left ||
                  event->key() == Qt::Key_Right))))
     {
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("No active node."),
-                    3000); // millisec
+        m_parent->statusBarMsg(tr("No active node."));
         return;
     }
 
@@ -402,16 +197,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         if (m_edgeAdding)
         {
             m_edgeAdding = false;
-            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                        tr("Edge adding cancelled"),
-                        3000); // millisec
+             m_parent->statusBarMsg(tr("Edge adding cancelled"));
         }
         else if (m_edgeDeleting)
         {
             m_edgeDeleting = false;
-            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                        tr("Edge deleting cancelled"),
-                        3000); // millisec
+            m_parent->statusBarMsg(tr("Edge deleting cancelled"));
         }
         else if(m_showingNodeNumbers)
         {
@@ -517,9 +308,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         if (m_nodeList.size()==1)
         {
-            dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                        tr("Last node cannot be deleted."),
-                        3000); // millisec
+            m_parent->statusBarMsg(tr("Last node cannot be deleted."));
             break;
         }
 
@@ -537,25 +326,14 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         // add edge to active node
     case Qt::Key_A:
-
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("Add edge: select destination node"),
-                    4000); // millisec
-
+        m_parent->statusBarMsg(tr("Add edge: select destination node."));
         m_edgeAdding = true;
-
         break;
 
         // add edge to active node
     case Qt::Key_D:
-
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("Delete edge: select other end-node"),
-                    4000); // millisec
-
+        m_parent->statusBarMsg(tr("Delete edge: select other end-node."));
         m_edgeDeleting = true;
-
-
         break;
 
     default:
@@ -699,18 +477,11 @@ void GraphWidget::nodeSelected(Node *node)
     }
 }
 
-//int GraphWidget::nodeId(Node *node)
-//{
-//    return m_nodeList.indexOf(node);
-//}
-
 void GraphWidget::addEdge(Node *source, Node *destination)
 {
     if (source->isConnected(destination))
     {
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("There is already an edge between these two nodes."),
-                    5000); // millisec
+        m_parent->statusBarMsg(tr("There is already an edge between these two nodes."));
     }
     else
     {
@@ -722,9 +493,7 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
 {
     if (!source->isConnected(destination))
     {
-        dynamic_cast<MainWindow *>(m_parent)->getStatusBar()->showMessage(
-                    tr("There no edge between these two nodes."),
-                    3000); // millisec
+        m_parent->statusBarMsg(tr("There no edge between these two nodes."));
     }
     else
     {

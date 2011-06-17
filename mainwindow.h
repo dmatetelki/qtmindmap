@@ -7,7 +7,7 @@
 #include "graphwidget.h"
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -15,27 +15,33 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-     QStatusBar * getStatusBar();
-     QString getFileName() { return m_fileName; }
-     void openFile(QString fileName);
-     void enableSave(const bool &enable = true);
-     void enableSaveAs(const bool &enable = true);
-     void enableCloseFile(const bool &enable = true);
-     void setTitle(const QString &title);
-//     void setModifiedTitle(const bool &modified = true);
+//    QStatusBar * getStatusBar(); /// rewrite as a message slot?
+    void statusBarMsg(const QString &msg);
 
 public slots:
+
+    void contentChanged(const bool &changed = true);
+
+    void newFile();
+    void openFile(const QString &fileName = "");
+    void saveFile();
+    void saveFileAs();
+    void closeFile();
 
     void exportScene();
     void about();
 
 private:
 
+    void setTitle(const QString &title);
+
     Ui::MainWindow *m_ui;
     GraphWidget *m_graphicsView;
     QString m_fileName;
+    bool m_contentChanged;
 
 };
 

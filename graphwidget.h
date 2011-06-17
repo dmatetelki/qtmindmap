@@ -26,14 +26,17 @@ public:
 //    int nodeId(Node *node);
     QList<Edge *> edges() const;
 
-public slots:
+//public slots:
 
-    void newFile();
-    void closeFile();
-    void saveFile();
-    void saveFileAs();
-    void openFile(const QString &fileName);
-    void openFile();
+    void newScene();
+    void closeScene();
+    void readContentFromFile(const QString &fileName);
+    void writeContentToFile(const QString &fileName);
+
+//    void savetoFile();
+//    void saveFileAs();
+//    void openFile(const QString &fileName);
+//    void openFile();
 
 protected:
 
