@@ -10,11 +10,13 @@ const double Node::m_pi = 3.14159265358979323846264338327950288419717;
 const double Node::m_oneAndHalfPi = Node::m_pi * 1.5;
 const double Node::m_twoPi = Node::m_pi * 2.0;
 
+const QColor Node::m_orange(255,215,0);
+
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
     m_number(-1),
-    m_hasBorder(true),
+    m_hasBorder(false),
     m_numberIsSpecial(false)
 {
     setFlag(ItemIsMovable);
@@ -217,10 +219,16 @@ void Node::paint(QPainter *painter,
         painter->setPen(Qt::transparent);
         painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
 
-        /// @bug is there a 1pixel wide yellow line at the
-        /// bottom of borderless items?
-        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint()));
+        painter->drawRoundedRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint()), 20.0, 15.0);
+        painter->setBrush(Qt::NoBrush);
+    }
+    else if (m_isActive) // draw background for active node
+    {
+        painter->setPen(Qt::transparent);
+        painter->setBrush(Node::m_orange);
+        painter->drawRoundedRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint()), 20.0, 15.0);
         painter->setBrush(Qt::NoBrush);
     }
 

@@ -64,6 +64,8 @@ private:
     bool m_edgeDeleting;
     bool m_contentChanged;
     QString m_fileName;
+
+    static const QColor m_paper;
 };
 
 #endif // GRAPHWIDGET_H

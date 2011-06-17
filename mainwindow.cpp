@@ -75,6 +75,8 @@ void MainWindow::newFile()
     contentChanged(false);
     m_fileName = "untitled";
     setTitle(m_fileName);
+
+    m_graphicsView->setFocus();
 }
 
 void MainWindow::openFile(const QString &fileName)

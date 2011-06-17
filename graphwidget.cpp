@@ -11,6 +11,9 @@
 #include "math.h"
 #include "mainwindow.h"
 
+//const QColor GraphWidget::m_paper(255,255,105);
+const QColor GraphWidget::m_paper(255,255,153);
+
 
 GraphWidget::GraphWidget(MainWindow *parent) :
     QGraphicsView(parent),
@@ -27,14 +30,12 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_scene->setSceneRect(-400, -400, 800, 800);
     setScene(m_scene);
+
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
-
-//    connect(m_scene, SIGNAL(changed(const QList<QRectF> &)),
-//            m_parent, SLOT(contentChanged()));
 }
 
 void GraphWidget::newScene()
@@ -93,14 +94,15 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
         QDomElement e = edges.item(i).toElement();
         if(!e.isNull())
         {
-            m_scene->addItem(new Edge(m_nodeList[e.attribute("source").toInt()],
-
-                                      m_nodeList[e.attribute("destination").toInt()]));
+            m_scene->addItem(new Edge(
+                              m_nodeList[e.attribute("source").toInt()],
+                              m_nodeList[e.attribute("destination").toInt()]));
         }
     }
 
     m_activeNode = m_nodeList.first();
     m_activeNode->setActive();
+    m_activeNode->setFocus();
 
     this->show();
 }
@@ -131,8 +133,10 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     foreach(Edge *edge, edges())
     {
         QDomElement cn = doc.createElement("edge");
-        cn.setAttribute( "source", QString::number(m_nodeList.indexOf(edge->sourceNode())));
-        cn.setAttribute( "destination", QString::number(m_nodeList.indexOf(edge->destNode())));
+        cn.setAttribute( "source",
+                      QString::number(m_nodeList.indexOf(edge->sourceNode())));
+        cn.setAttribute( "destination",
+                      QString::number(m_nodeList.indexOf(edge->destNode())));
         edges_root.appendChild(cn);
     }
 
@@ -159,8 +163,10 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
     painter.setRenderHint(QPainter::Antialiasing);
 
-    /// @bug scene background is not rendered
+    m_scene->setBackgroundBrush(GraphWidget::m_paper);
+
     m_scene->render(&painter);
+    painter.setBackground(GraphWidget::m_paper);
     painter.end();
 
     img.save(fileName);
@@ -170,6 +176,8 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
     // esc leaves node editing mode
     if (event->key() == Qt::Key_Escape && m_editingNode)
     {
@@ -367,17 +375,10 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
 {
     Q_UNUSED(rect);
 
-    QRectF sceneRect = this->sceneRect();
-
-    // Fill
-    QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
-    gradient.setColorAt(0, Qt::white);
-    gradient.setColorAt(1, Qt::lightGray);
-    painter->fillRect(rect.intersect(sceneRect), gradient);
+    painter->fillRect(m_scene->sceneRect(), GraphWidget::m_paper);
     painter->setBrush(Qt::NoBrush);
-    painter->drawRect(sceneRect);
+    painter->drawRect(m_scene->sceneRect());
 }
-
 
 void GraphWidget::scaleView(qreal scaleFactor)
 {
@@ -499,7 +500,8 @@ void GraphWidget::addEdge(Node *source, Node *destination)
 {
     if (source->isConnected(destination))
     {
-        m_parent->statusBarMsg(tr("There is already an edge between these two nodes."));
+        m_parent->statusBarMsg(
+                    tr("There is already an edge between these two nodes."));
     }
     else
     {
@@ -546,15 +548,17 @@ void GraphWidget::removeAllNodes()
 
 void GraphWidget::addFirstNode()
 {
-    Node *node1 = new Node(this);
-    node1->setHtml(QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
-    m_scene->addItem(node1);
-    node1->setPos(-10, -10);
-    node1->setBorder(false);
-    m_nodeList.append(node1);
+    Node *node = new Node(this);
+    node->setHtml(
+                QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
+    m_scene->addItem(node);
+    node->setPos(-25, -25);
+    node->setBorder(false);
+    m_nodeList.append(node);
 
     m_activeNode = m_nodeList.first();
     m_activeNode->setActive();
+//    m_scene->setFocusItem(m_activeNode);
 }
 
 QList<Edge *> GraphWidget::edges() const

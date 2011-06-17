@@ -65,6 +65,8 @@ private:
     static const double m_pi;
     static const double m_oneAndHalfPi;
     static const double m_twoPi;
+
+    static const QColor m_orange;
 };
 
 #endif // NODE_H
