@@ -476,6 +476,9 @@ void GraphWidget::nodeSelected(Node *node)
     showingAllNodeNumbers(false);
     m_showingNodeNumbers = false;
 
+    node->setEditable(false);
+    m_editingNode = false;
+
     if (m_edgeAdding)
     {
         addEdge(m_activeNode, node);
@@ -513,7 +516,7 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
     }
     else
     {
-        source->removeEdge(destination);
+        source->deleteEdge(destination);
         contentChanged();
     }
 }

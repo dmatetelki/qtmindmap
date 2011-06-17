@@ -17,14 +17,16 @@ public:
     ~Node();
 
     void addEdge(Edge *edge, bool startsFromThisNode);
+    void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);
-    void removeEdge(Node *otherEnd);
+
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
+    void setEditable(const bool &editable = true);
+
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
     double calculateBiggestAngle();
-    void setEditable(const bool &editable = true);
 
     // changing visibility from prot to pub
     void keyPressEvent(QKeyEvent *event);
@@ -41,7 +43,6 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void linkActivated(const QString &link);
 
 private:
 
@@ -60,8 +61,10 @@ private:
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;
-//    QTextCursor m_cursor;
 
+    static const double m_pi;
+    static const double m_oneAndHalfPi;
+    static const double m_twoPi;
 };
 
 #endif // NODE_H

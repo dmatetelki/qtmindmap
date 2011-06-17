@@ -6,9 +6,9 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
 
-static const double Pi = 3.14159265358979323846264338327950288419717;
-static double TwoPi = 2.0 * Pi;
-static double OneAndHalfPi = 1.5 * Pi;
+const double Node::m_pi = 3.14159265358979323846264338327950288419717;
+const double Node::m_oneAndHalfPi = Node::m_pi * 1.5;
+const double Node::m_twoPi = Node::m_pi * 2.0;
 
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
@@ -19,9 +19,7 @@ Node::Node(GraphWidget *parent) :
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
-
     setCacheMode(DeviceCoordinateCache);
-
     setDefaultTextColor(QColor(0,0,0));
 }
 
@@ -37,20 +35,7 @@ void Node::addEdge(Edge *edge, bool startsFromThisNode)
     edge->adjust();
 }
 
-void Node::removeEdgeFromList(Edge *edge)
-{
-    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
-        it != m_edgeList.end(); it++)
-    {
-        if (it->edge == edge)
-        {
-            m_edgeList.erase(it);
-            return;
-        }
-    }
-}
-
-void Node::removeEdge(Node *otherEnd)
+void Node::deleteEdge(Node *otherEnd)
 {
     for(QList<EdgeElement>::iterator it = m_edgeList.begin();
         it != m_edgeList.end(); it++)
@@ -66,125 +51,17 @@ void Node::removeEdge(Node *otherEnd)
     }
 }
 
-QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
+void Node::removeEdgeFromList(Edge *edge)
 {
-    switch (change) {
-
-    case ItemPositionChange:
-
-        if (change == ItemPositionChange && scene())
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
+    {
+        if (it->edge == edge)
         {
-            // value is the new position.
-            QPointF newPos = value.toPointF();
-
-            // the fence is reduced with the size of the node
-            QRectF rect (scene()->sceneRect().topLeft(),
-                         scene()->sceneRect().bottomRight() -
-                            boundingRect().bottomRight());
-
-            if (!rect.contains(newPos))
-            {
-                // Keep the item inside the scene rect.
-                newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
-                newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
-                return newPos;
-            }
+            m_edgeList.erase(it);
+            return;
         }
-        break;
-
-    case ItemPositionHasChanged:
-
-        m_graph->contentChanged();
-        foreach (EdgeElement element, m_edgeList) element.edge->adjust();
-        break;
-
-    default:
-        break;
-    };
-
-    return QGraphicsItem::itemChange(change, value);
-}
-
-void Node::paint(QPainter *painter,
-                 const QStyleOptionGraphicsItem *option,
-                 QWidget *w)
-{
-    // draw background in hint mode. num == -1 : not in hint mode
-    // if m_numberIsSpecial (can be selected with enter) bg is green, not yellow
-    if (m_number != -1)
-    {
-        painter->setPen(Qt::transparent);
-        painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
-
-        /// @bug is there a 1pixel wide yellow line at the
-        /// bottom of borderless items?
-        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint()));
-        painter->setBrush(Qt::NoBrush);
     }
-
-    // the text itself
-    QGraphicsTextItem::paint(painter, option, w);
-
-    if (m_hasBorder)
-    {
-        painter->setPen(m_isActive ? Qt::red : Qt::blue);
-        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint() -
-                          QPoint(1,1)));
-    }
-
-    // print num to topleft corner in hint mode.
-    if (m_number != -1)
-    {
-        painter->setPen(Qt::white);
-        painter->setBackground(Qt::red);
-        painter->setBackgroundMode(Qt::OpaqueMode);
-        painter->drawText(boundingRect().topLeft()+QPointF(0,11),
-                          QString("%1").arg(m_number));
-    }
-}
-
-
-
-void Node::setActive(const bool &active)
-{
-    m_isActive = active;
-    // update border color
-    update();
-}
-
-
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    m_graph->nodeSelected(this);
-
-    QGraphicsItem::mousePressEvent(event);
-}
-
-void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    Q_UNUSED(event);
-    m_graph->setActiveNodeEditable();
-}
-
-void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsItem::mouseReleaseEvent(event);
-}
-
-void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    QGraphicsItem::mouseMoveEvent(event);
-}
-
-void Node::showNumber(const int &number,
-                      const bool& show,
-                      const bool &numberIsSpecial)
-{
-    m_number = show ? number : -1;
-    m_numberIsSpecial = numberIsSpecial;
-    update();
 }
 
 void Node::setBorder(const bool &hasBorder)
@@ -193,61 +70,10 @@ void Node::setBorder(const bool &hasBorder)
    update();
 }
 
-double Node::calculateBiggestAngle()
+void Node::setActive(const bool &active)
 {
-    if (m_edgeList.empty())
-        return OneAndHalfPi;
-
-    if (m_edgeList.size()==1)
-    {
-        if (m_edgeList.first().startsFromThisNode)
-        {
-            return Pi - m_edgeList.first().edge->getAngle();
-        }
-        else
-        {
-            return TwoPi - m_edgeList.first().edge->getAngle();
-        }
-    }
-
-    QList<double> tmp;
-    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
-        it != m_edgeList.end(); it++)
-    {
-        tmp.push_back(it->startsFromThisNode ?
-                          it->edge->getAngle() :
-                          doubleModulo(Pi + it->edge->getAngle(), TwoPi));
-    }
-    qSort(tmp.begin(), tmp.end());
-
-    double prev(tmp.first());
-    double max_prev(tmp.last());
-    double max(TwoPi - tmp.last() + tmp.first());
-
-    for(QList<double>::const_iterator it = ++tmp.begin(); it!=tmp.end(); it++)
-    {
-        if (*it - prev > max )
-        {
-            max = *it - prev;
-            max_prev = prev;
-        }
-        prev = *it;
-    }
-
-    return TwoPi - doubleModulo(max_prev + max / 2, TwoPi);
-}
-
-void Node::linkActivated(const QString &link)
-{
-	qDebug() << __PRETTY_FUNCTION__;
-
-	qDebug() << link;
-}
-
-double Node::doubleModulo(const double &devided, const double &devisor)
-{
-    return devided - static_cast<double>(devisor * static_cast<int>(devided
-                                                                    / devisor));
+    m_isActive = active;
+    update();
 }
 
 void Node::setEditable(const bool &editable)
@@ -260,6 +86,52 @@ void Node::setEditable(const bool &editable)
     QTextCursor c = textCursor();
     c.setPosition(c.document()->toPlainText().length());
     setTextCursor(c);
+}
+
+void Node::showNumber(const int &number,
+                      const bool& show,
+                      const bool &numberIsSpecial)
+{
+    m_number = show ? number : -1;
+    m_numberIsSpecial = numberIsSpecial;
+    update();
+}
+
+double Node::calculateBiggestAngle()
+{
+    if (m_edgeList.empty())
+        return Node::m_oneAndHalfPi;
+
+    if (m_edgeList.size()==1)
+        return m_edgeList.first().startsFromThisNode ?
+                    Node::m_pi - m_edgeList.first().edge->getAngle() :
+                    Node::m_twoPi - m_edgeList.first().edge->getAngle();
+
+    QList<double> tmp;
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
+    {
+        tmp.push_back(it->startsFromThisNode ?
+                 it->edge->getAngle() :
+                 doubleModulo(Node::m_pi + it->edge->getAngle(), Node::m_twoPi));
+    }
+    qSort(tmp.begin(), tmp.end());
+
+    double prev(tmp.first());
+    double max_prev(tmp.last());
+    double max(Node::m_twoPi - tmp.last() + tmp.first());
+
+    for(QList<double>::const_iterator it = ++tmp.begin(); it!=tmp.end(); it++)
+    {
+        if (*it - prev > max )
+        {
+            max = *it - prev;
+            max_prev = prev;
+        }
+        prev = *it;
+    }
+
+    return Node::m_twoPi - doubleModulo(max_prev + max / 2, Node::m_twoPi);
 }
 
 void Node::keyPressEvent(QKeyEvent *event)
@@ -332,4 +204,112 @@ QList<Edge *> Node::edgesFrom() const
             list.push_back(element.edge);
 
     return list;
+}
+
+void Node::paint(QPainter *painter,
+                 const QStyleOptionGraphicsItem *option,
+                 QWidget *w)
+{
+    // draw background in hint mode. num == -1 : not in hint mode
+    // if m_numberIsSpecial (can be selected with enter) bg is green, not yellow
+    if (m_number != -1)
+    {
+        painter->setPen(Qt::transparent);
+        painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
+
+        /// @bug is there a 1pixel wide yellow line at the
+        /// bottom of borderless items?
+        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint()));
+        painter->setBrush(Qt::NoBrush);
+    }
+
+    // the text itself
+    QGraphicsTextItem::paint(painter, option, w);
+
+    if (m_hasBorder)
+    {
+        painter->setPen(m_isActive ? Qt::red : Qt::blue);
+        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
+                          boundingRect().bottomRight().toPoint() -
+                          QPoint(1,1)));
+    }
+
+    // print num to topleft corner in hint mode.
+    if (m_number != -1)
+    {
+        painter->setPen(Qt::white);
+        painter->setBackground(Qt::red);
+        painter->setBackgroundMode(Qt::OpaqueMode);
+        painter->drawText(boundingRect().topLeft()+QPointF(0,11),
+                          QString("%1").arg(m_number));
+    }
+}
+
+QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    switch (change) {
+
+    case ItemPositionChange:
+
+        if (change == ItemPositionChange && scene())
+        {
+            // value is the new position.
+            QPointF newPos = value.toPointF();
+
+            // the fence is reduced with the size of the node
+            QRectF rect (scene()->sceneRect().topLeft(),
+                         scene()->sceneRect().bottomRight() -
+                            boundingRect().bottomRight());
+
+            if (!rect.contains(newPos))
+            {
+                // Keep the item inside the scene rect.
+                newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+                newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+                return newPos;
+            }
+        }
+        break;
+
+    case ItemPositionHasChanged:
+
+        m_graph->contentChanged();
+        foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+        break;
+
+    default:
+        break;
+    };
+
+    return QGraphicsItem::itemChange(change, value);
+}
+
+void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    m_graph->nodeSelected(this);
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    m_graph->setActiveNodeEditable();
+}
+
+void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+double Node::doubleModulo(const double &devided, const double &devisor)
+{
+    return devided - static_cast<double>(devisor * static_cast<int>(devided
+                                                                    / devisor));
 }

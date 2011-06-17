@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include <QMovie>
 
-//#include "mainwindow.h"
 #include "node.h"
 
 class MainWindow;
@@ -22,23 +21,15 @@ public:
     void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
-//    int nodeId(Node *node);
     QList<Edge *> edges() const;
 
     void contentChanged(const bool &changed = true);
-
-//public slots:
 
     void newScene();
     void closeScene();
     void readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
-
-//    void savetoFile();
-//    void saveFileAs();
-//    void openFile(const QString &fileName);
-//    void openFile();
 
 protected:
 
