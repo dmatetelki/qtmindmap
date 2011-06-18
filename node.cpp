@@ -10,14 +10,17 @@ const double Node::m_pi = 3.14159265358979323846264338327950288419717;
 const double Node::m_oneAndHalfPi = Node::m_pi * 1.5;
 const double Node::m_twoPi = Node::m_pi * 2.0;
 
-const QColor Node::m_orange(255,215,0);
+const QColor Node::m_gold(255,215,0);
+const QColor Node::m_orange(255,102,0);
 
 Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
     m_number(-1),
-    m_hasBorder(true),
-    m_numberIsSpecial(false)
+    m_hasBorder(false),
+    m_numberIsSpecial(false),
+    m_color(m_gold),
+    m_textColor(0,0,0)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
@@ -93,6 +96,18 @@ void Node::setEditable(const bool &editable)
     QTextCursor c = textCursor();
     c.setPosition(c.document()->toPlainText().length());
     setTextCursor(c);
+}
+
+void Node::setColor(const QColor &color)
+{
+    m_color = color;
+    update();
+}
+
+void Node::setTextColor(const QColor &color)
+{
+    m_textColor = color;
+    update();
 }
 
 void Node::scale(const qreal &factor)
@@ -281,8 +296,10 @@ void Node::paint(QPainter *painter,
             painter->setPen(m_isActive ? Qt::red : Qt::blue) :
             painter->setPen(Qt::transparent);
 
-        if (m_isActive)
-                painter->setBrush(Node::m_orange);
+        m_isActive?
+//            painter->setBrush(Node::m_orange) :
+            painter->setBrush(m_color.darker(120)) :
+            painter->setBrush(m_color);
 
         painter->drawRoundedRect(boundingRect(), 20.0, 15.0);
     }
@@ -290,6 +307,7 @@ void Node::paint(QPainter *painter,
 
 
     // the text itself
+    setDefaultTextColor(m_textColor);
     QGraphicsTextItem::paint(painter, option, w);
 
 

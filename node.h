@@ -24,6 +24,10 @@ public:
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
     void setEditable(const bool &editable = true);
+    void setColor(const QColor &color);
+    QColor color() const { return m_color; }
+    void setTextColor(const QColor &color);
+    QColor textColor() const { return m_textColor; }
     void scale(const qreal &factor);
 
     void showNumber(const int &number, const bool& show = true,
@@ -65,12 +69,15 @@ private:
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;
+    QColor m_color;
+    QColor m_textColor;
 
     static const double m_pi;
     static const double m_oneAndHalfPi;
     static const double m_twoPi;
 
     static const QColor m_orange;
+    static const QColor m_gold;
 };
 
 #endif // NODE_H

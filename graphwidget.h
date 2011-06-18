@@ -65,6 +65,7 @@ private:
     QString m_fileName;
 
     static const QColor m_paper;
+    static const QColor m_gold;
 };
 
 #endif // GRAPHWIDGET_H

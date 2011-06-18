@@ -86,7 +86,14 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
             node->setPos(e.attribute("x").toFloat(),
                          e.attribute("y").toFloat());
             node->setScale(e.attribute("scale").toFloat());
-
+            node->setColor(QColor(e.attribute("bg_red").toFloat(),
+                                  e.attribute("bg_green").toFloat(),
+                                  e.attribute("bg_blue").toFloat(),
+                                  e.attribute("bg_alpha").toFloat()));
+            node->setTextColor(QColor(e.attribute("text_red").toFloat(),
+                                      e.attribute("text_green").toFloat(),
+                                      e.attribute("text_blue").toFloat(),
+                                      e.attribute("text_alpha").toFloat()));
             m_nodeList.append(node);
         }
     }
@@ -129,7 +136,15 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "x", QString::number(node->pos().x()));
         cn.setAttribute( "y", QString::number(node->pos().y()));
         cn.setAttribute( "htmlContent", node->toHtml());
-        cn.setAttribute("scale", QString::number(((QGraphicsTextItem*)node)->scale()));
+        cn.setAttribute( "scale", QString::number(((QGraphicsTextItem*)node)->scale()));
+        cn.setAttribute( "bg_red", QString::number(node->color().red()));
+        cn.setAttribute( "bg_green", QString::number(node->color().green()));
+        cn.setAttribute( "bg_blue", QString::number(node->color().blue()));
+        cn.setAttribute( "bg_alpha", QString::number(node->color().alpha()));
+        cn.setAttribute( "text_red", QString::number(node->textColor().red()));
+        cn.setAttribute( "text_green", QString::number(node->textColor().green()));
+        cn.setAttribute( "text_blue", QString::number(node->textColor().blue()));
+        cn.setAttribute( "text_alpha", QString::number(node->textColor().alpha()));
         nodes_root.appendChild(cn);
     }
 
@@ -198,11 +213,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     // certain actions need an active node
     if (!m_activeNode &&
-            ( event->key() == Qt::Key_Insert ||      // add new node
+            ( event->key() == Qt::Key_Insert ||     // add new node
              event->key() == Qt::Key_F2 ||          // edit node
              event->key() == Qt::Key_Delete ||      // delete node
              event->key() == Qt::Key_A ||           // add edge
              event->key() == Qt::Key_D ||           // remove edge
+             event->key() == Qt::Key_C ||           // node color
+             event->key() == Qt::Key_T ||           // node text color
              ( event->modifiers() &  Qt::ControlModifier &&  // moving node
                ( event->key() == Qt::Key_Up ||
                  event->key() == Qt::Key_Down ||
@@ -348,9 +365,14 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         // delete node
     case Qt::Key_Delete:
 
-        if (m_nodeList.size()==1)
+//        if (m_nodeList.size()==1)
+//        {
+//            m_parent->statusBarMsg(tr("Last node cannot be deleted."));
+//            break;
+//        }
+        if (m_activeNode == m_nodeList.first())
         {
-            m_parent->statusBarMsg(tr("Last node cannot be deleted."));
+            m_parent->statusBarMsg(tr("Base node cannot be deleted."));
             break;
         }
 
@@ -382,8 +404,27 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C:
     {
         QColorDialog dialog(this);
+        dialog.setWindowTitle(tr("Select node color"));
+        dialog.setOption(QColorDialog::ShowAlphaChannel);
         if (dialog.exec())
+        {
             QColor color = dialog.selectedColor();
+            m_activeNode->setColor(color);
+        }
+
+        break;
+    }
+
+    case Qt::Key_T:
+    {
+        QColorDialog dialog(this);
+        dialog.setWindowTitle(tr("Select text color"));
+        dialog.setOption(QColorDialog::ShowAlphaChannel);
+        if (dialog.exec())
+        {
+            QColor color = dialog.selectedColor();
+            m_activeNode->setTextColor(color);
+        }
 
         break;
     }
