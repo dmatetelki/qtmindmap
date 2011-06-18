@@ -277,6 +277,16 @@ QList<Edge *> Node::edgesFrom() const
     return list;
 }
 
+Edge * Node::edgeTo(const Node *node) const
+{
+    foreach(EdgeElement element, m_edgeList)
+        if (element.edge->sourceNode() == node  ||
+            element.edge->destNode() == node)
+            return element.edge;
+
+    return 0;
+}
+
 void Node::paint(QPainter *painter,
                  const QStyleOptionGraphicsItem *option,
                  QWidget *w)

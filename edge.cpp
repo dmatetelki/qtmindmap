@@ -43,6 +43,12 @@ double Edge::getAngle() const
     return m_angle;
 }
 
+void Edge::setColor(const QColor &color)
+{
+    m_color = color;
+    update();
+}
+
 void Edge::adjust()
 {
     if (!m_sourceNode || !m_destNode)
@@ -95,7 +101,7 @@ void Edge::paint(QPainter *painter,
         return;
 
     // Draw the line itself
-    painter->setPen(QPen(Qt::black,
+    painter->setPen(QPen(m_color,
                          1,
                          Qt::SolidLine,
                          Qt::RoundCap,
@@ -113,7 +119,7 @@ void Edge::paint(QPainter *painter,
               QPointF(sin(m_angle - Edge::m_pi + Edge::m_pi / 3) * m_arrowSize,
                       cos(m_angle - Edge::m_pi + Edge::m_pi / 3) * m_arrowSize);
 
-    painter->setBrush(Qt::black);
+    painter->setBrush(m_color);
     painter->drawPolygon(QPolygonF() << line.p2()
                                      << destArrowP1
                                      << destArrowP2);
