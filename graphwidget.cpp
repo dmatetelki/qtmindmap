@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QtXml>
+#include <QColorDialog>
 
 #include "node.h"
 #include "edge.h"
@@ -84,6 +85,8 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
             m_scene->addItem(node);
             node->setPos(e.attribute("x").toFloat(),
                          e.attribute("y").toFloat());
+            node->setScale(e.attribute("scale").toFloat());
+
             m_nodeList.append(node);
         }
     }
@@ -120,10 +123,13 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     foreach(Node *node, m_nodeList)
     {
         QDomElement cn = doc.createElement("nodes");
-//        cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
+
+        // no need to store ID: parsing order is preorder.
+        // cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
         cn.setAttribute( "x", QString::number(node->pos().x()));
         cn.setAttribute( "y", QString::number(node->pos().y()));
         cn.setAttribute( "htmlContent", node->toHtml());
+        cn.setAttribute("scale", QString::number(((QGraphicsTextItem*)node)->scale()));
         nodes_root.appendChild(cn);
     }
 
@@ -176,8 +182,6 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     // esc leaves node editing mode
     if (event->key() == Qt::Key_Escape && m_editingNode)
     {
@@ -199,11 +203,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              event->key() == Qt::Key_Delete ||      // delete node
              event->key() == Qt::Key_A ||           // add edge
              event->key() == Qt::Key_D ||           // remove edge
-             ( event->modifiers() ==  Qt::ControlModifier &&  // moving node
-              ( event->key() == Qt::Key_Up ||
-               event->key() == Qt::Key_Down ||
-               event->key() == Qt::Key_Left ||
-               event->key() == Qt::Key_Right))))
+             ( event->modifiers() &  Qt::ControlModifier &&  // moving node
+               ( event->key() == Qt::Key_Up ||
+                 event->key() == Qt::Key_Down ||
+                 event->key() == Qt::Key_Left ||
+                 event->key() == Qt::Key_Right ||
+                 event->key() == Qt::Key_Plus ||
+                 event->key() == Qt::Key_Minus ))))
     {
         m_parent->statusBarMsg(tr("No active node."));
         return;
@@ -254,10 +260,24 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         // zoom in/out
     case Qt::Key_Plus:
-        scaleView(qreal(1.2));
+        if (event->modifiers() &  Qt::ControlModifier)
+        {
+            m_activeNode->scale(qreal(1.2));
+        }
+        else
+        {
+            scaleView(qreal(1.2));
+        }
         break;
     case Qt::Key_Minus:
-        scaleView(1 / qreal(1.2));
+        if (event->modifiers() &  Qt::ControlModifier)
+        {
+            m_activeNode->scale(qreal(1 / 1.2));
+        }
+        else
+        {
+            scaleView(1 / qreal(1.2));
+        }
         break;
 
         // Hint mode: select a node vimperator style
@@ -359,6 +379,14 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         m_edgeDeleting = true;
         break;
 
+    case Qt::Key_C:
+    {
+        QColorDialog dialog(this);
+        if (dialog.exec())
+            QColor color = dialog.selectedColor();
+
+        break;
+    }
     default:
         QGraphicsView::keyPressEvent(event);
     }
@@ -554,6 +582,7 @@ void GraphWidget::addFirstNode()
     m_scene->addItem(node);
     node->setPos(-25, -25);
     node->setBorder(false);
+
     m_nodeList.append(node);
 
     m_activeNode = m_nodeList.first();

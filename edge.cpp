@@ -38,30 +38,6 @@ Node *Edge::destNode() const
     return m_destNode;
 }
 
-/** @note This is brute force. Isn't there a simple fv for this?
-  * The precision is not the best either
-  */
-QPointF firstNotContainedPoint(const QLineF &line,
-                               const QRectF &rect,
-                               bool reverse = false)
-{
-    if (reverse)
-    {
-        for (qreal t = 1; t!=0; t-=0.01)
-        {
-            if (!rect.contains(line.pointAt(t))) return line.pointAt(t);
-        }
-    }
-    else
-    {
-        for (qreal t = 0; t!=1; t+=0.01)
-        {
-            if (!rect.contains(line.pointAt(t))) return line.pointAt(t);
-        }
-    }
-    return QPoint(0,0);
-}
-
 double Edge::getAngle() const
 {
     return m_angle;
@@ -74,16 +50,14 @@ void Edge::adjust()
 
     prepareGeometryChange();
 
-    QLineF line(mapFromItem(m_sourceNode, 0, 0) +
-                m_sourceNode->boundingRect().center(),
-                mapFromItem(m_destNode, 0, 0)  +
-                m_destNode->boundingRect().center());
+    QLineF line(m_sourceNode->sceneBoundingRect().center(),
+                m_destNode->sceneBoundingRect().center());
 
-    if (line.length() > qreal(20.)) {
-        m_sourcePoint = firstNotContainedPoint(line,
-                            m_sourceNode->sceneBoundingRect());
-        m_destPoint = firstNotContainedPoint(line,
-                            m_destNode->sceneBoundingRect(),true);
+    if (line.length() > qreal(20.))
+    {
+        m_sourcePoint = m_sourceNode->intersect(line);
+        m_destPoint = m_destNode->intersect(line,true);
+
     } else {
         m_sourcePoint = m_destPoint = line.p1();
     }

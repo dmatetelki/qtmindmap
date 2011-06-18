@@ -19,10 +19,12 @@ public:
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);
+    void adjustEdges();
 
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
     void setEditable(const bool &editable = true);
+    void scale(const qreal &factor);
 
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
@@ -31,6 +33,7 @@ public:
     // changing visibility from prot to pub
     void keyPressEvent(QKeyEvent *event);
     bool isConnected(const Node *node) const;
+    QPointF intersect(const QLineF &line, const bool &reverse = false) const;
 
     QList<Edge *> edgesFrom() const;
 
@@ -43,6 +46,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    QPainterPath shape () const;
 
 private:
 

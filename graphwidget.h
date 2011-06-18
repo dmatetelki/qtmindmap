@@ -35,12 +35,11 @@ protected:
 
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void scaleView(qreal scaleFactor);
     void drawBackground(QPainter *painter, const QRectF &rect);
-
 
 private:
 
+    void scaleView(qreal scaleFactor);
     void showNodeNumbers();
     void showingAllNodeNumbers(const bool &show = true);
     void showingNodeNumbersBeginWithNumber(const int &number,

@@ -16,7 +16,7 @@ Node::Node(GraphWidget *parent) :
     m_graph(parent),
     m_isActive(false),
     m_number(-1),
-    m_hasBorder(false),
+    m_hasBorder(true),
     m_numberIsSpecial(false)
 {
     setFlag(ItemIsMovable);
@@ -66,6 +66,11 @@ void Node::removeEdgeFromList(Edge *edge)
     }
 }
 
+void Node::adjustEdges()
+{
+    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+}
+
 void Node::setBorder(const bool &hasBorder)
 {
    m_hasBorder = hasBorder;
@@ -88,6 +93,21 @@ void Node::setEditable(const bool &editable)
     QTextCursor c = textCursor();
     c.setPosition(c.document()->toPlainText().length());
     setTextCursor(c);
+}
+
+void Node::scale(const qreal &factor)
+{
+    qDebug() << factor * QGraphicsTextItem::scale();
+
+    if (factor * QGraphicsTextItem::scale() < 0.3 ||
+        factor * QGraphicsTextItem::scale() > 5 )
+        return;
+
+    // it would make stuff difficult, like limiting the pos. inside scene
+//    setTransformOriginPoint(boundingRect().center());
+
+    QGraphicsTextItem::setScale(factor * QGraphicsTextItem::scale());
+    adjustEdges();
 }
 
 void Node::showNumber(const int &number,
@@ -197,6 +217,40 @@ bool Node::isConnected(const Node *node) const
     return false;
 }
 
+QPointF Node::intersect(const QLineF &line, const bool &reverse) const
+{
+//    QPainterPath shape;
+//    shape.addRoundedRect(sceneBoundingRect(), 20.0, 15.0);
+
+//    QPainterPath l;
+//    l.moveTo(sceneBoundingRect().center());
+//    l.lineTo(line.p2());
+
+//    return shape.intersected(l).pointAtPercent(0.5);
+
+
+    /// @but this just does not work, doing it with brute force
+    QPainterPath path;
+    path.addRoundedRect(sceneBoundingRect(), 28.0, 28.0);
+
+    if (reverse)
+    {
+        for (qreal t = 1; t!=0; t-=0.01)
+        {
+            if (!path.contains(line.pointAt(t))) return line.pointAt(t);
+        }
+    }
+    else
+    {
+        for (qreal t = 0; t!=1; t+=0.01)
+        {
+            if (!path.contains(line.pointAt(t))) return line.pointAt(t);
+        }
+    }
+
+    return QPointF(0,0);
+}
+
 QList<Edge *> Node::edgesFrom() const
 {
     QList<Edge *> list;
@@ -219,29 +273,25 @@ void Node::paint(QPainter *painter,
         painter->setPen(Qt::transparent);
         painter->setBrush(m_numberIsSpecial ? Qt::green : Qt::yellow);
 
-        painter->drawRoundedRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint()), 20.0, 15.0);
-        painter->setBrush(Qt::NoBrush);
+        painter->drawRoundedRect(boundingRect(), 20.0, 15.0);
     }
-    else if (m_isActive) // draw background for active node
+    else
     {
-        painter->setPen(Qt::transparent);
-        painter->setBrush(Node::m_orange);
-        painter->drawRoundedRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint()), 20.0, 15.0);
-        painter->setBrush(Qt::NoBrush);
+        m_hasBorder ?
+            painter->setPen(m_isActive ? Qt::red : Qt::blue) :
+            painter->setPen(Qt::transparent);
+
+        if (m_isActive)
+                painter->setBrush(Node::m_orange);
+
+        painter->drawRoundedRect(boundingRect(), 20.0, 15.0);
     }
+    painter->setBrush(Qt::NoBrush);
+
 
     // the text itself
     QGraphicsTextItem::paint(painter, option, w);
 
-    if (m_hasBorder)
-    {
-        painter->setPen(m_isActive ? Qt::red : Qt::blue);
-        painter->drawRect(QRect(boundingRect().topLeft().toPoint(),
-                          boundingRect().bottomRight().toPoint() -
-                          QPoint(1,1)));
-    }
 
     // print num to topleft corner in hint mode.
     if (m_number != -1)
@@ -268,7 +318,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
             // the fence is reduced with the size of the node
             QRectF rect (scene()->sceneRect().topLeft(),
                          scene()->sceneRect().bottomRight() -
-                            boundingRect().bottomRight());
+                         boundingRect().bottomRight() * QGraphicsTextItem::scale() );
 
             if (!rect.contains(newPos))
             {
@@ -314,6 +364,14 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseMoveEvent(event);
+}
+
+/// @bug it seems sceneBoundingRect().contains doesn't care about path retval...
+QPainterPath Node::shape () const
+{
+    QPainterPath path;
+    path.addRoundedRect(boundingRect(), 20.0, 15.0);
+    return path;
 }
 
 double Node::doubleModulo(const double &devided, const double &devisor)
