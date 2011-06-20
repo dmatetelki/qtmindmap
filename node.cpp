@@ -70,10 +70,10 @@ void Node::removeEdgeFromList(Edge *edge)
     }
 }
 
-void Node::adjustEdges()
-{
-    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
-}
+//void Node::adjustEdges()
+//{
+//    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+//}
 
 void Node::setBorder(const bool &hasBorder)
 {
@@ -113,20 +113,21 @@ void Node::setTextColor(const QColor &color)
 
 void Node::scale(const qreal &factor)
 {
-    if (factor * QGraphicsTextItem::scale() < 0.2 ||
-        factor * QGraphicsTextItem::scale() > 10 )
+    if (factor * QGraphicsTextItem::scale() < 0.4 ||
+        factor * QGraphicsTextItem::scale() > 4 )
         return;
 
     // it would make stuff difficult, like limiting the pos. inside scene
-//    setTransformOriginPoint(boundingRect().center());
+    //    setTransformOriginPoint(boundingRect().center());
 
     QGraphicsTextItem::setScale(factor * QGraphicsTextItem::scale());
     foreach(EdgeElement element, m_edgeList)
         if (!element.startsFromThisNode)
-            element.edge->setWidth(element.edge->width() +
-                                   (factor>1 ? 2 : -2) );
-
-    adjustEdges();
+        {
+            element.edge->setWidth(element.edge->width() * factor );
+            /// @bug seems not working
+            element.edge->adjust();
+        }
 }
 
 void Node::showNumber(const int &number,
@@ -270,12 +271,25 @@ QPointF Node::intersect(const QLineF &line, const bool &reverse) const
     return QPointF(0,0);
 }
 
-QList<Edge *> Node::edgesFrom() const
+QList<Edge *> Node::edgesFrom(const bool &excludeSecondaries) const
 {
     QList<Edge *> list;
 
     foreach(EdgeElement element, m_edgeList)
-        if (element.startsFromThisNode)
+        if (element.startsFromThisNode &&
+                (!element.edge->secondary() || !excludeSecondaries))
+            list.push_back(element.edge);
+
+    return list;
+}
+
+QList<Edge *> Node::edgesToThis(const bool &excludeSecondaries) const
+{
+    QList<Edge *> list;
+
+    foreach(EdgeElement element, m_edgeList)
+        if (!element.startsFromThisNode &&
+                (!element.edge->secondary() || !excludeSecondaries))
             list.push_back(element.edge);
 
     return list;
@@ -283,16 +297,9 @@ QList<Edge *> Node::edgesFrom() const
 
 Edge * Node::edgeTo(const Node *node) const
 {
-    if (!node)
-    {
-      foreach(EdgeElement element, m_edgeList)
-        if (!element.startsFromThisNode)
-            return element.edge;
-    }
-
     foreach(EdgeElement element, m_edgeList)
-        if (element.edge->sourceNode() == node  ||
-            element.edge->destNode() == node)
+        if ((element.edge->sourceNode() == node  ||
+             element.edge->destNode() == node))
             return element.edge;
 
     return 0;

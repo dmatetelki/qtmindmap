@@ -19,7 +19,7 @@ public:
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);
-    void adjustEdges();
+//    void adjustEdges();
 
     void setBorder(const bool &hasBorder);
     void setActive(const bool &active = true);
@@ -39,8 +39,9 @@ public:
     bool isConnected(const Node *node) const;
     QPointF intersect(const QLineF &line, const bool &reverse = false) const;
 
-    QList<Edge *> edgesFrom() const;
-    Edge * edgeTo(const Node* node = 0) const;
+    QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
+    QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;
+    Edge * edgeTo(const Node* node) const;
 
 protected:
 

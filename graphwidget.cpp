@@ -95,6 +95,7 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
                                       e.attribute("text_green").toFloat(),
                                       e.attribute("text_blue").toFloat()/*,
                                       e.attribute("text_alpha").toFloat()*/));
+
             m_nodeList.append(node);
         }
     }
@@ -113,6 +114,7 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
                                   e.attribute("blue").toFloat()/*,
                                   e.attribute("alpha").toFloat()*/));
             edge->setWidth(e.attribute("width").toFloat());
+            edge->setSecondary(e.attribute("secondary").toInt() );
 
             m_scene->addItem(edge);
         }
@@ -144,7 +146,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "x", QString::number(node->pos().x()));
         cn.setAttribute( "y", QString::number(node->pos().y()));
         cn.setAttribute( "htmlContent", node->toHtml());
-        cn.setAttribute( "scale", QString::number(((QGraphicsTextItem*)node)->scale()));
+        cn.setAttribute( "scale", QString::number(dynamic_cast<QGraphicsTextItem*>(node)->scale()));
         cn.setAttribute( "bg_red", QString::number(node->color().red()));
         cn.setAttribute( "bg_green", QString::number(node->color().green()));
         cn.setAttribute( "bg_blue", QString::number(node->color().blue()));
@@ -171,6 +173,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "blue", QString::number(edge->color().blue()));
 //        cn.setAttribute( "alpha", QString::number(edge->color().alpha()));
         cn.setAttribute( "width", QString::number(edge->width()));
+        cn.setAttribute( "secondary", QString::number(edge->secondary()));
 
         edges_root.appendChild(cn);
     }
@@ -431,7 +434,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         {
             QColor color = dialog.selectedColor();
             m_activeNode->setColor(color);
-            m_activeNode->edgeTo()->setColor(color);
+            foreach (Edge * edge, m_activeNode->edgesToThis(false))
+                edge->setColor(color);
         }
 
         break;
@@ -615,6 +619,13 @@ void GraphWidget::nodeSelected(Node *node)
 
 void GraphWidget::addEdge(Node *source, Node *destination)
 {
+    if (destination == m_nodeList.first())
+    {
+        m_parent->statusBarMsg(
+                    tr("Root element cannot be an edge target."));
+        return;
+    }
+
     if (source->isConnected(destination))
     {
         m_parent->statusBarMsg(
@@ -622,8 +633,18 @@ void GraphWidget::addEdge(Node *source, Node *destination)
     }
     else
     {
+        bool sec(false);
+        if (!destination->edgesToThis().empty())
+        {
+            m_parent->statusBarMsg(
+                     tr("The graph is acyclic, edge added as secondary edge."));
+            sec = true;
+        }
         Edge *edge = new Edge(source, destination);
         edge->setColor(destination->color());
+        edge->setWidth(dynamic_cast<QGraphicsTextItem *>(destination)->scale()*2 + 1);
+        edge->setSecondary(sec);
+
         m_scene->addItem(edge);
         contentChanged();
     }

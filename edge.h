@@ -16,10 +16,12 @@ public:
     Node *destNode() const;
     double getAngle() const;
 
-    void setColor(const QColor &color);
     QColor color() const { return m_color; }
-    void setWidth(const qreal &width);
+    void setColor(const QColor &color);
     qreal width() const { return m_width; }
+    void setWidth(const qreal &width);
+    bool secondary() const  { return m_secondary; }
+    void setSecondary(const bool &sec = true );
 
     void adjust();
 
@@ -40,6 +42,7 @@ private:
     double m_angle;
     QColor m_color;
     qreal m_width;
+    bool m_secondary;
 
     static const qreal m_arrowSize;
     static const double m_pi;
