@@ -25,7 +25,7 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     m_editingNode(false),
     m_edgeAdding(false),
     m_edgeDeleting(false),
-    m_edgeColoring(false),
+//    m_edgeColoring(false),
     m_contentChanged(false)
 {
     m_scene = new QGraphicsScene(this);
@@ -89,12 +89,12 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
             node->setScale(e.attribute("scale").toFloat());
             node->setColor(QColor(e.attribute("bg_red").toFloat(),
                                   e.attribute("bg_green").toFloat(),
-                                  e.attribute("bg_blue").toFloat(),
-                                  e.attribute("bg_alpha").toFloat()));
+                                  e.attribute("bg_blue").toFloat()/*,
+                                  e.attribute("bg_alpha").toFloat()*/));
             node->setTextColor(QColor(e.attribute("text_red").toFloat(),
                                       e.attribute("text_green").toFloat(),
-                                      e.attribute("text_blue").toFloat(),
-                                      e.attribute("text_alpha").toFloat()));
+                                      e.attribute("text_blue").toFloat()/*,
+                                      e.attribute("text_alpha").toFloat()*/));
             m_nodeList.append(node);
         }
     }
@@ -110,8 +110,9 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
                         m_nodeList[e.attribute("destination").toInt()]);
             edge->setColor(QColor(e.attribute("red").toFloat(),
                                   e.attribute("green").toFloat(),
-                                  e.attribute("blue").toFloat(),
-                                  e.attribute("alpha").toFloat()));
+                                  e.attribute("blue").toFloat()/*,
+                                  e.attribute("alpha").toFloat()*/));
+            edge->setWidth(e.attribute("width").toFloat());
 
             m_scene->addItem(edge);
         }
@@ -147,11 +148,11 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "bg_red", QString::number(node->color().red()));
         cn.setAttribute( "bg_green", QString::number(node->color().green()));
         cn.setAttribute( "bg_blue", QString::number(node->color().blue()));
-        cn.setAttribute( "bg_alpha", QString::number(node->color().alpha()));
+//        cn.setAttribute( "bg_alpha", QString::number(node->color().alpha()));
         cn.setAttribute( "text_red", QString::number(node->textColor().red()));
         cn.setAttribute( "text_green", QString::number(node->textColor().green()));
         cn.setAttribute( "text_blue", QString::number(node->textColor().blue()));
-        cn.setAttribute( "text_alpha", QString::number(node->textColor().alpha()));
+//        cn.setAttribute( "text_alpha", QString::number(node->textColor().alpha()));
         nodes_root.appendChild(cn);
     }
 
@@ -168,7 +169,8 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "red", QString::number(edge->color().red()));
         cn.setAttribute( "green", QString::number(edge->color().green()));
         cn.setAttribute( "blue", QString::number(edge->color().blue()));
-        cn.setAttribute( "alpha", QString::number(edge->color().alpha()));
+//        cn.setAttribute( "alpha", QString::number(edge->color().alpha()));
+        cn.setAttribute( "width", QString::number(edge->width()));
 
         edges_root.appendChild(cn);
     }
@@ -232,7 +234,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
              event->key() == Qt::Key_D ||           // remove edge
              event->key() == Qt::Key_C ||           // node color
              event->key() == Qt::Key_T ||           // node text color
-             event->key() == Qt::Key_K ||           // edge text color
+//             event->key() == Qt::Key_K ||           // edge text color
              ( event->modifiers() &  Qt::ControlModifier &&  // moving node
                ( event->key() == Qt::Key_Up ||
                  event->key() == Qt::Key_Down ||
@@ -260,11 +262,11 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             m_edgeDeleting = false;
             m_parent->statusBarMsg(tr("Edge deleting cancelled."));
         }
-        else if (m_edgeColoring)
-        {
-            m_edgeColoring = false;
-            m_parent->statusBarMsg(tr("Edge coloring cancelled."));
-        }
+//        else if (m_edgeColoring)
+//        {
+//            m_edgeColoring = false;
+//            m_parent->statusBarMsg(tr("Edge coloring cancelled."));
+//        }
         else if(m_showingNodeNumbers)
         {
             m_hintNumber.clear();
@@ -423,11 +425,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     {
         QColorDialog dialog(this);
         dialog.setWindowTitle(tr("Select node color"));
-        dialog.setOption(QColorDialog::ShowAlphaChannel);
+//        dialog.setOption(QColorDialog::ShowAlphaChannel);
+        dialog.setCurrentColor(m_activeNode->color());
         if (dialog.exec())
         {
             QColor color = dialog.selectedColor();
             m_activeNode->setColor(color);
+            m_activeNode->edgeTo()->setColor(color);
         }
 
         break;
@@ -437,7 +441,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     {
         QColorDialog dialog(this);
         dialog.setWindowTitle(tr("Select text color"));
-        dialog.setOption(QColorDialog::ShowAlphaChannel);
+//        dialog.setOption(QColorDialog::ShowAlphaChannel);
+        dialog.setCurrentColor(m_activeNode->textColor());
         if (dialog.exec())
         {
             QColor color = dialog.selectedColor();
@@ -447,12 +452,12 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         break;
     }
 
-    case Qt::Key_K:
-    {
-        m_parent->statusBarMsg(tr("Edge color: select other end-node."));
-        m_edgeColoring = true;
-        break;
-    }
+//    case Qt::Key_K:
+//    {
+//        m_parent->statusBarMsg(tr("Edge color: select other end-node."));
+//        m_edgeColoring = true;
+//        break;
+//    }
 
     default:
         QGraphicsView::keyPressEvent(event);
@@ -502,6 +507,8 @@ void GraphWidget::insertNode()
     QPointF pos(length * cos(angle), length * sin(angle));
 
     Node *node = new Node(this);
+    node->setColor(m_activeNode->color());
+    node->setTextColor(m_activeNode->textColor());
     node->setHtml(QString(""));
     m_scene->addItem(node);
     node->setPos(m_activeNode->sceneBoundingRect().center() +
@@ -585,21 +592,21 @@ void GraphWidget::nodeSelected(Node *node)
         removeEdge(m_activeNode, node);
         m_edgeDeleting = false;
     }
-    else if (m_edgeColoring)
-    {
-        QColorDialog dialog(this);
-        dialog.setWindowTitle(tr("Select edge color"));
-        dialog.setOption(QColorDialog::ShowAlphaChannel);
-        if (dialog.exec())
-        {
-            QColor color = dialog.selectedColor();
+//    else if (m_edgeColoring)
+//    {
+//        QColorDialog dialog(this);
+//        dialog.setWindowTitle(tr("Select edge color"));
+//        dialog.setOption(QColorDialog::ShowAlphaChannel);
+//        if (dialog.exec())
+//        {
+//            QColor color = dialog.selectedColor();
 
-            Edge *edge = m_activeNode->edgeTo(node);
-            if (edge)
-                edge->setColor(color);
-        }
-        m_edgeColoring = false;
-    }
+//            Edge *edge = m_activeNode->edgeTo(node);
+//            if (edge)
+//                edge->setColor(color);
+//        }
+//        m_edgeColoring = false;
+//    }
     else
     {
         setActiveNode(node);
@@ -615,7 +622,9 @@ void GraphWidget::addEdge(Node *source, Node *destination)
     }
     else
     {
-        m_scene->addItem(new Edge(source, destination));
+        Edge *edge = new Edge(source, destination);
+        edge->setColor(destination->color());
+        m_scene->addItem(edge);
         contentChanged();
     }
 }

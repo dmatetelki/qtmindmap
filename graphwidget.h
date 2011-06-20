@@ -61,7 +61,7 @@ private:
     bool m_editingNode;
     bool m_edgeAdding;
     bool m_edgeDeleting;
-    bool m_edgeColoring;
+//    bool m_edgeColoring;
     bool m_contentChanged;
     QString m_fileName;
 

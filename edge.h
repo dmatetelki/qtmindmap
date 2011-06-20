@@ -15,8 +15,11 @@ public:
     Node *sourceNode() const;
     Node *destNode() const;
     double getAngle() const;
+
     void setColor(const QColor &color);
     QColor color() const { return m_color; }
+    void setWidth(const qreal &width);
+    qreal width() const { return m_width; }
 
     void adjust();
 
@@ -36,6 +39,7 @@ private:
     QPointF m_destPoint;
     double m_angle;
     QColor m_color;
+    qreal m_width;
 
     static const qreal m_arrowSize;
     static const double m_pi;

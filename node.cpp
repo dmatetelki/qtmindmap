@@ -26,6 +26,7 @@ Node::Node(GraphWidget *parent) :
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setDefaultTextColor(QColor(0,0,0));
+    setZValue(2);
 }
 
 Node::~Node()
@@ -112,16 +113,19 @@ void Node::setTextColor(const QColor &color)
 
 void Node::scale(const qreal &factor)
 {
-    qDebug() << factor * QGraphicsTextItem::scale();
-
-    if (factor * QGraphicsTextItem::scale() < 0.3 ||
-        factor * QGraphicsTextItem::scale() > 5 )
+    if (factor * QGraphicsTextItem::scale() < 0.2 ||
+        factor * QGraphicsTextItem::scale() > 10 )
         return;
 
     // it would make stuff difficult, like limiting the pos. inside scene
 //    setTransformOriginPoint(boundingRect().center());
 
     QGraphicsTextItem::setScale(factor * QGraphicsTextItem::scale());
+    foreach(EdgeElement element, m_edgeList)
+        if (!element.startsFromThisNode)
+            element.edge->setWidth(element.edge->width() +
+                                   (factor>1 ? 2 : -2) );
+
     adjustEdges();
 }
 
@@ -279,6 +283,13 @@ QList<Edge *> Node::edgesFrom() const
 
 Edge * Node::edgeTo(const Node *node) const
 {
+    if (!node)
+    {
+      foreach(EdgeElement element, m_edgeList)
+        if (!element.startsFromThisNode)
+            return element.edge;
+    }
+
     foreach(EdgeElement element, m_edgeList)
         if (element.edge->sourceNode() == node  ||
             element.edge->destNode() == node)

@@ -40,7 +40,7 @@ public:
     QPointF intersect(const QLineF &line, const bool &reverse = false) const;
 
     QList<Edge *> edgesFrom() const;
-    Edge * edgeTo(const Node* node) const;
+    Edge * edgeTo(const Node* node = 0) const;
 
 protected:
 
