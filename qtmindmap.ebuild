@@ -1,7 +1,7 @@
 DESCRIPTION="MindMap software written in Qt"
 HOMEPAGE="https://gitorious.org/qtmindmap"
-SRC_URI="https://gitorious.org/qtmindmap/qtmindmap/archive-tarball/master"
-LICENSE=""
+SRC_URI="http://matetelki.com/qtmindmap/qtmindmap-qtmindmap-master.tar.gz"
+LICENSE="GPL-2"
 
 SLOT="0"
 KEYWORDS="~x86"

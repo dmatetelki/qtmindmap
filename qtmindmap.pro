@@ -32,3 +32,5 @@ RESOURCES = qtmindmap.qrc
 TRANSLATIONS = qtmindmap_hu.ts
 
 CODECFORTR = UTF-8
+
+DESTDIR = /usr/bin
