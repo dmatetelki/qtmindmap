@@ -111,23 +111,26 @@ void Node::setTextColor(const QColor &color)
     update();
 }
 
-void Node::scale(const qreal &factor)
+void Node::setScale(const qreal &factor,const QRectF &sceneRect)
 {
-    if (factor * QGraphicsTextItem::scale() < 0.4 ||
-        factor * QGraphicsTextItem::scale() > 4 )
+    if (factor * scale() < 0.4 ||
+        factor * scale() > 4 )
         return;
 
-    // it would make stuff difficult, like limiting the pos. inside scene
-    //    setTransformOriginPoint(boundingRect().center());
+    if (!sceneRect.contains(pos() +
+                            boundingRect().bottomRight() * scale() * factor))
+        return;
 
-    QGraphicsTextItem::setScale(factor * QGraphicsTextItem::scale());
+    prepareGeometryChange();
+
+    QGraphicsTextItem::setScale(factor * scale());
     foreach(EdgeElement element, m_edgeList)
+    {
         if (!element.startsFromThisNode)
-        {
             element.edge->setWidth(element.edge->width() * factor );
-            /// @bug seems not working
-            element.edge->adjust();
-        }
+
+        element.edge->adjust();
+    }
 }
 
 void Node::showNumber(const int &number,
@@ -364,7 +367,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
             // the fence is reduced with the size of the node
             QRectF rect (scene()->sceneRect().topLeft(),
                          scene()->sceneRect().bottomRight() -
-                         boundingRect().bottomRight() * QGraphicsTextItem::scale() );
+                         boundingRect().bottomRight() * scale() );
 
             if (!rect.contains(newPos))
             {
@@ -412,7 +415,6 @@ void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-/// @bug it seems sceneBoundingRect().contains doesn't care about path retval...
 QPainterPath Node::shape () const
 {
     QPainterPath path;

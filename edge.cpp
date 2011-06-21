@@ -81,19 +81,15 @@ void Edge::adjust()
 
     if (line.length() > qreal(20.))
     {
-//        m_sourcePoint = m_sourceNode->intersect(line);
         m_destPoint = m_destNode->intersect(line,true);
-
-        /// @bug seems not to be updated
         m_sourcePoint = m_sourceNode->sceneBoundingRect().center();
-//        m_destPoint = m_destNode->sceneBoundingRect().center();
-
-    } else {
+    }
+    else
+    {
         m_sourcePoint = m_destPoint = line.p1();
     }
 }
 
-/// @bug not ok yet
 QRectF Edge::boundingRect() const
 {
     if (!m_sourceNode || !m_destNode)

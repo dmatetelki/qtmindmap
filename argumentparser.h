@@ -11,10 +11,6 @@ public:
 
     explicit ArgumentParser(QObject *parent = 0);
 
-    /***
-      * @param successful is true if the program needs to stop but its not error
-      * @return true is program can continue
-      */
     bool parseCmdLineArgs(bool &successful);
 
     bool isSystemTray() { return m_isSystemTray; }

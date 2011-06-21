@@ -28,7 +28,7 @@ public:
     QColor color() const { return m_color; }
     void setTextColor(const QColor &color);
     QColor textColor() const { return m_textColor; }
-    void scale(const qreal &factor);
+    void setScale(const qreal &factor, const QRectF &sceneRect);
 
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
