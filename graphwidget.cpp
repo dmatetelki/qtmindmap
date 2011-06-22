@@ -665,6 +665,22 @@ void GraphWidget::nodeSelected(Node *node)
     }
 }
 
+void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
+{
+    QList <Node *> nodeList;
+    if (event->modifiers() == Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+        node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
+}
+
 void GraphWidget::addEdge(Node *source, Node *destination)
 {
     if (destination == m_nodeList.first())

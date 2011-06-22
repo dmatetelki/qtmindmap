@@ -4,7 +4,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QKeyEvent>
-#include <QMovie>
+#include <QGraphicsSceneMouseEvent>
 
 #include "node.h"
 
@@ -21,6 +21,7 @@ public:
     void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
+    void nodeMoved(QGraphicsSceneMouseEvent *event);
     QList<Edge *> edges() const;
 
     void contentChanged(const bool &changed = true);

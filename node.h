@@ -16,6 +16,7 @@ public:
     Node(GraphWidget *graphWidget = 0);
     ~Node();
 
+    void moveNode(QGraphicsSceneMouseEvent *event);
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);

@@ -35,6 +35,11 @@ Node::~Node()
     foreach (EdgeElement element, m_edgeList) delete element.edge;
 }
 
+void Node::moveNode(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
 void Node::addEdge(Edge *edge, bool startsFromThisNode)
 {
     m_edgeList.push_back(EdgeElement(edge, startsFromThisNode));
@@ -444,7 +449,7 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsItem::mouseMoveEvent(event);
+    m_graph->nodeMoved(event);
 }
 
 QPainterPath Node::shape () const
