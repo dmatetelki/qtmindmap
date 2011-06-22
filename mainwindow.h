@@ -46,6 +46,12 @@ private:
     QString m_fileName;
     bool m_contentChanged;
 
+    QAction *m_trash;
+    QAction *m_info;
+    QAction *m_blocked;
+    QAction *m_question;
+    QAction *m_postpone;
+    QAction *m_delegate;
 };
 
 #endif // MAINWINDOW_H

@@ -24,12 +24,10 @@ src_configure() {
 }
 
 src_install() {
-    echo "hello"
-    ls
-    ls -R
-    ls ../ -R
     # do normal installation
-    # qt4-r2_src_install
+#     qt4-r2_src_install
+#     cp qtmindmap /usr/bin/
+    emake INSTALL_ROOT="${D}" DESTDIR="${D}" install || die "emake install failed"
     # Install translations
     # TODO how?
 }

@@ -37,6 +37,34 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
+
+    // why can't I do this with qtcreator?
+    /// @bug or a feature? no underline here
+    m_trash = new QAction(QIcon(":/user-trash-full.svg"), "&Trash it", this);
+    m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+    m_ui->mainToolBar->addAction(m_trash);
+
+    m_info = new QAction(QIcon(":/folder.svg"), "&Reference it", this);
+    m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    m_ui->mainToolBar->addAction(m_info);
+
+    m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"), this);
+    m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    m_ui->mainToolBar->addAction(m_blocked);
+
+    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What shall be done?"), this);
+//    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
+    m_ui->mainToolBar->addAction(m_question);
+
+    m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone it"), this);
+    m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+    m_ui->mainToolBar->addAction(m_postpone);
+
+    m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Delegate it"), this);
+    m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
+    m_ui->mainToolBar->addAction(m_delegate);
+
+    m_ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 }
 
 MainWindow::~MainWindow()

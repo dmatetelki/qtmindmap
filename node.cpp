@@ -463,5 +463,5 @@ QPainterPath Node::shape () const
 double Node::doubleModulo(const double &devided, const double &devisor)
 {
     return devided - static_cast<double>(devisor * static_cast<int>(devided
-                                                                    / devisor));
+                                                                  / devisor));
 }
