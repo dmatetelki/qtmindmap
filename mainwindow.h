@@ -30,7 +30,6 @@ public slots:
     bool saveFileAs();
     bool closeFile();
     void exportScene();
-    void quit();
 
     void keys();
     void about();
