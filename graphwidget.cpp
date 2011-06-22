@@ -403,6 +403,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         // delete node
     case Qt::Key_Delete:
+    {
 
         if (m_activeNode == m_nodeList.first())
         {
@@ -410,11 +411,25 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             break;
         }
 
-        if (m_hintNode==m_activeNode)
-            m_hintNode=0;
+        QList <Node *> nodeList;
+        if (event->modifiers() == Qt::ShiftModifier)
+        {
+            nodeList = m_activeNode->subtree();
+        }
+        else
+        {
+            nodeList.push_back(m_activeNode);
+        }
 
-        m_nodeList.removeAll(m_activeNode);
-        delete m_activeNode;
+        foreach(Node *node, nodeList)
+        {
+            if (m_hintNode==node)
+                m_hintNode=0;
+
+            m_nodeList.removeAll(node);
+            delete node;
+        }
+
         m_activeNode = 0;
         contentChanged();
 
@@ -422,7 +437,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             showNodeNumbers();
 
         break;
-
+    }
         // add edge to active node
     case Qt::Key_A:
         m_parent->statusBarMsg(tr("Add edge: select destination node."));
