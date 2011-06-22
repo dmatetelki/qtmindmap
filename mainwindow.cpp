@@ -25,9 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(closeFile()));
     connect(m_ui->actionExport, SIGNAL(activated()),
             this, SLOT(exportScene()));
-
     connect(m_ui->actionQuit, SIGNAL(activated()),
-            QApplication::instance(), SLOT(quit()));
+            this, SLOT(quit()));
 
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
             this, SLOT(about()));
@@ -207,6 +206,14 @@ void MainWindow::exportScene()
      {
          m_graphicsView->writeContentToPngFile(dialog.selectedFiles().first());
      }
+}
+
+void MainWindow::quit()
+{
+    if (m_contentChanged && !closeFile())
+        return;
+
+    QApplication::instance()->quit();
 }
 
 void MainWindow::keys()
