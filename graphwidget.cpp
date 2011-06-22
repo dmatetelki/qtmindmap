@@ -498,17 +498,23 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
-    if (QApplication::keyboardModifiers() == Qt::ControlModifier)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
-        if (m_activeNode)
-        {
-            m_activeNode->setScale(pow((double)1.2, event->delta() / 120.0),
-                                   sceneRect());
-        }
-        else
+        if (!m_activeNode)
         {
             m_parent->statusBarMsg(tr("No active node."));
             return;
+        }
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        {
+            foreach(Node *node, m_activeNode->subtree())
+                node->setScale(pow((double)1.2, event->delta() / 120.0),
+                                 sceneRect());
+        }
+        else
+        {
+            m_activeNode->setScale(pow((double)1.2, event->delta() / 120.0),
+                                   sceneRect());
         }
     }
     else
