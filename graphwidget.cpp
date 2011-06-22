@@ -302,9 +302,16 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         // zoom in/out
     case Qt::Key_Plus:
-        if (event->modifiers() &  Qt::ControlModifier)
+        if (event->modifiers() ==  Qt::ControlModifier)
         {
             m_activeNode->setScale(qreal(1.2),sceneRect());
+        }
+        else if (event->modifiers() &  Qt::ControlModifier &&
+                 event->modifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+                node->setScale(qreal(1.2),sceneRect());
         }
         else
         {
@@ -312,9 +319,16 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Minus:
-        if (event->modifiers() &  Qt::ControlModifier)
+        if (event->modifiers() ==  Qt::ControlModifier)
         {
             m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
+        }
+        else if (event->modifiers() &  Qt::ControlModifier &&
+                 event->modifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+                node->setScale(qreal(1 / 1.2),sceneRect());
         }
         else
         {
@@ -423,15 +437,28 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_C:
     {
+        QList <Node *> nodeList;
+        if (event->modifiers() == Qt::ShiftModifier)
+        {
+            nodeList = m_activeNode->subtree();
+        }
+        else
+        {
+            nodeList.push_back(m_activeNode);
+        }
+
         QColorDialog dialog(this);
         dialog.setWindowTitle(tr("Select node color"));
         dialog.setCurrentColor(m_activeNode->color());
         if (dialog.exec())
         {
             QColor color = dialog.selectedColor();
-            m_activeNode->setColor(color);
-            foreach (Edge * edge, m_activeNode->edgesToThis(false))
-                edge->setColor(color);
+            foreach(Node *node, nodeList)
+            {
+                node->setColor(color);
+                foreach (Edge * edge, node->edgesToThis(false))
+                    edge->setColor(color);
+            }
         }
 
         break;
@@ -439,13 +466,24 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_T:
     {
+        QList <Node *> nodeList;
+        if (event->modifiers() == Qt::ShiftModifier)
+        {
+            nodeList = m_activeNode->subtree();
+        }
+        else
+        {
+            nodeList.push_back(m_activeNode);
+        }
+
         QColorDialog dialog(this);
         dialog.setWindowTitle(tr("Select text color"));
         dialog.setCurrentColor(m_activeNode->textColor());
         if (dialog.exec())
         {
             QColor color = dialog.selectedColor();
-            m_activeNode->setTextColor(color);
+            foreach(Node *node, nodeList)
+                node->setTextColor(color);
         }
 
         break;
