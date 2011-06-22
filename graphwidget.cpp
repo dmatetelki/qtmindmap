@@ -273,24 +273,26 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down:
     case Qt::Key_Left:
     case Qt::Key_Right:
-        if (event->modifiers() ==  Qt::ControlModifier)
+        if (event->modifiers() &  Qt::ControlModifier)
         {
-            if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
-            else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
-            else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
-            else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
-            contentChanged();
-        }
-        else if (event->modifiers() &  Qt::ControlModifier &&
-                 event->modifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
+            if (event->modifiers() &  Qt::AltModifier)
             {
-                if (event->key() == Qt::Key_Up) node->moveBy(0, -20);
-                else if (event->key() == Qt::Key_Down) node->moveBy(0, 20);
-                else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
-                else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
+                QList <Node *> nodeList = m_activeNode->subtree();
+                foreach(Node *node, nodeList)
+                {
+                    if (event->key() == Qt::Key_Up) node->moveBy(0, -20);
+                    else if (event->key() == Qt::Key_Down) node->moveBy(0, 20);
+                    else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
+                    else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
+                    contentChanged();
+                }
+            }
+            else
+            {
+                if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
+                else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
+                else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
+                else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
                 contentChanged();
             }
         }
@@ -302,34 +304,42 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         // zoom in/out
     case Qt::Key_Plus:
-        if (event->modifiers() ==  Qt::ControlModifier)
+
+        if (event->modifiers() &  Qt::ControlModifier)
         {
-            m_activeNode->setScale(qreal(1.2),sceneRect());
-        }
-        else if (event->modifiers() &  Qt::ControlModifier &&
-                 event->modifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1.2),sceneRect());
+            if (event->modifiers() &  Qt::AltModifier)
+            {
+                QList <Node *> nodeList = m_activeNode->subtree();
+                foreach(Node *node, nodeList)
+                    node->setScale(qreal(1.2),sceneRect());
+            }
+            else
+            {
+                m_activeNode->setScale(qreal(1.2),sceneRect());
+            }
         }
         else
         {
             scaleView(qreal(1.2));
         }
         break;
+
     case Qt::Key_Minus:
-        if (event->modifiers() ==  Qt::ControlModifier)
+
+        if (event->modifiers() &  Qt::ControlModifier)
         {
-            m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
+            if (event->modifiers() &  Qt::AltModifier)
+            {
+                QList <Node *> nodeList = m_activeNode->subtree();
+                foreach(Node *node, nodeList)
+                    node->setScale(qreal(1 / 1.2),sceneRect());
+            }
+            else
+            {
+                m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
+            }
         }
-        else if (event->modifiers() &  Qt::ControlModifier &&
-                 event->modifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1 / 1.2),sceneRect());
-        }
+
         else
         {
             scaleView(1 / qreal(1.2));
@@ -412,7 +422,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         }
 
         QList <Node *> nodeList;
-        if (event->modifiers() == Qt::ShiftModifier)
+        if (event->modifiers() == Qt::AltModifier)
         {
             nodeList = m_activeNode->subtree();
         }
@@ -453,7 +463,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C:
     {
         QList <Node *> nodeList;
-        if (event->modifiers() == Qt::ShiftModifier)
+        if (event->modifiers() == Qt::AltModifier)
         {
             nodeList = m_activeNode->subtree();
         }
@@ -482,7 +492,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_T:
     {
         QList <Node *> nodeList;
-        if (event->modifiers() == Qt::ShiftModifier)
+        if (event->modifiers() == Qt::AltModifier)
         {
             nodeList = m_activeNode->subtree();
         }
@@ -757,7 +767,6 @@ void GraphWidget::addFirstNode()
                 QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
     m_scene->addItem(node);
     node->setPos(-25, -25);
-    node->setBorder(false);
 
     m_nodeList.append(node);
 

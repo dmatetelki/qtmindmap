@@ -86,9 +86,14 @@ void Node::setBorder(const bool &hasBorder)
    update();
 }
 
+/** @note Used to have some disorder here, how does an active node looks like?
+* Let is have border but the color shall not change, shadow is messy too.
+*/
+
 void Node::setActive(const bool &active)
 {
     m_isActive = active;
+    setBorder(active);
     update();
 }
 
@@ -361,18 +366,14 @@ void Node::paint(QPainter *painter,
     else
     {
         m_hasBorder ?
-            painter->setPen(m_isActive ? Qt::red : Qt::blue) :
+            painter->setPen(QPen(QBrush(Qt::black), 1)) : // border is scaled
             painter->setPen(Qt::transparent);
 
-        m_isActive?
-//            painter->setBrush(Node::m_orange) :
-            painter->setBrush(m_color.darker(120)) :
-            painter->setBrush(m_color);
-
+        painter->setBrush(m_color);
         painter->drawRoundedRect(boundingRect(), 20.0, 15.0);
+
     }
     painter->setBrush(Qt::NoBrush);
-
 
     // the text itself
     setDefaultTextColor(m_textColor);
