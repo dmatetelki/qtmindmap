@@ -296,6 +296,11 @@ void MainWindow::about()
     msgBox.exec();
 }
 
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    m_contentChanged && !closeFile() ? event->ignore() : event->accept();
+}
+
 void MainWindow::setTitle(const QString &title)
 {
     if (title.isEmpty())

@@ -35,6 +35,9 @@ public slots:
     void keys();
     void about();
 
+protected:
+    void closeEvent(QCloseEvent * event);
+
 private:
 
     void setTitle(const QString &title);
