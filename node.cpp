@@ -308,6 +308,38 @@ Edge * Node::edgeTo(const Node *node) const
     return 0;
 }
 
+
+QList<Node *> Node::subtree() const
+{
+    /** @note QList crashes if modified while traversal,
+      * QMutableListIterator lacks push_back
+      */
+
+    std::list<Node *> list;
+    list.push_back(const_cast<Node *>(this));
+
+    // inorder
+    for(std::list<Node *>::const_iterator it = list.begin();
+        it != list.end();
+        it++)
+    {
+        QList<Edge *> edges = (*it)->edgesFrom();
+        if (!edges.empty())
+        {
+            foreach(Edge *edge, edges)
+            {
+                if (!edge->secondary())
+                {
+                    list.push_back( edge->destNode() != this ?
+                                        edge->destNode():
+                                        edge->sourceNode());
+                }
+            }
+        }
+    }
+    return QList<Node *>::fromStdList(list);
+}
+
 void Node::paint(QPainter *painter,
                  const QStyleOptionGraphicsItem *option,
                  QWidget *w)

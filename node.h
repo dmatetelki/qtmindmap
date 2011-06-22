@@ -42,6 +42,7 @@ public:
     QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
     QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;
     Edge * edgeTo(const Node* node) const;
+    QList<Node *> subtree() const;
 
 protected:
 

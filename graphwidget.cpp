@@ -281,6 +281,19 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
             else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
             contentChanged();
         }
+        else if (event->modifiers() &  Qt::ControlModifier &&
+                 event->modifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+            {
+                if (event->key() == Qt::Key_Up) node->moveBy(0, -20);
+                else if (event->key() == Qt::Key_Down) node->moveBy(0, 20);
+                else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
+                else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
+                contentChanged();
+            }
+        }
         else // move scene
         {
             QGraphicsView::keyPressEvent(event);
