@@ -766,7 +766,6 @@ void GraphWidget::addFirstNode()
     node->setHtml(
                 QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
     m_scene->addItem(node);
-    node->setPos(-25, -25);
 
     m_nodeList.append(node);
 
