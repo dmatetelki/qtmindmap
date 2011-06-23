@@ -55,6 +55,7 @@ private:
     QAction *m_question;
     QAction *m_postpone;
     QAction *m_delegate;
+    QAction *m_maybe;
 };
 
 #endif // MAINWINDOW_H

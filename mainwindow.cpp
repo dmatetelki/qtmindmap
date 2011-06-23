@@ -41,41 +41,47 @@ MainWindow::MainWindow(QWidget *parent) :
     // why can't I do this with qtcreator?
     /// @bug or a feature? no underline here
 
-    /// @todo solve the shorcuts
-    m_doIt = new QAction(QIcon(":/user-trash-full.svg"), "&Do it", this);
-//    m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-    m_ui->mainToolBar->addAction(m_doIt);
+    m_doIt = new QAction(QIcon(":/applications-system.svg"), "&Do", this);
+    m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
     connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_trash = new QAction(QIcon(":/user-trash-full.svg"), "&Trash it", this);
+    m_trash = new QAction(QIcon(":/user-trash-full.svg"), "&Trash", this);
     m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-    m_ui->mainToolBar->addAction(m_trash);
     connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_info = new QAction(QIcon(":/folder.svg"), "&Reference it", this);
+    m_info = new QAction(QIcon(":/mail-attachment.svg"), "&Refer", this);
     m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    m_ui->mainToolBar->addAction(m_info);
     connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"), this);
     m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    m_ui->mainToolBar->addAction(m_blocked);
     connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What is it?"), this);
-//    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
-    m_ui->mainToolBar->addAction(m_question);
+    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What?"), this);
+    /// @todo come up with some shortcut
+//    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
     connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone it"), this);
+    m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone"), this);
     m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
-    m_ui->mainToolBar->addAction(m_postpone);
     connect(m_postpone, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Delegate it"), this);
-    m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
-    m_ui->mainToolBar->addAction(m_delegate);
+    m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Comission"), this);
+    m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
     connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("&Maybe"), this);
+    m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+    connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_ui->mainToolBar->addAction(m_doIt);
+    m_ui->mainToolBar->addAction(m_trash);
+    m_ui->mainToolBar->addAction(m_info);
+    m_ui->mainToolBar->addAction(m_blocked);
+    m_ui->mainToolBar->addAction(m_question);
+    m_ui->mainToolBar->addAction(m_postpone);
+    m_ui->mainToolBar->addAction(m_delegate);
+    m_ui->mainToolBar->addAction(m_maybe);
 
     m_ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 }
@@ -339,7 +345,7 @@ void MainWindow::insertPicture()
     //                dynamic_cast<QAction*>(QObject::sender())->icon().name());
     if (sender == m_doIt)
     {
-        m_graphicsView->insertPicture(":/user-trash-full.svg");
+        m_graphicsView->insertPicture(":/applications-system.svg");
     }
     else if (sender == m_trash)
     {
@@ -347,7 +353,7 @@ void MainWindow::insertPicture()
     }
     else if (sender == m_info)
     {
-        m_graphicsView->insertPicture(":/folder.svg");
+        m_graphicsView->insertPicture(":/mail-attachment.svg");
     }
     else if (sender == m_blocked)
     {
@@ -364,6 +370,10 @@ void MainWindow::insertPicture()
     else if (sender == m_delegate)
     {
         m_graphicsView->insertPicture(":/system-users.svg");
+    }
+    else if (sender == m_maybe)
+    {
+        m_graphicsView->insertPicture(":/dialog-information.svg");
     }
     else
     {
