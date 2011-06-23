@@ -22,6 +22,7 @@ public:
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
+    void nodeLostFocus();
     QList<Edge *> edges() const;
 
     void contentChanged(const bool &changed = true);

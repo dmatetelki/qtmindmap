@@ -476,6 +476,12 @@ QPainterPath Node::shape () const
     return path;
 }
 
+void Node::focusOutEvent(QFocusEvent *event)
+{
+    Q_UNUSED(event);
+    m_graph->nodeLostFocus();
+}
+
 double Node::doubleModulo(const double &devided, const double &devisor)
 {
     return devided - static_cast<double>(devisor * static_cast<int>(devided

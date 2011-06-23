@@ -220,15 +220,12 @@ void GraphWidget::insertPicture(const QString &picture)
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
-    // esc leaves node editing mode
-    if (event->key() == Qt::Key_Escape && m_editingNode)
+    if (event->key() == Qt::Key_Escape)
     {
-        m_activeNode->setEditable(false);
-        m_editingNode = false;
+        nodeLostFocus();
         return;
     }
-    // in node editing mode forward every key (except esc) to node
-    else if (m_editingNode)
+    if (m_editingNode)
     {
         m_activeNode->keyPressEvent(event);
         return;
@@ -257,28 +254,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     switch (event->key())
     {
-
-    case Qt::Key_Escape:
-
-        if (m_edgeAdding)
-        {
-            m_edgeAdding = false;
-             m_parent->statusBarMsg(tr("Edge adding cancelled."));
-        }
-        else if (m_edgeDeleting)
-        {
-            m_edgeDeleting = false;
-            m_parent->statusBarMsg(tr("Edge deleting cancelled."));
-        }
-        else if(m_showingNodeNumbers)
-        {
-            m_hintNumber.clear();
-            showingAllNodeNumbers(false);
-            m_showingNodeNumbers = false;
-        }
-
-        break;
-
         // move sceve, or move node if modkey is ctrl
     case Qt::Key_Up:
     case Qt::Key_Down:
@@ -701,6 +676,32 @@ void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
 
     foreach(Node *node, nodeList)
         node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
+}
+
+void GraphWidget::nodeLostFocus()
+{
+    if (m_editingNode)
+    {
+        m_editingNode = false;
+        m_activeNode->setEditable(false);
+        m_activeNode->update();
+    }
+    else if (m_edgeAdding)
+    {
+        m_edgeAdding = false;
+        m_parent->statusBarMsg(tr("Edge adding cancelled."));
+    }
+    else if (m_edgeDeleting)
+    {
+        m_edgeDeleting = false;
+        m_parent->statusBarMsg(tr("Edge deleting cancelled."));
+    }
+    else if(m_showingNodeNumbers)
+    {
+        m_hintNumber.clear();
+        showingAllNodeNumbers(false);
+        m_showingNodeNumbers = false;
+    }
 }
 
 void GraphWidget::addEdge(Node *source, Node *destination)

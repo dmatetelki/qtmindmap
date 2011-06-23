@@ -56,6 +56,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     QPainterPath shape () const;
+    void focusOutEvent(QFocusEvent *event);
 
 private:
 
