@@ -541,7 +541,7 @@ void GraphWidget::wheelEvent(QWheelEvent *event)
             m_parent->statusBarMsg(tr("No active node."));
             return;
         }
-        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        if (QApplication::keyboardModifiers() & Qt::AltModifier)
         {
             foreach(Node *node, m_activeNode->subtree())
                 node->setScale(pow((double)1.2, event->delta() / 120.0),
@@ -689,7 +689,8 @@ void GraphWidget::nodeSelected(Node *node)
 void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
 {
     QList <Node *> nodeList;
-    if (event->modifiers() == Qt::ShiftModifier)
+    if (event->modifiers() & Qt::AltModifier &&
+        event->modifiers() & Qt::ControlModifier)
     {
         nodeList = m_activeNode->subtree();
     }
