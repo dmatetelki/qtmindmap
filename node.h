@@ -33,6 +33,7 @@ public:
 
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
+    void insertPicture(const QString &picture, const int &pos = 0);
     double calculateBiggestAngle();
 
     // changing visibility from prot to pub

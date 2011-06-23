@@ -207,6 +207,17 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
     m_parent->statusBarMsg(tr("MindMap exported as ") + fileName);
 }
 
+void GraphWidget::insertPicture(const QString &picture)
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    m_activeNode->insertPicture(picture);
+}
+
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
     // esc leaves node editing mode

@@ -40,29 +40,42 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // why can't I do this with qtcreator?
     /// @bug or a feature? no underline here
+
+    /// @todo solve the shorcuts
+    m_doIt = new QAction(QIcon(":/user-trash-full.svg"), "&Do it", this);
+//    m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+    m_ui->mainToolBar->addAction(m_doIt);
+    connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
+
     m_trash = new QAction(QIcon(":/user-trash-full.svg"), "&Trash it", this);
     m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     m_ui->mainToolBar->addAction(m_trash);
+    connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_info = new QAction(QIcon(":/folder.svg"), "&Reference it", this);
     m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     m_ui->mainToolBar->addAction(m_info);
+    connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"), this);
     m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     m_ui->mainToolBar->addAction(m_blocked);
+    connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What shall be done?"), this);
+    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What is it?"), this);
 //    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     m_ui->mainToolBar->addAction(m_question);
+    connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone it"), this);
     m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
     m_ui->mainToolBar->addAction(m_postpone);
+    connect(m_postpone, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Delegate it"), this);
     m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
     m_ui->mainToolBar->addAction(m_delegate);
+    connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 }
@@ -315,6 +328,47 @@ void MainWindow::about()
     QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();
+}
+
+void MainWindow::insertPicture()
+{
+    QAction *sender = dynamic_cast<QAction*>(QObject::sender());
+
+    /// @note Why QIcon does not store it's fileName? It would be easier:
+    //    m_graphicsView->insertPicture(
+    //                dynamic_cast<QAction*>(QObject::sender())->icon().name());
+    if (sender == m_doIt)
+    {
+        m_graphicsView->insertPicture(":/user-trash-full.svg");
+    }
+    else if (sender == m_trash)
+    {
+        m_graphicsView->insertPicture(":/user-trash-full.svg");
+    }
+    else if (sender == m_info)
+    {
+        m_graphicsView->insertPicture(":/folder.svg");
+    }
+    else if (sender == m_blocked)
+    {
+        m_graphicsView->insertPicture(":/dialog-warning.svg");
+    }
+    else if (sender == m_question)
+    {
+        m_graphicsView->insertPicture(":/help-browser.svg");
+    }
+    else if (sender == m_postpone)
+    {
+        m_graphicsView->insertPicture(":/x-office-calendar.svg");
+    }
+    else if (sender == m_delegate)
+    {
+        m_graphicsView->insertPicture(":/system-users.svg");
+    }
+    else
+    {
+        return;
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent * event)

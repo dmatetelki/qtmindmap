@@ -34,6 +34,8 @@ public slots:
     void keys();
     void about();
 
+    void insertPicture();
+
 protected:
     void closeEvent(QCloseEvent * event);
 
@@ -46,6 +48,7 @@ private:
     QString m_fileName;
     bool m_contentChanged;
 
+    QAction *m_doIt;
     QAction *m_trash;
     QAction *m_info;
     QAction *m_blocked;

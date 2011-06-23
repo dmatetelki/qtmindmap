@@ -32,6 +32,8 @@ public:
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
 
+    void insertPicture(const QString &picture);
+
 protected:
 
     void keyPressEvent(QKeyEvent *event);

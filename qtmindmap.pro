@@ -6,7 +6,10 @@
 
 QT       += core gui svg xml
 
+CONFIG   += warn_on
+
 TARGET = qtmindmap
+
 TEMPLATE = app
 
 

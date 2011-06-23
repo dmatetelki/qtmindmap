@@ -152,6 +152,22 @@ void Node::showNumber(const int &number,
     update();
 }
 
+void Node::insertPicture(const QString &picture, const int &pos)
+{
+    QTextCursor c = textCursor();
+
+    if (pos)
+    {
+        c.setPosition(pos);
+    }
+
+    c.insertHtml(QString("<img src=").append(picture).
+                 append(" width=15 height=15></img>"));
+
+    m_graph->contentChanged();
+    foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+}
+
 double Node::calculateBiggestAngle()
 {
     if (m_edgeList.empty())
