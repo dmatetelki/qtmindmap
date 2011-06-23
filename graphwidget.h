@@ -18,7 +18,6 @@ public:
     GraphWidget(MainWindow *parent = 0);
 
     void setActiveNode(Node *node);
-    void insertNode();
     void setActiveNodeEditable();
     void nodeSelected(Node *node);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
@@ -34,6 +33,11 @@ public:
     void writeContentToPngFile(const QString &fileName);
 
     void insertPicture(const QString &picture);
+
+public slots:
+
+    void insertNode();
+    void removeNode();
 
 protected:
 

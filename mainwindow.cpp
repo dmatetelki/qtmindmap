@@ -41,6 +41,56 @@ MainWindow::MainWindow(QWidget *parent) :
     // why can't I do this with qtcreator?
     /// @bug or a feature? no underline here
 
+    m_zoomIn = new QAction(tr("Zoom in (+)"), this);
+    m_zoomOut = new QAction(tr("Zoom out (+)"), this);
+
+    m_addNode = new QAction(tr("Add node (ins)"), this);
+    connect(m_addNode, SIGNAL(activated()), m_graphicsView, SLOT(insertNode()));
+    m_delNode = new QAction(tr("Del node (del)"), this);
+    connect(m_delNode, SIGNAL(activated()), m_graphicsView, SLOT(removeNode()));
+
+    m_editNode = new QAction(tr("Edit node (F2)"), this);
+    m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
+    m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
+    m_nodeColor = new QAction(tr("Node color (c)"), this);
+    m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
+    m_addEdge = new QAction(tr("Add edge (a)"), this);
+    m_delEdge = new QAction(tr("Del edge (d)"), this);
+    m_moveNode = new QAction(tr("Move node (Ctrl cursor)"), this);
+    m_moveNode->setDisabled(true);
+    m_subtree = new QAction(tr("Apply on subtree (Alt)"), this);
+    m_subtree->setDisabled(true);
+
+    m_hintMode = new QAction(tr("Hint mode (f)"), this);
+    m_showMainToolbar = new QAction(tr("Main toolbar (Ctrl m)"), this);
+    m_showMainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+    connect(m_showMainToolbar, SIGNAL(activated()), this, SLOT(showMainToolbar()));
+
+    m_showStatusIconToolbar = new QAction(tr("Status icons (Ctrl i)"), this);
+
+    m_ui->mainToolBar->addAction(m_addNode);
+    m_ui->mainToolBar->addAction(m_delNode);
+    m_ui->mainToolBar->addAction(m_editNode);
+    m_ui->mainToolBar->addAction(m_scaleUpNode);
+    m_ui->mainToolBar->addAction(m_scaleDownNode);
+    m_ui->mainToolBar->addAction(m_nodeColor);
+    m_ui->mainToolBar->addAction(m_nodeTextColor);
+    m_ui->mainToolBar->addAction(m_addEdge);
+    m_ui->mainToolBar->addAction(m_delEdge);
+
+    m_ui->mainToolBar->addSeparator();
+    m_ui->mainToolBar->addAction(m_zoomIn);
+    m_ui->mainToolBar->addAction(m_zoomOut);
+    m_ui->mainToolBar->addAction(m_hintMode);
+    m_ui->mainToolBar->addAction(m_moveNode);
+    m_ui->mainToolBar->addAction(m_subtree);
+    m_ui->mainToolBar->addAction(m_showMainToolbar);
+    m_ui->mainToolBar->addAction(m_showStatusIconToolbar);
+
+    m_ui->mainToolBar->hide();
+
+
+
     m_doIt = new QAction(QIcon(":/applications-system.svg"), "&Do", this);
     m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
     connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
@@ -57,9 +107,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&What?"), this);
-    /// @todo come up with some shortcut
-//    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
+    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&How?"), this);
+    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
     connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone"), this);
@@ -74,16 +123,16 @@ MainWindow::MainWindow(QWidget *parent) :
     m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
     connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_ui->mainToolBar->addAction(m_doIt);
-    m_ui->mainToolBar->addAction(m_trash);
-    m_ui->mainToolBar->addAction(m_info);
-    m_ui->mainToolBar->addAction(m_blocked);
-    m_ui->mainToolBar->addAction(m_question);
-    m_ui->mainToolBar->addAction(m_postpone);
-    m_ui->mainToolBar->addAction(m_delegate);
-    m_ui->mainToolBar->addAction(m_maybe);
-
-    m_ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_ui->statusIcons_toolBar->addAction(m_doIt);
+    m_ui->statusIcons_toolBar->addAction(m_trash);
+    m_ui->statusIcons_toolBar->addAction(m_info);
+    m_ui->statusIcons_toolBar->addAction(m_blocked);
+    m_ui->statusIcons_toolBar->addAction(m_question);
+    m_ui->statusIcons_toolBar->addAction(m_postpone);
+    m_ui->statusIcons_toolBar->addAction(m_delegate);
+    m_ui->statusIcons_toolBar->addAction(m_maybe);
+    m_ui->statusIcons_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_ui->statusIcons_toolBar->hide();
 }
 
 MainWindow::~MainWindow()
@@ -128,6 +177,8 @@ void MainWindow::newFile()
     setTitle(m_fileName);
 
     m_graphicsView->setFocus();
+
+    showMainToolbar();
 }
 
 void MainWindow::openFile(const QString &fileName)
@@ -165,6 +216,7 @@ void MainWindow::openFile(const QString &fileName)
     m_ui->actionClose->setEnabled(true);
     contentChanged(false);
     setTitle(m_fileName);
+    showMainToolbar();
 }
 
 void MainWindow::saveFile()
@@ -238,6 +290,7 @@ bool MainWindow::closeFile()
     m_contentChanged = false;
     setTitle("");
     m_graphicsView->closeScene();
+    showMainToolbar(false);
     return true;
 }
 
@@ -381,9 +434,56 @@ void MainWindow::insertPicture()
     }
 }
 
+void MainWindow::addNode() { }
+void MainWindow::delNode() { }
+void MainWindow::editNode() { }
+void MainWindow::scaleUpNode() { }
+void MainWindow::scaleDownNode() { }
+void MainWindow::nodeColor() { }
+void MainWindow::nodeTextColor() { }
+void MainWindow::addEdge() { }
+void MainWindow::delEdge() { }
+void MainWindow::zoomIn() { }
+void MainWindow::zoomOut() { }
+void MainWindow::hintMode() { }
+
+void MainWindow::showMainToolbar(const bool &show)
+{
+    m_ui->mainToolBar->setVisible(show ?
+                                      !m_ui->mainToolBar->isVisible() :
+                                      false);
+}
+
+void MainWindow::showStatusIconToolbar(const bool &show)
+{
+    m_ui->statusIcons_toolBar->setVisible(
+                                show ?
+                                     !m_ui->statusIcons_toolBar->isVisible() :
+                                     false);
+}
+
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     m_contentChanged && !closeFile() ? event->ignore() : event->accept();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        if (event->key() == Qt::Key_M)
+        {
+            showMainToolbar();
+            return;
+        }
+        if (event->key() == Qt::Key_I)
+        {
+            showStatusIconToolbar();
+            return;
+        }
+    }
+
+    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::setTitle(const QString &title)

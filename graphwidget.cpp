@@ -348,9 +348,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         // insert new node
     case Qt::Key_Insert:
         insertNode();
-        contentChanged();
-        if (m_showingNodeNumbers)
-            showNodeNumbers();
 
         break;
 
@@ -400,38 +397,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         // delete node
     case Qt::Key_Delete:
     {
-
-        if (m_activeNode == m_nodeList.first())
-        {
-            m_parent->statusBarMsg(tr("Base node cannot be deleted."));
-            break;
-        }
-
-        QList <Node *> nodeList;
-        if (event->modifiers() == Qt::AltModifier)
-        {
-            nodeList = m_activeNode->subtree();
-        }
-        else
-        {
-            nodeList.push_back(m_activeNode);
-        }
-
-        foreach(Node *node, nodeList)
-        {
-            if (m_hintNode==node)
-                m_hintNode=0;
-
-            m_nodeList.removeAll(node);
-            delete node;
-        }
-
-        m_activeNode = 0;
-        contentChanged();
-
-        if (m_showingNodeNumbers)
-            showNodeNumbers();
-
+        removeNode();
         break;
     }
         // add edge to active node
@@ -563,6 +529,12 @@ void GraphWidget::setActiveNode(Node *node)
 
 void GraphWidget::insertNode()
 {
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
     double angle(m_activeNode->calculateBiggestAngle());
 
     qreal length(100);
@@ -583,6 +555,50 @@ void GraphWidget::insertNode()
 
     setActiveNode(node);
     setActiveNodeEditable();
+
+    contentChanged();
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
+}
+
+void GraphWidget::removeNode()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    if (m_activeNode == m_nodeList.first())
+    {
+        m_parent->statusBarMsg(tr("Base node cannot be deleted."));
+        return;
+    }
+
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::AltModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+    {
+        if (m_hintNode==node)
+            m_hintNode=0;
+
+        m_nodeList.removeAll(node);
+        delete node;
+    }
+
+    m_activeNode = 0;
+    contentChanged();
+
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
 }
 
 void GraphWidget::showingAllNodeNumbers(const bool &show)

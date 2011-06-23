@@ -36,8 +36,26 @@ public slots:
 
     void insertPicture();
 
+    void addNode();
+    void delNode();
+    void editNode();
+    void scaleUpNode();
+    void scaleDownNode();
+    void nodeColor();
+    void nodeTextColor();
+    void addEdge();
+    void delEdge();
+    void zoomIn();
+    void zoomOut();
+    void hintMode();
+
+    void showMainToolbar(const bool &show = true);
+    void showStatusIconToolbar(const bool &show = true);
+
+
 protected:
     void closeEvent(QCloseEvent * event);
+    void keyPressEvent(QKeyEvent *event);
 
 private:
 
@@ -47,6 +65,23 @@ private:
     GraphWidget *m_graphicsView;
     QString m_fileName;
     bool m_contentChanged;
+
+    QAction *m_addNode;
+    QAction *m_delNode;
+    QAction *m_editNode;
+    QAction *m_scaleUpNode;
+    QAction *m_scaleDownNode;
+    QAction *m_nodeColor;
+    QAction *m_nodeTextColor;
+    QAction *m_addEdge;
+    QAction *m_delEdge;
+    QAction *m_zoomIn;
+    QAction *m_zoomOut;
+    QAction *m_hintMode;
+    QAction *m_moveNode;
+    QAction *m_subtree;
+    QAction *m_showMainToolbar;
+    QAction *m_showStatusIconToolbar;
 
     QAction *m_doIt;
     QAction *m_trash;
