@@ -26,7 +26,7 @@ public:
 
     void newScene();
     void closeScene();
-    void readContentFromXmlFile(const QString &fileName);
+    bool readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
 

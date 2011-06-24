@@ -52,21 +52,21 @@ void GraphWidget::closeScene()
     this->hide();
 }
 
-void GraphWidget::readContentFromXmlFile(const QString &fileName)
+bool GraphWidget::readContentFromXmlFile(const QString &fileName)
 {
     QDomDocument doc("QtMindMap");
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
         m_parent->statusBarMsg(tr("Couldn't read file."));
-        return;
+        return false;
     }
 
     if (!doc.setContent(&file))
     {
         m_parent->statusBarMsg(tr("Couldn't parse XML file."));
         file.close();
-        return;
+        return false;
     }
     file.close();
 
@@ -121,6 +121,7 @@ void GraphWidget::readContentFromXmlFile(const QString &fileName)
     m_activeNode->setFocus();
 
     this->show();
+    return true;
 }
 
 void GraphWidget::writeContentToXmlFile(const QString &fileName)

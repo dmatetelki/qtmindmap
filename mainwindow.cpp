@@ -201,6 +201,7 @@ void MainWindow::openFile(const QString &fileName)
     if (!closeFile())
         return;
 
+    QString currFilename(m_fileName);
     if (fileName.isEmpty())
     {
         QFileDialog dialog(this,
@@ -224,7 +225,12 @@ void MainWindow::openFile(const QString &fileName)
         m_fileName = fileName;
     }
 
-    m_graphicsView->readContentFromXmlFile(m_fileName);
+    if (!m_graphicsView->readContentFromXmlFile(m_fileName))
+    {
+        m_fileName = currFilename;
+        return;
+    }
+
 
     m_ui->actionSave->setEnabled(true);
     m_ui->actionSaveAs->setEnabled(true);
