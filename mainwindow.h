@@ -31,7 +31,6 @@ public slots:
     bool closeFile();
     void exportScene();
 
-    void keys();
     void about();
 
     void insertPicture();

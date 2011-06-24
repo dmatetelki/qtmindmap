@@ -104,15 +104,15 @@ MainWindow::MainWindow(QWidget *parent) :
     m_insertIcon = new QAction(tr("Insert icon:"), this);
     m_insertIcon->setDisabled(true);
 
-    m_doIt = new QAction(QIcon(":/applications-system.svg"), "&Do", this);
+    m_doIt = new QAction(QIcon(":/applications-system.svg"), tr("&Do"), this);
     m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
     connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_trash = new QAction(QIcon(":/user-trash-full.svg"), "&Trash", this);
+    m_trash = new QAction(QIcon(":/user-trash-full.svg"), tr("&Trash"), this);
     m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_info = new QAction(QIcon(":/mail-attachment.svg"), "&Refer", this);
+    m_info = new QAction(QIcon(":/mail-attachment.svg"), tr("&Refer"), this);
     m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
 
@@ -132,8 +132,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
     connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
 
-    m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("&Maybe"), this);
-    m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+    m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("ma&Ybe"), this);
+    m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
     connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
 
     m_ui->statusIcons_toolBar->addAction(m_insertIcon);
@@ -165,7 +165,7 @@ void MainWindow::contentChanged(const bool& changed)
     {
         setWindowTitle(windowTitle().prepend("* "));
         m_contentChanged = true;
-        if (m_fileName != "untitled")
+        if (m_fileName != tr("untitled"))
             m_ui->actionSave->setEnabled(true);
     }
     else if (m_contentChanged == true && changed == false)
@@ -188,7 +188,7 @@ void MainWindow::newFile()
     m_ui->actionClose->setEnabled(true);
     m_ui->actionExport->setEnabled(true);
     contentChanged(false);
-    m_fileName = "untitled";
+    m_fileName = tr("untitled");
     setTitle(m_fileName);
 
     m_graphicsView->setFocus();
@@ -297,8 +297,8 @@ bool MainWindow::closeFile()
     if (m_contentChanged)
     {
         QMessageBox msgBox(this);
-        msgBox.setText("The document has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setText(tr("The document has been modified."));
+        msgBox.setInformativeText(tr("Do you want to save your changes?"));
         msgBox.setStandardButtons(QMessageBox::Save |
                                   QMessageBox::Discard |
                                   QMessageBox::Cancel);
@@ -308,7 +308,7 @@ bool MainWindow::closeFile()
         switch (ret) {
         case QMessageBox::Save:
         {
-            if (m_fileName == "untitled")
+            if (m_fileName == tr("untitled"))
             {
                 if (!saveFileAs())
                         return false;
@@ -353,71 +353,6 @@ void MainWindow::exportScene()
      {
          m_graphicsView->writeContentToPngFile(dialog.selectedFiles().first());
      }
-}
-
-void MainWindow::keys()
-{
-    QMessageBox msgBox(this);
-    msgBox.setWindowTitle(tr("Keys of QtMindMap"));
-    msgBox.setText(tr("Usage of keys & mouse buttons"));
-    msgBox.setInformativeText(
-
-                QString("<table><tr><td><b>").
-
-                append(tr("Keys")).
-                append("</b></td><td></td></tr><tr><td>+,-</td><td>").
-                append(tr("zoom in/out of the view")).
-                append("</td></tr></tr><tr><td>").
-                append(tr("cursors")).
-                append("</td><td>").
-                append(tr("move view scrollbars")).
-                append("</td></tr></tr><tr><td>").
-                append(tr("ctrl + cursors")).
-                append("</td><td>").
-                append(tr("move active node")).
-                append("</td></tr></tr><tr><td>Delete</td><td>").
-                append(tr("remove active node")).
-                append("</td></tr></tr><tr><td>Insert</td><td>").
-                append(tr("add new node to active node")).
-                append("</td></tr></tr><tr><td>f</td><td>").
-                append(tr("enter/leave hint mode (vimperator style select)")).
-                append("</td></tr></tr><tr><td>").
-                append(tr("numbers, backspace, enter")).
-                append("</td><td>").
-                append(tr("select numbers in hint mode")).
-                append("</td></tr></tr><tr><td>F2</td><td>").
-                append(tr("edit active node")).
-                append("</td></tr></tr><tr><td>Esc</td><td>").
-                append(tr("leaving node editing/adding/deleting mode")).
-                append("</td></tr></tr><tr><td>").
-                append(tr("editing mode: ctrl+cursors")).
-                append("</td><td>").
-                append(tr("jump to beginning of next/prev word")).
-                append("</td></tr></tr><tr><td>a</td><td>").
-                append(tr("add new edge to active node (select the destination)")).
-                append("</td></tr></tr><tr><td>d</td><td>").
-                append(tr("delete edge of active node (select other end)")).
-                append("</td></tr><tr><td><b>").
-                append(tr("Mouse")).
-                append("</b></td><td></td></tr><tr><td>").
-                append(tr("scroll")).
-                append("</td><td>").
-                append(tr("zoom in/out of the view")).
-                append("</td></tr><tr><td>").
-                append(tr("click")).
-                append("</td><td>").
-                append(tr("select node")).
-                append("</td></tr><tr><td>").
-                append(tr("double clikk")).
-                append("</td><td>").
-                append(tr("set node editable")).
-                append("</td></tr><tr><td>").
-                append(tr("drag")).
-                append("</td><td>").
-                append(tr("move node")).
-                append("</td></tr></table>"));
-
-    msgBox.exec();
 }
 
 void MainWindow::about()

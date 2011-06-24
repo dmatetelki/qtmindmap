@@ -32,6 +32,7 @@ FORMS    += mainwindow.ui
 
 RESOURCES = qtmindmap.qrc
 
-TRANSLATIONS = qtmindmap_hu.ts
+TRANSLATIONS += qtmindmap_hu.ts \
+                qtmindmap_nb_NO.ts
 
 CODECFORTR = UTF-8

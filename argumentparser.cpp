@@ -17,7 +17,8 @@ ArgumentParser::ArgumentParser(QObject *parent) :
 
 void ArgumentParser::printUsage()
 {
-    std::cout << tr("Usage: ").toStdString() << "qtmindmap [OPTION][FILE]"
+    std::cout << tr("Usage: ").toStdString() << "qtmindmap "
+              << tr("[OPTION][FILE]").toStdString()
               << std::endl
               << tr("Mindmap program in QT").toStdString() << std::endl
               << std::endl
