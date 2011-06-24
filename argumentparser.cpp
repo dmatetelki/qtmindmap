@@ -109,12 +109,6 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
             successful = false;
             return false;
         }
-        if (!fileInfo.isWritable())
-        {
-            std::cout << tr("File: ").toStdString() <<
-                         m_filePath.toStdString() <<
-                         tr(" is not writeable.").toStdString() << std::endl;
-        }
     }
     return true;
 }

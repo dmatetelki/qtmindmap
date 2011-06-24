@@ -225,6 +225,11 @@ void MainWindow::openFile(const QString &fileName)
         m_fileName = fileName;
     }
 
+
+    QFileInfo fileInfo(fileName);
+    if (!fileInfo.isWritable())
+        statusBarMsg(tr("Read-only file!"));
+
     if (!m_graphicsView->readContentFromXmlFile(m_fileName))
     {
         m_fileName = currFilename;
@@ -232,17 +237,35 @@ void MainWindow::openFile(const QString &fileName)
     }
 
 
-    m_ui->actionSave->setEnabled(true);
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
     m_ui->actionExport->setEnabled(true);
+
     contentChanged(false);
-    setTitle(m_fileName);
+
+    if (!fileInfo.isWritable())
+    {
+        m_ui->actionSave->setEnabled(false);
+        setTitle(QString("readonly ").append(m_fileName));
+    }
+    else
+    {
+        m_ui->actionSave->setEnabled(true);
+        setTitle(m_fileName);
+    }
+
     showMainToolbar();
 }
 
 void MainWindow::saveFile()
 {
+    QFileInfo fileInfo(m_fileName);
+    if (!fileInfo.isWritable())
+    {
+        statusBarMsg(tr("Read-only file!"));
+        return;
+    }
+
     m_graphicsView->writeContentToXmlFile(m_fileName);
     contentChanged(false);
 }
