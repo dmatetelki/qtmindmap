@@ -136,7 +136,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     root.appendChild(nodes_root);
     foreach(Node *node, m_nodeList)
     {
-        QDomElement cn = doc.createElement("nodes");
+        QDomElement cn = doc.createElement("node");
 
         // no need to store ID: parsing order is preorder.
         // cn.setAttribute( "id", QString::number(m_nodeList.indexOf(node)));
@@ -833,7 +833,7 @@ QList<Edge *> GraphWidget::edges() const
     QList<Edge *> list;
 
     foreach(Node * node, m_nodeList)
-        list.append(node->edgesFrom());
+        list.append(node->edgesFrom(false));
 
     return list;
 }
