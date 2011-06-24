@@ -13,7 +13,6 @@
 #include "math.h"
 #include "mainwindow.h"
 
-//const QColor GraphWidget::m_paper(255,255,105);
 const QColor GraphWidget::m_paper(255,255,153);
 
 
@@ -26,7 +25,6 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     m_editingNode(false),
     m_edgeAdding(false),
     m_edgeDeleting(false),
-//    m_edgeColoring(false),
     m_contentChanged(false)
 {
     m_scene = new QGraphicsScene(this);
@@ -247,7 +245,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         if (event->modifiers() &  Qt::ControlModifier)
         {
-            if (event->modifiers() &  Qt::MetaModifier)
+            if (event->modifiers() &  Qt::ShiftModifier)
             {
                 QList <Node *> nodeList = m_activeNode->subtree();
                 foreach(Node *node, nodeList)
@@ -707,7 +705,8 @@ void GraphWidget::nodeSelected(Node *node)
 void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
 {
     QList <Node *> nodeList;
-    if (event->modifiers() & Qt::MetaModifier)
+    if (event->modifiers() & Qt::ControlModifier &&
+        event->modifiers() & Qt::ShiftModifier)
     {
         nodeList = m_activeNode->subtree();
     }

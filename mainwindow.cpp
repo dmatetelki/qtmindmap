@@ -186,6 +186,7 @@ void MainWindow::newFile()
     m_ui->actionSave->setEnabled(false);
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
+    m_ui->actionExport->setEnabled(true);
     contentChanged(false);
     m_fileName = "untitled";
     setTitle(m_fileName);
@@ -228,6 +229,7 @@ void MainWindow::openFile(const QString &fileName)
     m_ui->actionSave->setEnabled(true);
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
+    m_ui->actionExport->setEnabled(true);
     contentChanged(false);
     setTitle(m_fileName);
     showMainToolbar();
@@ -301,6 +303,7 @@ bool MainWindow::closeFile()
     m_ui->actionSave->setEnabled(false);
     m_ui->actionSaveAs->setEnabled(false);
     m_ui->actionClose->setEnabled(false);
+    m_ui->actionExport->setEnabled(false);
     m_contentChanged = false;
     setTitle("");
     m_graphicsView->closeScene();
@@ -470,6 +473,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    // incative action does not listen to signals
     if (event->modifiers() & Qt::ControlModifier)
     {
         if (event->key() == Qt::Key_M)
