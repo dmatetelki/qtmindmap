@@ -456,7 +456,7 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
-    m_graph->setActiveNodeEditable();
+    m_graph->editNode();
 }
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

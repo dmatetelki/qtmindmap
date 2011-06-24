@@ -18,10 +18,8 @@ public:
     GraphWidget(MainWindow *parent = 0);
 
     void setActiveNode(Node *node);
-    void setActiveNodeEditable();
     void nodeSelected(Node *node);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
-    void nodeLostFocus();
     QList<Edge *> edges() const;
 
     void contentChanged(const bool &changed = true);
@@ -36,8 +34,17 @@ public:
 
 public slots:
 
+    void zoomIn();
+    void zoomOut();
     void insertNode();
     void removeNode();
+    void editNode();
+    void nodeColor();
+    void nodeTextColor();
+    void addEdge();
+    void removeEdge();
+    void hintMode();
+    void nodeLostFocus();
 
 protected:
 

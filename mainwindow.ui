@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -45,7 +45,6 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionKeys"/>
     <addaction name="actionAbout_QtMindMap"/>
    </widget>
    <addaction name="menuFile"/>
@@ -68,13 +67,13 @@
     <bool>true</bool>
    </property>
    <property name="windowTitle">
-    <string>status icons</string>
+    <string>insert status icons</string>
    </property>
    <attribute name="toolBarArea">
     <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
   </widget>
   <action name="actionNew">

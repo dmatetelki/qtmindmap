@@ -36,19 +36,6 @@ public slots:
 
     void insertPicture();
 
-    void addNode();
-    void delNode();
-    void editNode();
-    void scaleUpNode();
-    void scaleDownNode();
-    void nodeColor();
-    void nodeTextColor();
-    void addEdge();
-    void delEdge();
-    void zoomIn();
-    void zoomOut();
-    void hintMode();
-
     void showMainToolbar(const bool &show = true);
     void showStatusIconToolbar(const bool &show = true);
 
@@ -77,12 +64,14 @@ private:
     QAction *m_delEdge;
     QAction *m_zoomIn;
     QAction *m_zoomOut;
+    QAction *m_esc;
     QAction *m_hintMode;
     QAction *m_moveNode;
     QAction *m_subtree;
     QAction *m_showMainToolbar;
     QAction *m_showStatusIconToolbar;
 
+    QAction *m_insertIcon;
     QAction *m_doIt;
     QAction *m_trash;
     QAction *m_info;

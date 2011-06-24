@@ -31,8 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
             this, SLOT(about()));
-    connect(m_ui->actionKeys, SIGNAL(activated()),
-            this, SLOT(keys()));
+
+//    connect(m_ui->actionKeys, SIGNAL(activated()),
+//            this, SLOT(keys()));
 
 
     setCentralWidget(m_graphicsView);
@@ -41,32 +42,42 @@ MainWindow::MainWindow(QWidget *parent) :
     // why can't I do this with qtcreator?
     /// @bug or a feature? no underline here
 
-    m_zoomIn = new QAction(tr("Zoom in (+)"), this);
-    m_zoomOut = new QAction(tr("Zoom out (+)"), this);
-
     m_addNode = new QAction(tr("Add node (ins)"), this);
     connect(m_addNode, SIGNAL(activated()), m_graphicsView, SLOT(insertNode()));
     m_delNode = new QAction(tr("Del node (del)"), this);
     connect(m_delNode, SIGNAL(activated()), m_graphicsView, SLOT(removeNode()));
+    m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
+    connect(m_editNode, SIGNAL(activated()), m_graphicsView, SLOT(editNode()));
 
-    m_editNode = new QAction(tr("Edit node (F2)"), this);
+    /// @todo pass ctrl
     m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
     m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
-    m_nodeColor = new QAction(tr("Node color (c)"), this);
-    m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
-    m_addEdge = new QAction(tr("Add edge (a)"), this);
-    m_delEdge = new QAction(tr("Del edge (d)"), this);
-    m_moveNode = new QAction(tr("Move node (Ctrl cursor)"), this);
-    m_moveNode->setDisabled(true);
-    m_subtree = new QAction(tr("Apply on subtree (Alt)"), this);
-    m_subtree->setDisabled(true);
 
+    m_nodeColor = new QAction(tr("Node color (c)"), this);
+    connect(m_nodeColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeColor()));
+    m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
+    connect(m_nodeTextColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeTextColor()));
+    m_addEdge = new QAction(tr("Add edge (a)"), this);
+    connect(m_addEdge, SIGNAL(activated()), m_graphicsView, SLOT(addEdge()));
+    m_delEdge = new QAction(tr("Del edge (d)"), this);
+    connect(m_delEdge, SIGNAL(activated()), m_graphicsView, SLOT(removeEdge()));
+    m_moveNode = new QAction(tr("Move node\n(Ctrl cursor, drag)"), this);
+    m_moveNode->setDisabled(true);
+    m_subtree = new QAction(tr("Change on wholesubtree\n(Ctrl shift)"), this);
+    m_subtree->setDisabled(true);
+    m_zoomIn = new QAction(tr("Zoom in (+, scrollup)"), this);
+    connect(m_zoomIn, SIGNAL(activated()), m_graphicsView, SLOT(zoomIn()));
+    m_zoomOut = new QAction(tr("Zoom out (-, scrolldown)"), this);
+    connect(m_zoomOut, SIGNAL(activated()), m_graphicsView, SLOT(zoomOut()));
+    m_esc = new QAction(tr("Leave editing,\nedge eadd/remove (esc)"), this);
+    connect(m_esc, SIGNAL(activated()), m_graphicsView, SLOT(nodeLostFocus()));
     m_hintMode = new QAction(tr("Hint mode (f)"), this);
-    m_showMainToolbar = new QAction(tr("Main toolbar (Ctrl m)"), this);
+    connect(m_hintMode, SIGNAL(activated()), m_graphicsView, SLOT(hintMode()));
+    m_showMainToolbar = new QAction(tr("Show main toolbar\n(Ctrl m)"), this);
     m_showMainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
     connect(m_showMainToolbar, SIGNAL(activated()), this, SLOT(showMainToolbar()));
-
-    m_showStatusIconToolbar = new QAction(tr("Status icons (Ctrl i)"), this);
+    m_showStatusIconToolbar = new QAction(tr("Insert status icons\n(Ctrl i)"), this);
+    connect(m_showStatusIconToolbar, SIGNAL(activated()), this, SLOT(showStatusIconToolbar()));
 
     m_ui->mainToolBar->addAction(m_addNode);
     m_ui->mainToolBar->addAction(m_delNode);
@@ -81,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->mainToolBar->addSeparator();
     m_ui->mainToolBar->addAction(m_zoomIn);
     m_ui->mainToolBar->addAction(m_zoomOut);
+    m_ui->mainToolBar->addAction(m_esc);
     m_ui->mainToolBar->addAction(m_hintMode);
     m_ui->mainToolBar->addAction(m_moveNode);
     m_ui->mainToolBar->addAction(m_subtree);
@@ -89,7 +101,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_ui->mainToolBar->hide();
 
-
+    m_insertIcon = new QAction(tr("Insert icon:"), this);
+    m_insertIcon->setDisabled(true);
 
     m_doIt = new QAction(QIcon(":/applications-system.svg"), "&Do", this);
     m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
@@ -123,6 +136,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
     connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
 
+    m_ui->statusIcons_toolBar->addAction(m_insertIcon);
     m_ui->statusIcons_toolBar->addAction(m_doIt);
     m_ui->statusIcons_toolBar->addAction(m_trash);
     m_ui->statusIcons_toolBar->addAction(m_info);
@@ -433,19 +447,6 @@ void MainWindow::insertPicture()
         return;
     }
 }
-
-void MainWindow::addNode() { }
-void MainWindow::delNode() { }
-void MainWindow::editNode() { }
-void MainWindow::scaleUpNode() { }
-void MainWindow::scaleDownNode() { }
-void MainWindow::nodeColor() { }
-void MainWindow::nodeTextColor() { }
-void MainWindow::addEdge() { }
-void MainWindow::delEdge() { }
-void MainWindow::zoomIn() { }
-void MainWindow::zoomOut() { }
-void MainWindow::hintMode() { }
 
 void MainWindow::showMainToolbar(const bool &show)
 {
