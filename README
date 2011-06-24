@@ -1,18 +1,54 @@
-Create a backlog list.
-Let's do this project with Scrum.
+QtMindMap
 
-- Dummy main widget & build system
-- Test system(?)
-- Menu bar: save/open file, quit.
-- canvas with root element
-- element widget
-- connect/disconnect emelent (line widget)
-- move element
-- element, line widget properties (rigth click menu)
-- moving with cursor keys, inserting / deleting with cursor keys
-- icon
-- taskbar app
+  Software written in QT, aims to provide the features of Freemind(java)
 
 
-TODO:
-- set about dialog's size fiexd
+Compile:
+
+  No external depencencies.
+
+  mkdir qtmindmap
+  cd qtmindmap
+  git clone git://gitorious.org/qtmindmap/qtmindmap.git
+  qmake qtmindmap.pro
+  make
+
+Run:
+
+  ./qtmindmap -h
+
+  Usage: qtmindmap [OPTION][FILE]
+  Mindmap program in QT
+
+  Options:
+  -h,  --help             Prints this help.
+  -t,  --tray             Starts application in system tray.
+  -s,  --show-minimized   Hide main window, just show systray icon.
+
+  Report bugs to: denes.matetelki@gmail.com
+
+
+Keys:
+
+  +,-   zoom in/out of the view
+  cursor keys   move view scrollbars
+  ctrl + cursor keys:   move active node
+  del   remove active node
+  ins   add new node to active node
+  f   enter/leave hint mode
+  numbers, backspace, enter:  select number in hint mode
+  F2  edit active node
+  esc   leaving node editing, edge adding/deleting mode
+  editing mode: ctrl+cursor keys  jump to beginning of next/prev word
+  a   add new edge to active node (select the destination)
+  d   delete edge of active node (select other end)
+  c   set color of node
+  t   set textcolor on node
+  ctrl shoft  apply change on subtree of current node: del, move, resize, color, textcolor
+
+Mouse:
+
+  scroll  zoom in/out view
+  click   select node
+  drag  move node
+  double click  sets node editable
