@@ -43,6 +43,8 @@ public slots:
     void showMainToolbar(const bool &show = true);
     void showStatusIconToolbar(const bool &show = true);
 
+    // handle changed content at quit
+    void quit();
 
 protected:
 
@@ -51,10 +53,6 @@ protected:
 
     // show/hide toolbars, otherwise pass on the event to GraphWidget
     void keyPressEvent(QKeyEvent *event);
-
-private slots:
-
-    void quit();
 
 private:
 

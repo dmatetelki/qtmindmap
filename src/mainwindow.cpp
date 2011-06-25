@@ -313,6 +313,14 @@ void MainWindow::showStatusIconToolbar(const bool &show)
                                      false);
 }
 
+void MainWindow::quit()
+{
+    if (m_contentChanged && !closeFile())
+        return;
+
+    QApplication::instance()->quit();
+}
+
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     m_contentChanged && !closeFile() ? event->ignore() : event->accept();
@@ -337,15 +345,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
     QMainWindow::keyPressEvent(event);
 }
-
-void MainWindow::quit()
-{
-    if (m_contentChanged && !closeFile())
-        return;
-
-    QApplication::instance()->quit();
-}
-
 
 void MainWindow::setUpMainToolbar()
 {

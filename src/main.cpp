@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     // system tray?
     MainWindow w;
-    SystemTray systemtray(&w);
+    SystemTray *systemtray;
     if (argParser.isSystemTray() or argParser.isShowMinimized())
     {
         if (!QSystemTrayIcon::isSystemTrayAvailable())
@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
         QApplication::setQuitOnLastWindowClosed(false);
-        systemtray.setup();
-        systemtray.show();
+        systemtray = new SystemTray(&w);
+        systemtray->show();
     }
 
     // open file if any

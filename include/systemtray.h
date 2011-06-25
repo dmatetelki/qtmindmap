@@ -14,20 +14,20 @@ class SystemTray : public QWidget
 public:
 
     explicit SystemTray(MainWindow *mainWindow, QWidget *parent = 0);
-    void setup();
-    void show();
+
+    // access private member
+    void show() { m_systemTrayIcon->show(); }
 
 private:
 
-        MainWindow *m_mainWindow;
-
-        QSystemTrayIcon *m_systemTrayIcon;
-        QMenu *m_trayIconMenu;
-        QAction *m_minimizeAction;
-        QAction *m_maximizeAction;
-        QAction *m_restoreAction;
-        QAction *m_quitAction;
-        QIcon *m_icon;
+    MainWindow *m_parent;
+    QSystemTrayIcon *m_systemTrayIcon;
+    QMenu *m_trayIconMenu;
+    QAction *m_minimizeAction;
+    QAction *m_maximizeAction;
+    QAction *m_restoreAction;
+    QAction *m_quitAction;
+    QIcon *m_icon;
 
 };
 
