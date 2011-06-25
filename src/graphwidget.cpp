@@ -16,17 +16,16 @@
 
 const QColor GraphWidget::m_paper(255,255,153);
 
-
-GraphWidget::GraphWidget(MainWindow *parent) :
-    QGraphicsView(parent),
-    m_parent(parent),
-    m_activeNode(0),
-    m_showingNodeNumbers(false),
-    m_hintNode(0),
-    m_editingNode(false),
-    m_edgeAdding(false),
-    m_edgeDeleting(false),
-    m_contentChanged(false)
+GraphWidget::GraphWidget(MainWindow *parent)
+    : QGraphicsView(parent)
+    , m_parent(parent)
+    , m_activeNode(0)
+    , m_showingNodeNumbers(false)
+    , m_hintNode(0)
+    , m_editingNode(false)
+    , m_edgeAdding(false)
+    , m_edgeDeleting(false)
+    , m_contentChanged(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -38,6 +37,51 @@ GraphWidget::GraphWidget(MainWindow *parent) :
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
+}
+
+void GraphWidget::nodeSelected(Node *node)
+{
+    // leave hint mode
+    showingAllNodeNumbers(false);
+    m_showingNodeNumbers = false;
+
+    if (m_edgeAdding)
+    {
+        addEdge(m_activeNode, node);
+        m_edgeAdding = false;
+    }
+    else if (m_edgeDeleting)
+    {
+        removeEdge(m_activeNode, node);
+        m_edgeDeleting = false;
+    }
+    else
+    {
+        setActiveNode(node);
+    }
+}
+
+void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
+{
+    // move just the active Node, or it's subtree too?
+    QList <Node *> nodeList;
+    if (event->modifiers() & Qt::ControlModifier &&
+        event->modifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+        node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
+}
+
+void GraphWidget::contentChanged(const bool &changed)
+{
+    m_parent->contentChanged(changed);
 }
 
 void GraphWidget::newScene()
@@ -55,6 +99,7 @@ void GraphWidget::closeScene()
 
 bool GraphWidget::readContentFromXmlFile(const QString &fileName)
 {
+    // open & parse XML file
     QDomDocument doc("QtMindMap");
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
@@ -71,10 +116,9 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
     }
     file.close();
 
-    removeAllNodes();
-
     QDomElement docElem = doc.documentElement();
 
+    // add nodes
     QDomNodeList nodes = docElem.childNodes().item(0).childNodes();
     for (unsigned int i = 0; i < nodes.length(); i++)
     {
@@ -98,6 +142,7 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
         }
     }
 
+    // add edges
     QDomNodeList edges = docElem.childNodes().item(1).childNodes();
     for (unsigned int i = 0; i < edges.length(); i++)
     {
@@ -117,6 +162,7 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
         }
     }
 
+    // test the first node the active one
     m_activeNode = m_nodeList.first();
     m_activeNode->setActive();
     m_activeNode->setFocus();
@@ -127,6 +173,7 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
 
 void GraphWidget::writeContentToXmlFile(const QString &fileName)
 {
+    // create XML doc object
     QDomDocument doc("QtMindMap");
 
     QDomElement root = doc.createElement("qtmindmap");
@@ -157,7 +204,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     //edges
     QDomElement edges_root = doc.createElement("edges");
     root.appendChild(edges_root);
-    foreach(Edge *edge, edges())
+    foreach(Edge *edge, allEdges())
     {
         QDomElement cn = doc.createElement("edge");
         cn.setAttribute( "source",
@@ -173,17 +220,18 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         edges_root.appendChild(cn);
     }
 
+    // write XML doc object to file
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
         m_parent->statusBarMsg(tr("Couldn't open file to write."));
         return;
     }
-
     QTextStream ts( &file );
     ts << doc.toString();
     file.close();
 
+    // show a statusBar message to the user
     m_parent->statusBarMsg(tr("Saved."));
 }
 
@@ -196,6 +244,7 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
     painter.setRenderHint(QPainter::Antialiasing);
 
+    // Strange that I have to set this, and scene->render() does not do this
     m_scene->setBackgroundBrush(GraphWidget::m_paper);
 
     m_scene->render(&painter);
@@ -204,6 +253,7 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
     img.save(fileName);
 
+    // show a statusBar message to the user
     m_parent->statusBarMsg(tr("MindMap exported as ") + fileName);
 }
 
@@ -218,14 +268,296 @@ void GraphWidget::insertPicture(const QString &picture)
     m_activeNode->insertPicture(picture);
 }
 
+void GraphWidget::insertNode()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    // get the biggest angle between the edges of the Node.
+    double angle(m_activeNode->calculateBiggestAngle());
+
+    // let the distance between the current and new Node be 100 pixels
+    qreal length(100);
+
+    QPointF pos(length * cos(angle), length * sin(angle));
+
+    // add a new node which inherits the color and textColor
+    Node *node = new Node(this);
+    node->setColor(m_activeNode->color());
+    node->setTextColor(m_activeNode->textColor());
+    node->setHtml(QString(""));
+    m_scene->addItem(node);
+    node->setPos(m_activeNode->sceneBoundingRect().center() +
+                 pos -
+                 node->boundingRect().center());
+    m_nodeList.append(node);
+
+    addEdge(m_activeNode, node);
+
+    // set it the active Node and editable, so the user can edit it at once
+    setActiveNode(node);
+    editNode();
+
+    contentChanged();
+
+    // it we are in hint mode, the numbers shall be re-calculated
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
+}
+
+void GraphWidget::removeNode()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    if (m_activeNode == m_nodeList.first())
+    {
+        m_parent->statusBarMsg(tr("Base node cannot be deleted."));
+        return;
+    }
+
+    // remove just the active Node or it's subtree too?
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+    {
+        if (m_hintNode==node)
+            m_hintNode=0;
+
+        m_nodeList.removeAll(node);
+        delete node;
+    }
+
+    m_activeNode = 0;
+    contentChanged();
+
+    // it we are in hint mode, the numbers shall be re-calculated
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
+}
+
+void GraphWidget::editNode()
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    m_editingNode = true;
+    m_activeNode->setEditable();
+    m_scene->setFocusItem(m_activeNode);
+}
+
+void GraphWidget::zoomIn()
+{
+    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
+    {
+        if (!m_activeNode)
+        {
+            m_parent->statusBarMsg(tr("No active node."));
+            return;
+        }
+
+        // Scale up just the active Node or it's subtree too?
+        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+                node->setScale(qreal(1.2),sceneRect());
+        }
+        else
+        {
+            m_activeNode->setScale(qreal(1.2),sceneRect());
+        }
+    }
+    else // zoom in the view
+    {
+        scaleView(qreal(1.2));
+    }
+}
+
+void GraphWidget::zoomOut()
+{
+    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
+    {
+        if (!m_activeNode)
+        {
+            m_parent->statusBarMsg(tr("No active node."));
+            return;
+        }
+
+        // Scale down just the active Node or it's subtree too?
+        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+                node->setScale(qreal(1 / 1.2),sceneRect());
+        }
+        else
+        {
+            m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
+        }
+    }
+    else // zoom out of the view
+    {
+        scaleView(qreal(1 / 1.2));
+    }
+}
+
+void GraphWidget::nodeColor()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    // Set color of the active Node or of it's subtree too?
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    // popup a color selector dialogm def color is the curr one.
+    QColorDialog dialog(this);
+    dialog.setWindowTitle(tr("Select node color"));
+    dialog.setCurrentColor(m_activeNode->color());
+    if (dialog.exec())
+    {
+        QColor color = dialog.selectedColor();
+        foreach(Node *node, nodeList)
+        {
+            node->setColor(color);
+            foreach (Edge * edge, node->edgesToThis(false))
+                edge->setColor(color);
+        }
+    }
+}
+
+void GraphWidget::nodeTextColor()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    // Set textcolor of the active Node or of it's subtree too?
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    // popup a color selector dialogm def color is the curr one.
+    QColorDialog dialog(this);
+    dialog.setWindowTitle(tr("Select text color"));
+    dialog.setCurrentColor(m_activeNode->textColor());
+    if (dialog.exec())
+    {
+        QColor color = dialog.selectedColor();
+        foreach(Node *node, nodeList)
+            node->setTextColor(color);
+    }
+}
+
+void GraphWidget::addEdge()
+{
+    m_parent->statusBarMsg(tr("Add edge: select destination node."));
+    m_edgeAdding = true;
+}
+
+void GraphWidget::removeEdge()
+{
+    m_parent->statusBarMsg(tr("Delete edge: select other end-node."));
+    m_edgeDeleting = true;
+}
+
+void GraphWidget::nodeLostFocus()
+{
+    qDebug() << __PRETTY_FUNCTION__;
+
+    if (m_editingNode)
+    {
+        m_editingNode = false;
+        m_activeNode->setEditable(false);
+        m_activeNode->update();
+    }
+    else if (m_edgeAdding)
+    {
+        m_edgeAdding = false;
+        m_parent->statusBarMsg(tr("Edge adding cancelled."));
+    }
+    else if (m_edgeDeleting)
+    {
+        m_edgeDeleting = false;
+        m_parent->statusBarMsg(tr("Edge deleting cancelled."));
+    }
+    else if(m_showingNodeNumbers)
+    {
+        m_hintNumber.clear();
+        showingAllNodeNumbers(false);
+        m_showingNodeNumbers = false;
+    }
+}
+
+void GraphWidget::hintMode()
+{
+    // vimperator-style node selection with keys.
+    // show or hide the numbers if we enter/leave this mode.
+    m_showingNodeNumbers = !m_showingNodeNumbers;
+    if (!m_showingNodeNumbers)
+    {
+        showingAllNodeNumbers(false);
+        return;
+    }
+
+    m_hintNumber.clear();
+    showNodeNumbers();
+}
+
+// All key event arrives here.
+// MainWindow::keyPressEvent passes all of them here, except
+// Ctrl + m (show/hide mainToolBar) and Ctrl + i (show/hide statusIconsToolbar)
 void GraphWidget::keyPressEvent(QKeyEvent *event)
 {
+    // Node lost focus: leaving  edge adding/deleting or Node editing.
     if (event->key() == Qt::Key_Escape)
     {
         nodeLostFocus();
         return;
     }
 
+    // During Node editing mode, pass every key to the Node's keyPressEvent.
     if (m_editingNode)
     {
         m_activeNode->keyPressEvent(event);
@@ -234,6 +566,8 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     switch (event->key())
     {
+
+    // move
     case Qt::Key_Up:
     case Qt::Key_Down:
     case Qt::Key_Left:
@@ -247,6 +581,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         if (event->modifiers() &  Qt::ControlModifier)
         {
+            // Move whole subtree of active Node.
             if (event->modifiers() &  Qt::ShiftModifier)
             {
                 QList <Node *> nodeList = m_activeNode->subtree();
@@ -259,7 +594,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                     contentChanged();
                 }
             }
-            else
+            else // Move just the active Node.
             {
                 if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
                 else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
@@ -268,7 +603,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                 contentChanged();
             }
         }
-        else // move scene
+        else // Move scene.
         {
             QGraphicsView::keyPressEvent(event);
         }
@@ -284,7 +619,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         zoomOut();
         break;
 
-        // Hint mode: select a node vimperator style
+    // Hint mode: select a Node vimperator-style.
     case Qt::Key_F:
 
         hintMode();
@@ -295,7 +630,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         break;
 
-        // used in node selection mode, to select node with numbers/enter
+    // Used in hint mode, to select node with numbers/backspace/enter.
     case Qt::Key_0:
     case Qt::Key_1:
     case Qt::Key_2:
@@ -315,7 +650,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         break;
 
-        // delete one letter back in node selection
+    // Delete one letter back in hint mode.
     case Qt::Key_Backspace:
         if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
             break;
@@ -324,7 +659,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         showNodeNumbers();
         break;
 
-        // in node selection select node if nudenum = enterednum
+    // In hint mode select the suggested Node.
     case Qt::Key_Return:
     case Qt::Key_Enter:
 
@@ -368,8 +703,6 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
-
-
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
     event->delta() > 0 ?
@@ -389,10 +722,114 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
 void GraphWidget::scaleView(qreal scaleFactor)
 {
     qreal factor = transform().scale(scaleFactor, scaleFactor).
-            mapRect(QRectF(0, 0, 1, 1)).width();
-    if (factor < 0.2 || factor > 10) return;
+                                        mapRect(QRectF(0, 0, 1, 1)).width();
+
+    // don't allow to scale up/down too much
+    if (factor < 0.2 || factor > 10)
+        return;
 
     scale(scaleFactor, scaleFactor);
+}
+
+QList<Edge *> GraphWidget::allEdges() const
+{
+    QList<Edge *> list;
+
+    // GraphWidget has a list of Nodes only.
+    // Each Node maintains a list of it's own Edges.
+    // We iterate through the list of Nodes and call Node::edgesFrom() on them.
+    // edgesFrom(exludeSecundaries=false) return a list of edges (including
+    // secondary edges) which starts from this Node.
+    foreach(Node * node, m_nodeList)
+        list.append(node->edgesFrom(false));
+
+    return list;
+}
+
+
+void GraphWidget::addEdge(Node *source, Node *destination)
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    if (destination == m_nodeList.first())
+    {
+        m_parent->statusBarMsg(
+                    tr("Root element cannot be an edge target."));
+        return;
+    }
+
+    if (source->isConnected(destination))
+    {
+        m_parent->statusBarMsg(
+                    tr("There is already an edge between these two nodes."));
+    }
+    else
+    {
+        // aviod the graph beeing acyclic. (ok, Nodes having multiple parents)
+        bool sec(false);
+        if (!destination->edgesToThis().empty())
+        {
+            m_parent->statusBarMsg(
+                     tr("The graph is acyclic, edge added as secondary edge."));
+            sec = true;
+        }
+        Edge *edge = new Edge(source, destination);
+        edge->setColor(destination->color());
+        edge->setWidth(destination->scale()*2 + 1);
+
+        // The Edge is secondary, because the Node already has a parent
+        // (it is already a destination of another Edge)
+        edge->setSecondary(sec);
+
+        m_scene->addItem(edge);
+        contentChanged();
+    }
+}
+
+void GraphWidget::removeEdge(Node *source, Node *destination)
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    if (!source->isConnected(destination))
+    {
+        m_parent->statusBarMsg(tr("There no edge between these two nodes."));
+    }
+    else
+    {
+        source->deleteEdge(destination);
+        contentChanged();
+    }
+}
+
+void GraphWidget::addFirstNode()
+{
+    Node *node = new Node(this);
+    node->setHtml(
+                QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
+    m_scene->addItem(node);
+
+    m_nodeList.append(node);
+
+    m_activeNode = m_nodeList.first();
+    m_activeNode->setActive();
+}
+
+void GraphWidget::removeAllNodes()
+{
+    foreach(Node *node, m_nodeList)
+        delete node;
+
+    m_nodeList.clear();
+    m_activeNode = 0;
+    m_hintNode = 0;
 }
 
 void GraphWidget::setActiveNode(Node *node)
@@ -404,246 +841,36 @@ void GraphWidget::setActiveNode(Node *node)
     m_activeNode->setActive();
 }
 
-void GraphWidget::zoomIn()
+// re-draw numbers
+void GraphWidget::showNodeNumbers()
 {
-    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
-    {
-        if (!m_activeNode)
-        {
-            m_parent->statusBarMsg(tr("No active node."));
-            return;
-        }
-
-        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1.2),sceneRect());
-        }
-        else
-        {
-            m_activeNode->setScale(qreal(1.2),sceneRect());
-        }
-    }
-    else
-    {
-        scaleView(qreal(1.2));
-    }
+    if (m_hintNumber.isEmpty())
+     {
+         showingAllNodeNumbers(true);
+         m_nodeList.first()->showNumber(0,true,true);
+         m_hintNode = m_nodeList.first();
+     }
+     else
+     {
+         showingAllNodeNumbers(false);
+         showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
+     }
 }
 
-void GraphWidget::zoomOut()
-{
-    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
-    {
-        if (!m_activeNode)
-        {
-            m_parent->statusBarMsg(tr("No active node."));
-            return;
-        }
-
-        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1 / 1.2),sceneRect());
-        }
-        else
-        {
-            m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
-        }
-    }
-    else
-    {
-        scaleView(qreal(1 / 1.2));
-    }
-}
-
-void GraphWidget::insertNode()
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    double angle(m_activeNode->calculateBiggestAngle());
-
-    qreal length(100);
-
-    QPointF pos(length * cos(angle), length * sin(angle));
-
-    Node *node = new Node(this);
-    node->setColor(m_activeNode->color());
-    node->setTextColor(m_activeNode->textColor());
-    node->setHtml(QString(""));
-    m_scene->addItem(node);
-    node->setPos(m_activeNode->sceneBoundingRect().center() +
-                 pos -
-                 node->boundingRect().center());
-    m_nodeList.append(node);
-
-    addEdge(m_activeNode, node);
-
-    setActiveNode(node);
-    editNode();
-
-    contentChanged();
-    if (m_showingNodeNumbers)
-        showNodeNumbers();
-}
-
-void GraphWidget::removeNode()
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    if (m_activeNode == m_nodeList.first())
-    {
-        m_parent->statusBarMsg(tr("Base node cannot be deleted."));
-        return;
-    }
-
-    QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    foreach(Node *node, nodeList)
-    {
-        if (m_hintNode==node)
-            m_hintNode=0;
-
-        m_nodeList.removeAll(node);
-        delete node;
-    }
-
-    m_activeNode = 0;
-    contentChanged();
-
-    if (m_showingNodeNumbers)
-        showNodeNumbers();
-}
-
-void GraphWidget::editNode()
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    m_editingNode = true;
-    m_activeNode->setEditable();
-    m_scene->setFocusItem(m_activeNode);
-}
-
-void GraphWidget::nodeColor()
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    QColorDialog dialog(this);
-    dialog.setWindowTitle(tr("Select node color"));
-    dialog.setCurrentColor(m_activeNode->color());
-    if (dialog.exec())
-    {
-        QColor color = dialog.selectedColor();
-        foreach(Node *node, nodeList)
-        {
-            node->setColor(color);
-            foreach (Edge * edge, node->edgesToThis(false))
-                edge->setColor(color);
-        }
-    }
-}
-
-void GraphWidget::nodeTextColor()
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    QColorDialog dialog(this);
-    dialog.setWindowTitle(tr("Select text color"));
-    dialog.setCurrentColor(m_activeNode->textColor());
-    if (dialog.exec())
-    {
-        QColor color = dialog.selectedColor();
-        foreach(Node *node, nodeList)
-            node->setTextColor(color);
-    }
-}
-
-void GraphWidget::addEdge()
-{
-    m_parent->statusBarMsg(tr("Add edge: select destination node."));
-    m_edgeAdding = true;
-}
-
-void GraphWidget::removeEdge()
-{
-    m_parent->statusBarMsg(tr("Delete edge: select other end-node."));
-    m_edgeDeleting = true;
-}
-
-void GraphWidget::hintMode()
-{
-    m_showingNodeNumbers = !m_showingNodeNumbers;
-    if (!m_showingNodeNumbers)
-    {
-        showingAllNodeNumbers(false);
-        return;
-    }
-
-    m_hintNumber.clear();
-    showNodeNumbers();
-}
-
+// show/hide numbers on all nodes
 void GraphWidget::showingAllNodeNumbers(const bool &show)
 {
-    int i =0;
+    int i(0);
     for (QList<Node *>::const_iterator it = m_nodeList.begin();
-         it != m_nodeList.end(); it++, i++)
+         it != m_nodeList.end(); it++,
+         i++)
+    {
         dynamic_cast<Node*>(*it)->showNumber(i,show);
+    }
 }
 
-void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
+// show nodes numbers where number begins with 'prefix'
+void GraphWidget::showingNodeNumbersBeginWithNumber(const int &prefix,
                                                     const bool &show)
 {
     int i(0);
@@ -651,14 +878,17 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
     for (QList<Node *>::const_iterator it = m_nodeList.begin();
          it != m_nodeList.end(); it++, i++)
     {
-        if (i == number)
+        // if nodenumber == 'prefix' the node is selected
+        if (i == prefix)
         {
             hit++;
             dynamic_cast<Node*>(*it)->showNumber(i,show,true);
             m_hintNode = dynamic_cast<Node*>(*it);
             continue;
         }
-        if (numberStartsWithNumber(i, number))
+
+        // if 'i' starts with 'prefix'
+        if ((QString::number(i)).startsWith(QString::number(prefix)))
         {
             hit++;
             dynamic_cast<Node*>(*it)->showNumber(i,show);
@@ -675,171 +905,3 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &number,
     }
 }
 
-bool GraphWidget::numberStartsWithNumber(const int &number, const int &prefix)
-{
-    return (QString::number(number)).startsWith(QString::number(prefix));
-}
-
-void GraphWidget::nodeSelected(Node *node)
-{
-    showingAllNodeNumbers(false);
-    m_showingNodeNumbers = false;
-
-    node->setEditable(false);
-    m_editingNode = false;
-
-    if (m_edgeAdding)
-    {
-        addEdge(m_activeNode, node);
-        m_edgeAdding = false;
-    }
-    else if (m_edgeDeleting)
-    {
-        removeEdge(m_activeNode, node);
-        m_edgeDeleting = false;
-    }
-    else
-    {
-        setActiveNode(node);
-    }
-}
-
-void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
-{
-    QList <Node *> nodeList;
-    if (event->modifiers() & Qt::ControlModifier &&
-        event->modifiers() & Qt::ShiftModifier)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    foreach(Node *node, nodeList)
-        node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
-}
-
-void GraphWidget::nodeLostFocus()
-{
-    if (m_editingNode)
-    {
-        m_editingNode = false;
-        m_activeNode->setEditable(false);
-        m_activeNode->update();
-    }
-    else if (m_edgeAdding)
-    {
-        m_edgeAdding = false;
-        m_parent->statusBarMsg(tr("Edge adding cancelled."));
-    }
-    else if (m_edgeDeleting)
-    {
-        m_edgeDeleting = false;
-        m_parent->statusBarMsg(tr("Edge deleting cancelled."));
-    }
-    else if(m_showingNodeNumbers)
-    {
-        m_hintNumber.clear();
-        showingAllNodeNumbers(false);
-        m_showingNodeNumbers = false;
-    }
-}
-
-void GraphWidget::addEdge(Node *source, Node *destination)
-{
-    if (destination == m_nodeList.first())
-    {
-        m_parent->statusBarMsg(
-                    tr("Root element cannot be an edge target."));
-        return;
-    }
-
-    if (source->isConnected(destination))
-    {
-        m_parent->statusBarMsg(
-                    tr("There is already an edge between these two nodes."));
-    }
-    else
-    {
-        bool sec(false);
-        if (!destination->edgesToThis().empty())
-        {
-            m_parent->statusBarMsg(
-                     tr("The graph is acyclic, edge added as secondary edge."));
-            sec = true;
-        }
-        Edge *edge = new Edge(source, destination);
-        edge->setColor(destination->color());
-        edge->setWidth(destination->scale()*2 + 1);
-        edge->setSecondary(sec);
-
-        m_scene->addItem(edge);
-        contentChanged();
-    }
-}
-
-void GraphWidget::removeEdge(Node *source, Node *destination)
-{
-    if (!source->isConnected(destination))
-    {
-        m_parent->statusBarMsg(tr("There no edge between these two nodes."));
-    }
-    else
-    {
-        source->deleteEdge(destination);
-        contentChanged();
-    }
-}
-
-void GraphWidget::showNodeNumbers()
-{
-    if (m_hintNumber.isEmpty())
-     {
-         showingAllNodeNumbers(true);
-         m_nodeList.first()->showNumber(0,true,true);
-         m_hintNode = m_nodeList.first();
-     }
-     else
-     {
-         showingAllNodeNumbers(false);
-         showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
-     }
-}
-
-void GraphWidget::removeAllNodes()
-{
-    foreach(Node *node, m_nodeList) delete node;
-    m_nodeList.clear();
-    m_activeNode = 0;
-    m_hintNode = 0;
-}
-
-void GraphWidget::addFirstNode()
-{
-    Node *node = new Node(this);
-    node->setHtml(
-                QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
-    m_scene->addItem(node);
-
-    m_nodeList.append(node);
-
-    m_activeNode = m_nodeList.first();
-    m_activeNode->setActive();
-}
-
-QList<Edge *> GraphWidget::edges() const
-{
-    QList<Edge *> list;
-
-    foreach(Node * node, m_nodeList)
-        list.append(node->edgesFrom(false));
-
-    return list;
-}
-
-void GraphWidget::contentChanged(const bool &changed)
-{
-    m_parent->contentChanged(changed);
-}

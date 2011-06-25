@@ -99,11 +99,13 @@ void Node::setActive(const bool &active)
 
 void Node::setEditable(const bool &editable)
 {
-    setTextInteractionFlags(
-                editable ?
-                    Qt::TextEditable :
-                    Qt::NoTextInteraction);
+    if (!editable)
+    {
+        setTextInteractionFlags(Qt::NoTextInteraction);
+        return;
+    }
 
+    setTextInteractionFlags(Qt::TextEditable);
     QTextCursor c = textCursor();
     c.setPosition(c.document()->toPlainText().length());
     setTextCursor(c);
@@ -479,7 +481,10 @@ QPainterPath Node::shape () const
 
 void Node::focusOutEvent(QFocusEvent *event)
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
     Q_UNUSED(event);
+    setEditable(false);
     m_graph->nodeLostFocus();
 }
 

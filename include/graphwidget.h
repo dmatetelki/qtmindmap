@@ -17,54 +17,64 @@ class GraphWidget : public QGraphicsView
 public:
     GraphWidget(MainWindow *parent = 0);
 
-    void setActiveNode(Node *node);
+    // node reports back it's state change
     void nodeSelected(Node *node);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
-    QList<Edge *> edges() const;
 
+    // notify MainWindow: a node/edge has changed
     void contentChanged(const bool &changed = true);
 
+    // commands from MainWindow
     void newScene();
     void closeScene();
     bool readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
-
     void insertPicture(const QString &picture);
 
 public slots:
 
-    void zoomIn();
-    void zoomOut();
+    // commands from MainWindow's MainToolBar's actions
     void insertNode();
     void removeNode();
     void editNode();
+    void zoomIn();
+    void zoomOut();
     void nodeColor();
     void nodeTextColor();
     void addEdge();
     void removeEdge();
-    void hintMode();
     void nodeLostFocus();
+    void hintMode();
 
 protected:
 
+    // key dispathcer of the whole program: long and pedant
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void drawBackground(QPainter *painter, const QRectF &rect);
 
 private:
 
+    // zoom in/out of the view
     void scaleView(qreal scaleFactor);
-    void showNodeNumbers();
-    void showingAllNodeNumbers(const bool &show = true);
-    void showingNodeNumbersBeginWithNumber(const int &number,
-                                           const bool &show = true);
-    bool numberStartsWithNumber(const int &number, const int &prefix);
-    qreal calculateBiggestAngle(Node *node);
+
+    // functions on the edges
+    QList<Edge *> allEdges() const;
     void addEdge(Node *source, Node *destination);
     void removeEdge(Node* source, Node *destination);
-    void removeAllNodes();
+
+    // functions on nodes
     void addFirstNode();
+    void removeAllNodes();
+    void setActiveNode(Node *node);
+
+    // hint mode's nodenumber handling functions
+    void showNodeNumbers();
+    void showingAllNodeNumbers(const bool &show = true);
+    void showingNodeNumbersBeginWithNumber(const int &prefix,
+                                           const bool &show = true);
+
 
     QList<Node *> m_nodeList;
     MainWindow *m_parent;
@@ -80,7 +90,6 @@ private:
     QString m_fileName;
 
     static const QColor m_paper;
-    static const QColor m_gold;
 };
 
 #endif // GRAPHWIDGET_H
