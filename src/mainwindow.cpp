@@ -10,142 +10,29 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui(new Ui::MainWindow),
     m_contentChanged(false)
 {
-    m_graphicsView = new GraphWidget(this);
-
+    // setup ui
     m_ui->setupUi(this);
-    connect(m_ui->actionNew, SIGNAL(activated()),
-            this, SLOT(newFile()));
-    connect(m_ui->actionOpen, SIGNAL(activated()),
-            this, SLOT(openFile()));
-    connect(m_ui->actionSave, SIGNAL(activated()),
-            this, SLOT(saveFile()));
-    connect(m_ui->actionSaveAs, SIGNAL(activated()),
-            this, SLOT(saveFileAs()));
-    connect(m_ui->actionClose, SIGNAL(activated()),
-            this, SLOT(closeFile()));
-    connect(m_ui->actionExport, SIGNAL(activated()),
-            this, SLOT(exportScene()));
-
-    connect(m_ui->actionQuit, SIGNAL(activated()),
-            QApplication::instance(), SLOT(quit()));
-
+    connect(m_ui->actionNew, SIGNAL(activated()), this, SLOT(newFile()));
+    connect(m_ui->actionOpen, SIGNAL(activated()), this, SLOT(openFile()));
+    connect(m_ui->actionSave, SIGNAL(activated()), this, SLOT(saveFile()));
+    connect(m_ui->actionSaveAs, SIGNAL(activated()), this, SLOT(saveFileAs()));
+    connect(m_ui->actionClose, SIGNAL(activated()), this, SLOT(closeFile()));
+    connect(m_ui->actionExport, SIGNAL(activated()), this, SLOT(exportScene()));
+    connect(m_ui->actionQuit, SIGNAL(activated()), this, SLOT(quit()));
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
             this, SLOT(about()));
 
-//    connect(m_ui->actionKeys, SIGNAL(activated()),
-//            this, SLOT(keys()));
 
-
+    // graphwidget is hided by def, new/open file will show it
+    m_graphicsView = new GraphWidget(this);
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
 
-    // why can't I do this with qtcreator?
-    /// @bug or a feature? no underline here
-
-    m_addNode = new QAction(tr("Add node (ins)"), this);
-    connect(m_addNode, SIGNAL(activated()), m_graphicsView, SLOT(insertNode()));
-    m_delNode = new QAction(tr("Del node (del)"), this);
-    connect(m_delNode, SIGNAL(activated()), m_graphicsView, SLOT(removeNode()));
-    m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
-    connect(m_editNode, SIGNAL(activated()), m_graphicsView, SLOT(editNode()));
-
-    /// @todo pass ctrl
-    m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
-    m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
-
-    m_nodeColor = new QAction(tr("Node color (c)"), this);
-    connect(m_nodeColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeColor()));
-    m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
-    connect(m_nodeTextColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeTextColor()));
-    m_addEdge = new QAction(tr("Add edge (a)"), this);
-    connect(m_addEdge, SIGNAL(activated()), m_graphicsView, SLOT(addEdge()));
-    m_delEdge = new QAction(tr("Del edge (d)"), this);
-    connect(m_delEdge, SIGNAL(activated()), m_graphicsView, SLOT(removeEdge()));
-    m_moveNode = new QAction(tr("Move node\n(Ctrl cursor, drag)"), this);
-    m_moveNode->setDisabled(true);
-    m_subtree = new QAction(tr("Change on wholesubtree\n(Ctrl shift)"), this);
-    m_subtree->setDisabled(true);
-    m_zoomIn = new QAction(tr("Zoom in (+, scrollup)"), this);
-    connect(m_zoomIn, SIGNAL(activated()), m_graphicsView, SLOT(zoomIn()));
-    m_zoomOut = new QAction(tr("Zoom out (-, scrolldown)"), this);
-    connect(m_zoomOut, SIGNAL(activated()), m_graphicsView, SLOT(zoomOut()));
-    m_esc = new QAction(tr("Leave editing,\nedge eadd/remove (esc)"), this);
-    connect(m_esc, SIGNAL(activated()), m_graphicsView, SLOT(nodeLostFocus()));
-    m_hintMode = new QAction(tr("Hint mode (f)"), this);
-    connect(m_hintMode, SIGNAL(activated()), m_graphicsView, SLOT(hintMode()));
-    m_showMainToolbar = new QAction(tr("Show main toolbar\n(Ctrl m)"), this);
-    m_showMainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
-    connect(m_showMainToolbar, SIGNAL(activated()), this, SLOT(showMainToolbar()));
-    m_showStatusIconToolbar = new QAction(tr("Insert status icons\n(Ctrl i)"), this);
-    connect(m_showStatusIconToolbar, SIGNAL(activated()), this, SLOT(showStatusIconToolbar()));
-
-    m_ui->mainToolBar->addAction(m_addNode);
-    m_ui->mainToolBar->addAction(m_delNode);
-    m_ui->mainToolBar->addAction(m_editNode);
-    m_ui->mainToolBar->addAction(m_scaleUpNode);
-    m_ui->mainToolBar->addAction(m_scaleDownNode);
-    m_ui->mainToolBar->addAction(m_nodeColor);
-    m_ui->mainToolBar->addAction(m_nodeTextColor);
-    m_ui->mainToolBar->addAction(m_addEdge);
-    m_ui->mainToolBar->addAction(m_delEdge);
-
-    m_ui->mainToolBar->addSeparator();
-    m_ui->mainToolBar->addAction(m_zoomIn);
-    m_ui->mainToolBar->addAction(m_zoomOut);
-    m_ui->mainToolBar->addAction(m_esc);
-    m_ui->mainToolBar->addAction(m_hintMode);
-    m_ui->mainToolBar->addAction(m_moveNode);
-    m_ui->mainToolBar->addAction(m_subtree);
-    m_ui->mainToolBar->addAction(m_showMainToolbar);
-    m_ui->mainToolBar->addAction(m_showStatusIconToolbar);
-
+    // setup toolbars, don't show them
+    setUpMainToolbar();
     m_ui->mainToolBar->hide();
 
-    m_insertIcon = new QAction(tr("Insert icon:"), this);
-    m_insertIcon->setDisabled(true);
-
-    m_doIt = new QAction(QIcon(":/applications-system.svg"), tr("&Do"), this);
-    m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
-    connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_trash = new QAction(QIcon(":/user-trash-full.svg"), tr("&Trash"), this);
-    m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-    connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_info = new QAction(QIcon(":/mail-attachment.svg"), tr("&Refer"), this);
-    m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"), this);
-    m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&How?"), this);
-    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
-    connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone"), this);
-    m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
-    connect(m_postpone, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Comission"), this);
-    m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("ma&Ybe"), this);
-    m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
-    connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
-
-    m_ui->statusIcons_toolBar->addAction(m_insertIcon);
-    m_ui->statusIcons_toolBar->addAction(m_doIt);
-    m_ui->statusIcons_toolBar->addAction(m_trash);
-    m_ui->statusIcons_toolBar->addAction(m_info);
-    m_ui->statusIcons_toolBar->addAction(m_blocked);
-    m_ui->statusIcons_toolBar->addAction(m_question);
-    m_ui->statusIcons_toolBar->addAction(m_postpone);
-    m_ui->statusIcons_toolBar->addAction(m_delegate);
-    m_ui->statusIcons_toolBar->addAction(m_maybe);
-    m_ui->statusIcons_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    setUpStatusIconToolbar();
     m_ui->statusIcons_toolBar->hide();
 }
 
@@ -165,7 +52,9 @@ void MainWindow::contentChanged(const bool& changed)
     {
         setWindowTitle(windowTitle().prepend("* "));
         m_contentChanged = true;
-        if (m_fileName != tr("untitled"))
+
+        QFileInfo fileInfo(m_fileName);
+        if (m_fileName != tr("untitled") && fileInfo.isWritable())
             m_ui->actionSave->setEnabled(true);
     }
     else if (m_contentChanged == true && changed == false)
@@ -225,8 +114,7 @@ void MainWindow::openFile(const QString &fileName)
         m_fileName = fileName;
     }
 
-
-    QFileInfo fileInfo(fileName);
+    QFileInfo fileInfo(m_fileName);
     if (!fileInfo.isWritable())
         statusBarMsg(tr("Read-only file!"));
 
@@ -240,19 +128,14 @@ void MainWindow::openFile(const QString &fileName)
     m_ui->actionSaveAs->setEnabled(true);
     m_ui->actionClose->setEnabled(true);
     m_ui->actionExport->setEnabled(true);
+    m_ui->actionSave->setEnabled(false);
+    m_ui->actionSave->setEnabled(false);
 
     contentChanged(false);
 
-    if (!fileInfo.isWritable())
-    {
-        m_ui->actionSave->setEnabled(false);
-        setTitle(QString("readonly ").append(m_fileName));
-    }
-    else
-    {
-        m_ui->actionSave->setEnabled(true);
-        setTitle(m_fileName);
-    }
+    fileInfo.isWritable() ?
+         setTitle(m_fileName) :
+         setTitle(QString("readonly ").append(m_fileName));
 
     showMainToolbar();
 }
@@ -455,16 +338,136 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     QMainWindow::keyPressEvent(event);
 }
 
+void MainWindow::quit()
+{
+    if (m_contentChanged && !closeFile())
+        return;
+
+    QApplication::instance()->quit();
+}
+
+
+void MainWindow::setUpMainToolbar()
+{
+    // why can't I do this with qtcreator? (adding actions to toolbar)
+
+    /// @bug or a feature? no underline here
+    m_addNode = new QAction(tr("Add node (ins)"), this);
+    connect(m_addNode, SIGNAL(activated()), m_graphicsView, SLOT(insertNode()));
+    m_delNode = new QAction(tr("Del node (del)"), this);
+    connect(m_delNode, SIGNAL(activated()), m_graphicsView, SLOT(removeNode()));
+    m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
+    connect(m_editNode, SIGNAL(activated()), m_graphicsView, SLOT(editNode()));
+
+    /// @todo pass ctrl
+    m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
+    m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
+
+    m_nodeColor = new QAction(tr("Node color (c)"), this);
+    connect(m_nodeColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeColor()));
+    m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
+    connect(m_nodeTextColor, SIGNAL(activated()), m_graphicsView, SLOT(nodeTextColor()));
+    m_addEdge = new QAction(tr("Add edge (a)"), this);
+    connect(m_addEdge, SIGNAL(activated()), m_graphicsView, SLOT(addEdge()));
+    m_delEdge = new QAction(tr("Del edge (d)"), this);
+    connect(m_delEdge, SIGNAL(activated()), m_graphicsView, SLOT(removeEdge()));
+    m_moveNode = new QAction(tr("Move node\n(Ctrl cursor, drag)"), this);
+    m_moveNode->setDisabled(true);
+    m_subtree = new QAction(tr("Change on wholesubtree\n(Ctrl shift)"), this);
+    m_subtree->setDisabled(true);
+    m_zoomIn = new QAction(tr("Zoom in (+, scrollup)"), this);
+    connect(m_zoomIn, SIGNAL(activated()), m_graphicsView, SLOT(zoomIn()));
+    m_zoomOut = new QAction(tr("Zoom out (-, scrolldown)"), this);
+    connect(m_zoomOut, SIGNAL(activated()), m_graphicsView, SLOT(zoomOut()));
+    m_esc = new QAction(tr("Leave editing,\nedge eadd/remove (esc)"), this);
+    connect(m_esc, SIGNAL(activated()), m_graphicsView, SLOT(nodeLostFocus()));
+    m_hintMode = new QAction(tr("Hint mode (f)"), this);
+    connect(m_hintMode, SIGNAL(activated()), m_graphicsView, SLOT(hintMode()));
+    m_showMainToolbar = new QAction(tr("Show main toolbar\n(Ctrl m)"), this);
+    m_showMainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+    connect(m_showMainToolbar, SIGNAL(activated()), this, SLOT(showMainToolbar()));
+    m_showStatusIconToolbar = new QAction(tr("Insert status icons\n(Ctrl i)"), this);
+    connect(m_showStatusIconToolbar, SIGNAL(activated()), this, SLOT(showStatusIconToolbar()));
+
+    m_ui->mainToolBar->addAction(m_addNode);
+    m_ui->mainToolBar->addAction(m_delNode);
+    m_ui->mainToolBar->addAction(m_editNode);
+    m_ui->mainToolBar->addAction(m_scaleUpNode);
+    m_ui->mainToolBar->addAction(m_scaleDownNode);
+    m_ui->mainToolBar->addAction(m_nodeColor);
+    m_ui->mainToolBar->addAction(m_nodeTextColor);
+    m_ui->mainToolBar->addAction(m_addEdge);
+    m_ui->mainToolBar->addAction(m_delEdge);
+
+    m_ui->mainToolBar->addSeparator();
+    m_ui->mainToolBar->addAction(m_zoomIn);
+    m_ui->mainToolBar->addAction(m_zoomOut);
+    m_ui->mainToolBar->addAction(m_esc);
+    m_ui->mainToolBar->addAction(m_hintMode);
+    m_ui->mainToolBar->addAction(m_moveNode);
+    m_ui->mainToolBar->addAction(m_subtree);
+    m_ui->mainToolBar->addAction(m_showMainToolbar);
+    m_ui->mainToolBar->addAction(m_showStatusIconToolbar);
+}
+
+void MainWindow::setUpStatusIconToolbar()
+{
+    m_insertIcon = new QAction(tr("Insert icon:"), this);
+    m_insertIcon->setDisabled(true);
+
+    m_doIt = new QAction(QIcon(":/applications-system.svg"), tr("&Do"), this);
+    m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
+    connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_trash = new QAction(QIcon(":/user-trash-full.svg"), tr("&Trash"), this);
+    m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+    connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_info = new QAction(QIcon(":/mail-attachment.svg"), tr("&Refer"), this);
+    m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"),
+                            this);
+    m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
+    connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_question = new QAction(QIcon(":/help-browser.svg"), tr("&How?"), this);
+    m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
+    connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone"),
+                             this);
+    m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+    connect(m_postpone, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Comission"),
+                             this);
+    m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("ma&Ybe"),
+                          this);
+    m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
+
+    m_ui->statusIcons_toolBar->addAction(m_insertIcon);
+    m_ui->statusIcons_toolBar->addAction(m_doIt);
+    m_ui->statusIcons_toolBar->addAction(m_trash);
+    m_ui->statusIcons_toolBar->addAction(m_info);
+    m_ui->statusIcons_toolBar->addAction(m_blocked);
+    m_ui->statusIcons_toolBar->addAction(m_question);
+    m_ui->statusIcons_toolBar->addAction(m_postpone);
+    m_ui->statusIcons_toolBar->addAction(m_delegate);
+    m_ui->statusIcons_toolBar->addAction(m_maybe);
+    m_ui->statusIcons_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+}
+
 void MainWindow::setTitle(const QString &title)
 {
-    if (title.isEmpty())
-    {
-        setWindowTitle("QtMindMap");
-    }
-    else
-    {
-        QString t(title);
-        t.append(" - QtMindMap");
-        setWindowTitle(t);
-    }
+    title.isEmpty() ?
+         setWindowTitle("QtMindMap") :
+         setWindowTitle(QString(title).append(" - QtMindMap"));
 }
+
+

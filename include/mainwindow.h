@@ -19,32 +19,47 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    // instead of givin access to private m_ui
     void statusBarMsg(const QString &msg);
+
+    // indicate that content has changed, modify title, save actions
     void contentChanged(const bool &changed = true);
 
 public slots:
 
+    // filemenu actions
     void newFile();
     void openFile(const QString &fileName = "");
     void saveFile();
     bool saveFileAs();
     bool closeFile();
     void exportScene();
-
     void about();
 
+    // insert state icon
     void insertPicture();
 
+    // toolbars
     void showMainToolbar(const bool &show = true);
     void showStatusIconToolbar(const bool &show = true);
 
 
 protected:
+
+    // handle changed content at exit events
     void closeEvent(QCloseEvent * event);
+
+    // show/hide toolbars, otherwise pass on the event to GraphWidget
     void keyPressEvent(QKeyEvent *event);
+
+private slots:
+
+    void quit();
 
 private:
 
+    void setUpMainToolbar();
+    void setUpStatusIconToolbar();
     void setTitle(const QString &title);
 
     Ui::MainWindow *m_ui;
@@ -52,6 +67,7 @@ private:
     QString m_fileName;
     bool m_contentChanged;
 
+    // main toolbar actions
     QAction *m_addNode;
     QAction *m_delNode;
     QAction *m_editNode;
@@ -70,6 +86,7 @@ private:
     QAction *m_showMainToolbar;
     QAction *m_showStatusIconToolbar;
 
+    // state icons toolbar actions
     QAction *m_insertIcon;
     QAction *m_doIt;
     QAction *m_trash;

@@ -33,9 +33,7 @@ int main(int argc, char *argv[])
     ArgumentParser argParser;
     bool success;
     if (!argParser.parseCmdLineArgs(success))
-    {
         return success ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
 
     // system tray?
     MainWindow w;
@@ -54,9 +52,13 @@ int main(int argc, char *argv[])
         systemtray.show();
     }
 
+    // open file if any
     if (!argParser.filePath().isEmpty())
         w.openFile(argParser.filePath());
 
-    if (!argParser.isShowMinimized()) w.show();
+    // show minimized?
+    if (!argParser.isShowMinimized())
+        w.show();
+
     return a.exec();
 }
