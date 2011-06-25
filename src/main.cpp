@@ -5,9 +5,9 @@
 #include <QRegExp>
 #include <QTranslator>
 
-#include "mainwindow.h"
-#include "systemtray.h"
-#include "argumentparser.h"
+#include "include/mainwindow.h"
+#include "include/systemtray.h"
+#include "include/argumentparser.h"
 
 int main(int argc, char *argv[])
 {

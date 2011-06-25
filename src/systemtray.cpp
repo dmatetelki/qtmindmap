@@ -1,4 +1,4 @@
-#include "systemtray.h"
+#include "include/systemtray.h"
 
 #include <QApplication>
 

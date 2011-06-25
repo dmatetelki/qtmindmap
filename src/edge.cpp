@@ -2,8 +2,8 @@
 #include <QDebug>
 
 
-#include "edge.h"
-#include "node.h"
+#include "include/edge.h"
+#include "include/node.h"
 
 #include <math.h>
 

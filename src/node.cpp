@@ -1,4 +1,4 @@
-#include "node.h"
+#include "include/node.h"
 
 #include <QPainter>
 #include <QStyleOption>

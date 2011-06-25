@@ -1,4 +1,4 @@
-#include "graphwidget.h"
+#include "include/graphwidget.h"
 
 #include <QDebug>
 #include <QStatusBar>
@@ -8,10 +8,11 @@
 #include <QColorDialog>
 #include <QApplication>
 
-#include "node.h"
-#include "edge.h"
-#include "math.h"
-#include "mainwindow.h"
+#include "include/node.h"
+#include "include/edge.h"
+#include "include/mainwindow.h"
+
+#include <math.h>
 
 const QColor GraphWidget::m_paper(255,255,153);
 

@@ -13,26 +13,26 @@ TARGET = qtmindmap
 TEMPLATE = app
 
 
-SOURCES += main.cpp \
-        mainwindow.cpp \
-    graphwidget.cpp \
-    node.cpp \
-    edge.cpp \
-    systemtray.cpp \
-    argumentparser.cpp
+SOURCES += src/main.cpp \
+           src/mainwindow.cpp \
+           src/graphwidget.cpp \
+           src/node.cpp \
+           src/edge.cpp \
+           src/systemtray.cpp \
+           src/argumentparser.cpp
 
-HEADERS  += mainwindow.h \
-    graphwidget.h \
-    node.h \
-    edge.h \
-    systemtray.h \
-    argumentparser.h
+HEADERS  += include/mainwindow.h \
+            include/graphwidget.h \
+            include/node.h \
+            include/edge.h \
+            include/systemtray.h \
+            include/argumentparser.h
 
-FORMS    += mainwindow.ui
+FORMS    += ui/mainwindow.ui
 
-RESOURCES = qtmindmap.qrc
+RESOURCES = images/qtmindmap.qrc
 
-TRANSLATIONS += qtmindmap_hu.ts \
-                qtmindmap_nb_NO.ts
+TRANSLATIONS += lang/qtmindmap_hu.ts \
+                lang/qtmindmap_nb_NO.ts
 
 CODECFORTR = UTF-8
