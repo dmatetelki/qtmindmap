@@ -319,9 +319,12 @@ void MainWindow::setUpMainToolbar()
     connect(m_editNode, SIGNAL(activated()), m_graphicsView,
             SLOT(editNode()));
 
-    /// @todo pass ctrl
     m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
+    connect(m_scaleUpNode, SIGNAL(activated()), m_graphicsView,
+            SLOT(scaleUp()));
     m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
+    connect(m_scaleDownNode, SIGNAL(activated()), m_graphicsView,
+            SLOT(scaleDown()));
 
     m_nodeColor = new QAction(tr("Node color (c)"), this);
     connect(m_nodeColor, SIGNAL(activated()), m_graphicsView,

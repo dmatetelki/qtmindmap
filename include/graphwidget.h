@@ -39,6 +39,8 @@ public slots:
     void editNode();
     void zoomIn();
     void zoomOut();
+    void scaleUp();
+    void scaleDown();
     void nodeColor();
     void nodeTextColor();
     void addEdge();

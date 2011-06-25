@@ -364,57 +364,53 @@ void GraphWidget::editNode()
 
 void GraphWidget::zoomIn()
 {
-    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
-    {
-        if (!m_activeNode)
-        {
-            m_parent->statusBarMsg(tr("No active node."));
-            return;
-        }
-
-        // Scale up just the active Node or it's subtree too?
-        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1.2),sceneRect());
-        }
-        else
-        {
-            m_activeNode->setScale(qreal(1.2),sceneRect());
-        }
-    }
-    else // zoom in the view
-    {
-        scaleView(qreal(1.2));
-    }
+    scaleView(qreal(1.2));
 }
 
 void GraphWidget::zoomOut()
 {
-    if (QApplication::keyboardModifiers() &  Qt::ControlModifier)
-    {
-        if (!m_activeNode)
-        {
-            m_parent->statusBarMsg(tr("No active node."));
-            return;
-        }
+    scaleView(qreal(1 / 1.2));
+}
 
-        // Scale down just the active Node or it's subtree too?
-        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
-        {
-            QList <Node *> nodeList = m_activeNode->subtree();
-            foreach(Node *node, nodeList)
-                node->setScale(qreal(1 / 1.2),sceneRect());
-        }
-        else
-        {
-            m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
-        }
-    }
-    else // zoom out of the view
+void GraphWidget::scaleUp()
+{
+    if (!m_activeNode)
     {
-        scaleView(qreal(1 / 1.2));
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    // Scale up just the active Node or it's subtree too?
+    if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
+    {
+        QList <Node *> nodeList = m_activeNode->subtree();
+        foreach(Node *node, nodeList)
+            node->setScale(qreal(1.2),sceneRect());
+    }
+    else
+    {
+        m_activeNode->setScale(qreal(1.2),sceneRect());
+    }
+}
+
+void GraphWidget::scaleDown()
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    // Scale down just the active Node or it's subtree too?
+    if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
+    {
+        QList <Node *> nodeList = m_activeNode->subtree();
+        foreach(Node *node, nodeList)
+            node->setScale(qreal(1 / 1.2),sceneRect());
+    }
+    else
+    {
+        m_activeNode->setScale(qreal(1 / 1.2),sceneRect());
     }
 }
 
@@ -619,12 +615,17 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_Plus:
 
-        zoomIn();
+        event->modifiers() & Qt::ControlModifier ?
+            scaleUp() :
+            zoomIn();
+
         break;
 
     case Qt::Key_Minus:
 
-        zoomOut();
+        event->modifiers() & Qt::ControlModifier ?
+            scaleDown() :
+            zoomOut();
         break;
 
     // Hint mode: select a Node vimperator-style.
@@ -713,9 +714,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
 void GraphWidget::wheelEvent(QWheelEvent *event)
 {
-    event->delta() > 0 ?
-            zoomIn() :
-            zoomOut();
+    event->modifiers() & Qt::ControlModifier ?
+                (event->delta() > 0 ?
+                        scaleUp() :
+                        scaleDown()) :
+                (event->delta() > 0 ?
+                        zoomIn() :
+                        zoomOut());
 }
 
 void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
