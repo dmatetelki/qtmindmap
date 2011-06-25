@@ -1,26 +1,25 @@
-QT       += core gui svg
+QT       += core gui svg xml
 
 CONFIG += qtestlib
 
 TARGET = qtmindmap_test
 
-SOURCES += mainwindow.cpp \
-    aboutdialog.cpp \
-    graphwidget.cpp \
-    node.cpp \
-    edge.cpp \
-    systemtray.cpp \
-    argumentparser.cpp \
-    algorithmtests.cpp
+SOURCES += src/mainwindow.cpp \
+           src/graphwidget.cpp \
+           src/node.cpp \
+           src/edge.cpp \
+           src/systemtray.cpp \
+           src/argumentparser.cpp \
+           test/algorithmtests.cpp
 
-HEADERS  += mainwindow.h \
-    aboutdialog.h \
-    graphwidget.h \
-    node.h \
-    edge.h \
-    systemtray.h \
-    argumentparser.h \
-    algorithmtests.h
+HEADERS  += include/mainwindow.h \
+            include/graphwidget.h \
+            include/node.h \
+            include/edge.h \
+            include/systemtray.h \
+            include/argumentparser.h \
+            test/algorithmtests.h
 
-FORMS    += mainwindow.ui \
-    aboutdialog.ui
+FORMS    += ui/mainwindow.ui
+
+RESOURCES = images/qtmindmap.qrc

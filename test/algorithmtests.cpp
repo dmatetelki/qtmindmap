@@ -4,9 +4,10 @@
 
 #include <QDebug>
 
-#include "node.h"
-
-#include "edge.h"
+#include "include/mainwindow.h"
+#include "include/graphwidget.h"
+#include "include/node.h"
+#include "include/edge.h"
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 
@@ -30,14 +31,18 @@ double angleOfPoints(const QPointF &a, const QPointF &b)
 
 void AlgorithmTests::calculateBiggestAngle()
 {
+    MainWindow *mainWindow = new MainWindow;
+    GraphWidget *graphWidget = new GraphWidget(mainWindow);
+
     // no edges
-    Node *node1 = new Node();
+    Node *node1 = new Node(graphWidget);
     node1->setPos(0,0);
     QCOMPARE(node1->calculateBiggestAngle(), Pi * 1.5);
 
+
     // one egde
     // 1
-    Node *node2 = new Node();
+    Node *node2 = new Node(graphWidget);
     node2->setPos(30,0);
 
     Edge *edge1 = new Edge(node1, node2);
@@ -60,12 +65,12 @@ void AlgorithmTests::calculateBiggestAngle()
     node2->setPos(30,0);
     edge1->m_angle = angleOfPoints(node1->pos(), node2->pos());
 
-    Node *node3 = new Node();
+    Node *node3 = new Node(graphWidget);
     node3->setPos(-30,0);
     Edge *edge2 = new Edge(node1, node3);
     edge2->m_angle = angleOfPoints(node1->pos(), node3->pos());
 
-    Node *node4 = new Node();
+    Node *node4 = new Node(graphWidget);
     node4->setPos(0, -30);
     Edge *edge3 = new Edge(node1, node4);
     edge3->m_angle = angleOfPoints(node1->pos(), node4->pos());
@@ -78,6 +83,10 @@ void AlgorithmTests::calculateBiggestAngle()
     delete node1;
     delete node2;
     delete node3;
+    delete node4;
+
+    delete graphWidget;
+    delete mainWindow;
 }
 
 
