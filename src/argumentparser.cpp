@@ -6,15 +6,6 @@
 
 #include <iostream>
 
-ArgumentParser::ArgumentParser(QObject *parent) :
-    QObject(parent),
-    m_isSystemTray(false),
-    m_isShowMinimized(false),
-    m_filePath()
-{
-}
-
-
 void ArgumentParser::printUsage()
 {
     std::cout << tr("Usage: ").toStdString() << "qtmindmap "

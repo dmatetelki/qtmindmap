@@ -175,16 +175,16 @@ double Node::calculateBiggestAngle()
 
     if (m_edgeList.size()==1)
         return m_edgeList.first().startsFromThisNode ?
-                    Node::m_pi - m_edgeList.first().edge->getAngle() :
-                    Node::m_twoPi - m_edgeList.first().edge->getAngle();
+                    Node::m_pi - m_edgeList.first().edge->angle() :
+                    Node::m_twoPi - m_edgeList.first().edge->angle();
 
     QList<double> tmp;
     for(QList<EdgeElement>::iterator it = m_edgeList.begin();
         it != m_edgeList.end(); it++)
     {
         tmp.push_back(it->startsFromThisNode ?
-                 it->edge->getAngle() :
-                 doubleModulo(Node::m_pi + it->edge->getAngle(), Node::m_twoPi));
+                 it->edge->angle() :
+                 doubleModulo(Node::m_pi + it->edge->angle(), Node::m_twoPi));
     }
     qSort(tmp.begin(), tmp.end());
 
@@ -266,35 +266,36 @@ bool Node::isConnected(const Node *node) const
     return false;
 }
 
-QPointF Node::intersect(const QLineF &line, const bool &reverse) const
+QPointF Node::intersection(const QLineF &line, const bool &reverse) const
 {
-//    QPainterPath shape;
-//    shape.addRoundedRect(sceneBoundingRect(), 20.0, 15.0);
 
-//    QPainterPath l;
-//    l.moveTo(sceneBoundingRect().center());
-//    l.lineTo(line.p2());
+    /// @note What a shame, the following does not work,
+    /// doing it with brute (unaccurate) force
 
-//    return shape.intersected(l).pointAtPercent(0.5);
+    //    QPainterPath shape;
+    //    shape.addRoundedRect(sceneBoundingRect(), 20.0, 15.0);
+
+    //    QPainterPath l;
+    //    l.moveTo(sceneBoundingRect().center());
+    //    l.lineTo(line.p2());
+
+    //    return shape.intersected(l).pointAtPercent(0.5);
 
 
-    /// @but this just does not work, doing it with brute force
     QPainterPath path;
     path.addRoundedRect(sceneBoundingRect(), 28.0, 28.0);
 
     if (reverse)
     {
         for (qreal t = 1; t!=0; t-=0.01)
-        {
-            if (!path.contains(line.pointAt(t))) return line.pointAt(t);
-        }
+            if (!path.contains(line.pointAt(t)))
+                return line.pointAt(t);
     }
     else
     {
         for (qreal t = 0; t!=1; t+=0.01)
-        {
-            if (!path.contains(line.pointAt(t))) return line.pointAt(t);
-        }
+            if (!path.contains(line.pointAt(t)))
+                return line.pointAt(t);
     }
 
     return QPointF(0,0);

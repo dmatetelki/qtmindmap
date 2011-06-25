@@ -39,7 +39,7 @@ public:
     // changing visibility from prot to pub
     void keyPressEvent(QKeyEvent *event);
     bool isConnected(const Node *node) const;
-    QPointF intersect(const QLineF &line, const bool &reverse = false) const;
+    QPointF intersection(const QLineF &line, const bool &reverse = false) const;
 
     QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
     QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;

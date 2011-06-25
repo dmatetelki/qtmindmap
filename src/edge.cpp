@@ -17,6 +17,7 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     , m_width(1)
     , m_secondary(false)
 {
+    // does not interact with user
     setAcceptedMouseButtons(0);
     setZValue(1);
 
@@ -31,21 +32,6 @@ Edge::~Edge()
 {
     m_sourceNode->removeEdgeFromList(this);
     m_destNode->removeEdgeFromList(this);
-}
-
-Node *Edge::sourceNode() const
-{
-    return m_sourceNode;
-}
-
-Node *Edge::destNode() const
-{
-    return m_destNode;
-}
-
-double Edge::getAngle() const
-{
-    return m_angle;
 }
 
 void Edge::setColor(const QColor &color)
@@ -71,23 +57,13 @@ void Edge::setSecondary(const bool &sec)
 
 void Edge::adjust()
 {
-    if (!m_sourceNode || !m_destNode)
-        return;
-
     prepareGeometryChange();
 
     QLineF line(m_sourceNode->sceneBoundingRect().center(),
                 m_destNode->sceneBoundingRect().center());
 
-    if (line.length() > qreal(20.))
-    {
-        m_destPoint = m_destNode->intersect(line,true);
-        m_sourcePoint = m_sourceNode->sceneBoundingRect().center();
-    }
-    else
-    {
-        m_sourcePoint = m_destPoint = line.p1();
-    }
+    m_destPoint = m_destNode->intersection(line, true);
+    m_sourcePoint = m_sourceNode->sceneBoundingRect().center();
 }
 
 QRectF Edge::boundingRect() const
@@ -98,9 +74,11 @@ QRectF Edge::boundingRect() const
     qreal penWidth = 1;
     qreal extra = (penWidth + m_arrowSize  + m_width) / 2.0;
 
-    return QRectF(m_sourcePoint, QSizeF(m_destPoint.x() - m_sourcePoint.x(),
-                                      m_destPoint.y() - m_sourcePoint.y()))
-        .normalized().adjusted(-extra, -extra, extra, extra);
+    return QRectF(m_sourcePoint,
+                  QSizeF(m_destPoint.x() - m_sourcePoint.x(),
+                         m_destPoint.y() - m_sourcePoint.y()))
+                            .normalized().adjusted(-extra, -extra,
+                                                   extra, extra);
 }
 
 void Edge::paint(QPainter *painter,
@@ -109,19 +87,18 @@ void Edge::paint(QPainter *painter,
 {
     Q_UNUSED(w);
 
-    if (!m_sourceNode || !m_destNode)
-        return;
-
+    // calculate angle
     QLineF line(m_sourcePoint, m_destPoint);
 
     m_angle = ::acos(line.dx() / line.length());
     if (line.dy() >= 0)
         m_angle = Edge::m_twoPi - m_angle;
 
+    // no need to draw when the nodes overlap
     if (sourceNode()->collidesWithItem(destNode()))
         return;
 
-    // Draw the line itself
+    // Draw the line itself - if secondary then dashline
     painter->setPen(QPen(m_color,
                          m_width,
                          m_secondary ?
@@ -141,7 +118,15 @@ void Edge::paint(QPainter *painter,
                          Qt::RoundCap,
                          Qt::RoundJoin));
 
+    painter->setBrush(m_color);
     qreal arrowSize = m_arrowSize + m_width;
+
+    // no need to draw the arrow if the nodes are too close
+    if (line.length() < arrowSize)
+    {
+        painter->drawLine(m_sourcePoint, m_destPoint);
+        return;
+    }
 
     QPointF destArrowP1 = m_destPoint +
                           QPointF(sin(m_angle - Edge::m_pi / 3) * arrowSize,
@@ -149,7 +134,8 @@ void Edge::paint(QPainter *painter,
     QPointF destArrowP2 = m_destPoint +
               QPointF(sin(m_angle - Edge::m_pi + Edge::m_pi / 3) * arrowSize,
                       cos(m_angle - Edge::m_pi + Edge::m_pi / 3) * arrowSize);
-    painter->setBrush(m_color);
+
+
     painter->drawPolygon(QPolygonF() << line.p2()
                                      << destArrowP1
                                      << destArrowP2);

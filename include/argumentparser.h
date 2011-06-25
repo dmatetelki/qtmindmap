@@ -9,8 +9,16 @@ class ArgumentParser : public QObject
 
 public:
 
-    explicit ArgumentParser(QObject *parent = 0);
+    explicit ArgumentParser(QObject *parent = 0)
+        : QObject(parent)
+        , m_isSystemTray(false)
+        , m_isShowMinimized(false)
+        , m_filePath() {}
 
+    /** parse QCoreApplication::arguments and put data to priv. members
+      * @param successful true if cannot continue but it is not an error
+      * @return true if the program can continue
+      */
     bool parseCmdLineArgs(bool &successful);
 
     bool isSystemTray() { return m_isSystemTray; }
@@ -20,6 +28,7 @@ public:
 
 private:
 
+    // print --help text
     void printUsage();
 
     bool m_isSystemTray;
