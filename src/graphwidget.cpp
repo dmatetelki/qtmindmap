@@ -37,6 +37,7 @@ GraphWidget::GraphWidget(MainWindow *parent)
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
+
 }
 
 void GraphWidget::nodeSelected(Node *node)
@@ -257,19 +258,14 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
     m_parent->statusBarMsg(tr("MindMap exported as ") + fileName);
 }
 
-void GraphWidget::insertPicture(const QString &picture)
-{
-    if (!m_activeNode)
-    {
-        m_parent->statusBarMsg(tr("No active node."));
-        return;
-    }
-
-    m_activeNode->insertPicture(picture);
-}
-
 void GraphWidget::insertNode()
 {
+    /// @note this is TERRIBLE!
+    // basically when insertNode() is called from mainToolBar, it needs to
+    // wait for a paralell nodeLostFocus() to finish...
+    // so I call ANOTHER one which takes the same amount of time...just kill me
+    nodeLostFocus();
+
     if (!m_activeNode)
     {
         m_parent->statusBarMsg(tr("No active node."));
@@ -543,6 +539,18 @@ void GraphWidget::hintMode()
 
     m_hintNumber.clear();
     showNodeNumbers();
+}
+
+
+void GraphWidget::insertPicture(const QString &picture)
+{
+    if (!m_activeNode)
+    {
+        m_parent->statusBarMsg(tr("No active node."));
+        return;
+    }
+
+    m_activeNode->insertPicture(picture);
 }
 
 // All key event arrives here.

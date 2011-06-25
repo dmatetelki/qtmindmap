@@ -5,69 +5,69 @@
 <context>
     <name>ArgumentParser</name>
     <message>
-        <location filename="argumentparser.cpp" line="20"/>
+        <location filename="../src/argumentparser.cpp" line="11"/>
         <source>Usage: </source>
         <translation>Használat: </translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="21"/>
+        <location filename="../src/argumentparser.cpp" line="12"/>
         <source>[OPTION][FILE]</source>
         <translation>[OPCIÓK][FÁJL]</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="23"/>
+        <location filename="../src/argumentparser.cpp" line="14"/>
         <source>Mindmap program in QT</source>
         <translation>Agytérkép program QT-ben írva</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="25"/>
+        <location filename="../src/argumentparser.cpp" line="16"/>
         <source>Options:</source>
         <translation>Opciók:</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="26"/>
+        <location filename="../src/argumentparser.cpp" line="17"/>
         <source>Prints this help.</source>
         <translation>Kiírja ezt a szöveget.</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="29"/>
+        <location filename="../src/argumentparser.cpp" line="20"/>
         <source>Starts application in system tray.</source>
         <translation>A programot a tálcán is elinditja.</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="32"/>
+        <location filename="../src/argumentparser.cpp" line="23"/>
         <source>Hide main window, just show systray icon.</source>
         <translation>Nem mutatja a főablakot, csak a tálcán indítja el.</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="34"/>
+        <location filename="../src/argumentparser.cpp" line="25"/>
         <source>Report bugs to: </source>
         <translation>Ide jelentsd a hibákat: </translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="71"/>
+        <location filename="../src/argumentparser.cpp" line="62"/>
         <source>Unkown options: </source>
         <translation>Ismeretlen opciók:</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="91"/>
-        <location filename="argumentparser.cpp" line="99"/>
-        <location filename="argumentparser.cpp" line="107"/>
+        <location filename="../src/argumentparser.cpp" line="82"/>
+        <location filename="../src/argumentparser.cpp" line="90"/>
+        <location filename="../src/argumentparser.cpp" line="98"/>
         <source>File: </source>
         <translation>Fájl: </translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="93"/>
+        <location filename="../src/argumentparser.cpp" line="84"/>
         <source> does not exists.</source>
         <translation> nem létezik.</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="101"/>
+        <location filename="../src/argumentparser.cpp" line="92"/>
         <source> is not a file.</source>
         <translation> nem egy fájl.</translation>
     </message>
     <message>
-        <location filename="argumentparser.cpp" line="109"/>
+        <location filename="../src/argumentparser.cpp" line="100"/>
         <source> is not readable.</source>
         <translation> nem olvasható.</translation>
     </message>
@@ -79,67 +79,69 @@
 <context>
     <name>GraphWidget</name>
     <message>
-        <location filename="graphwidget.cpp" line="61"/>
+        <location filename="../src/graphwidget.cpp" line="108"/>
         <source>Couldn&apos;t read file.</source>
         <translation>Nem lehet olvasni a fájlt.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="67"/>
+        <location filename="../src/graphwidget.cpp" line="114"/>
         <source>Couldn&apos;t parse XML file.</source>
         <oldsource>Couldn&apos;t parse XML file</oldsource>
         <translation>Nem lehetett elemezni az XML dokumentumot.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="178"/>
+        <location filename="../src/graphwidget.cpp" line="228"/>
         <source>Couldn&apos;t open file to write.</source>
         <translation>Nem lehetett a fájlt megnyitni írásra.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="186"/>
+        <location filename="../src/graphwidget.cpp" line="236"/>
         <source>Saved.</source>
         <translation>Elmentve.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="206"/>
+        <location filename="../src/graphwidget.cpp" line="258"/>
         <source>MindMap exported as </source>
         <translation>Az agytérkép exportálva lett, mint</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="213"/>
-        <location filename="graphwidget.cpp" line="243"/>
-        <location filename="graphwidget.cpp" line="412"/>
-        <location filename="graphwidget.cpp" line="439"/>
-        <location filename="graphwidget.cpp" line="464"/>
-        <location filename="graphwidget.cpp" line="498"/>
-        <location filename="graphwidget.cpp" line="539"/>
-        <location filename="graphwidget.cpp" line="552"/>
-        <location filename="graphwidget.cpp" line="586"/>
+        <location filename="../src/graphwidget.cpp" line="271"/>
+        <location filename="../src/graphwidget.cpp" line="311"/>
+        <location filename="../src/graphwidget.cpp" line="356"/>
+        <location filename="../src/graphwidget.cpp" line="371"/>
+        <location filename="../src/graphwidget.cpp" line="399"/>
+        <location filename="../src/graphwidget.cpp" line="425"/>
+        <location filename="../src/graphwidget.cpp" line="461"/>
+        <location filename="../src/graphwidget.cpp" line="549"/>
+        <location filename="../src/graphwidget.cpp" line="586"/>
+        <location filename="../src/graphwidget.cpp" line="762"/>
+        <location filename="../src/graphwidget.cpp" line="805"/>
         <source>No active node.</source>
         <translation>Nincs aktív csúcs.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="504"/>
+        <location filename="../src/graphwidget.cpp" line="317"/>
         <source>Base node cannot be deleted.</source>
         <translation>Bázis csúcs nem törölhető.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="568"/>
+        <location filename="../src/graphwidget.cpp" line="443"/>
         <source>Select node color</source>
         <translation>Csúcs szín választás</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="602"/>
+        <location filename="../src/graphwidget.cpp" line="479"/>
         <source>Select text color</source>
         <translation>Csúcs szüvegszín választás</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="734"/>
+        <location filename="../src/graphwidget.cpp" line="514"/>
         <source>Edge adding cancelled.</source>
         <oldsource>Edge adding cancelled</oldsource>
         <translation>Él hozzáadása megszakítva.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="739"/>
+        <location filename="../src/graphwidget.cpp" line="519"/>
         <source>Edge deleting cancelled.</source>
         <oldsource>Edge deleting cancelled</oldsource>
         <translation>Él törlés megszakítva.</translation>
@@ -149,32 +151,32 @@
         <translation type="obsolete">Az utolsó csúcs nem törölhető.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="614"/>
+        <location filename="../src/graphwidget.cpp" line="491"/>
         <source>Add edge: select destination node.</source>
         <translation>Él hozzáadásához válassz ki cél csúcsot.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="620"/>
+        <location filename="../src/graphwidget.cpp" line="497"/>
         <source>Delete edge: select other end-node.</source>
         <translation>Él törléséhez válaszd ki a másik csúcsot.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="754"/>
+        <location filename="../src/graphwidget.cpp" line="769"/>
         <source>Root element cannot be an edge target.</source>
         <translation>Bázis csúcs nem lehet él végpontja.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="761"/>
+        <location filename="../src/graphwidget.cpp" line="776"/>
         <source>There is already an edge between these two nodes.</source>
         <translation>Már létezik él e két csúcs között.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="769"/>
+        <location filename="../src/graphwidget.cpp" line="785"/>
         <source>The graph is acyclic, edge added as secondary edge.</source>
         <translation>A gráf aciklikus, az él másodlagosként lett hozzáadva.</translation>
     </message>
     <message>
-        <location filename="graphwidget.cpp" line="786"/>
+        <location filename="../src/graphwidget.cpp" line="811"/>
         <source>There no edge between these two nodes.</source>
         <translation>Nincs él e között a két csúcs között.</translation>
     </message>
@@ -182,267 +184,276 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwindow.ui" line="14"/>
+        <location filename="../ui/mainwindow.ui" line="14"/>
         <source>QtMindMap</source>
         <translation>QtMindMap</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="32"/>
+        <location filename="../ui/mainwindow.ui" line="32"/>
         <source>&amp;File</source>
         <translation>&amp;Fájl</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="46"/>
+        <location filename="../ui/mainwindow.ui" line="46"/>
         <source>&amp;Help</source>
         <translation>&amp;Segítség</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="55"/>
+        <location filename="../ui/mainwindow.ui" line="55"/>
         <source>main toolbar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="70"/>
+        <location filename="../ui/mainwindow.ui" line="70"/>
         <source>insert status icons</source>
         <translation>Állapot ikon beszúrása</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="84"/>
+        <location filename="../ui/mainwindow.ui" line="84"/>
         <source>&amp;New</source>
         <translation>&amp;Új</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="95"/>
+        <location filename="../ui/mainwindow.ui" line="95"/>
         <source>&amp;Open</source>
         <translation>Meg&amp;nyitás</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="106"/>
+        <location filename="../ui/mainwindow.ui" line="106"/>
         <source>&amp;Save</source>
         <translation>&amp;Mentés</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="114"/>
+        <location filename="../ui/mainwindow.ui" line="114"/>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="122"/>
+        <location filename="../ui/mainwindow.ui" line="122"/>
         <source>&amp;About QtMindMap</source>
         <translation>A QtMindMap-ről</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="130"/>
+        <location filename="../ui/mainwindow.ui" line="130"/>
         <source>&amp;Close</source>
         <translation>&amp;Bezárás</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="141"/>
+        <location filename="../ui/mainwindow.ui" line="141"/>
         <source>E&amp;xport</source>
         <translation>E&amp;xportálás</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="144"/>
+        <location filename="../ui/mainwindow.ui" line="144"/>
         <source>Export</source>
         <translation>Exportálás</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="155"/>
+        <location filename="../ui/mainwindow.ui" line="155"/>
         <source>Save&amp;As</source>
         <translation>Mentés min&amp;t</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="158"/>
+        <location filename="../ui/mainwindow.ui" line="158"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="163"/>
+        <location filename="../ui/mainwindow.ui" line="163"/>
         <source>&amp;Keys</source>
         <translation>&amp;Billentyűk</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="45"/>
+        <location filename="../src/mainwindow.cpp" line="183"/>
+        <source>Save mindmap - qtmindmap</source>
+        <translation>agytérkép mentése - qtmindmap</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="184"/>
+        <source>The mindmap has been modified.</source>
+        <translation>Az agytérkép módosult.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="310"/>
         <source>Add node (ins)</source>
         <translation>Csúcs hozzáadása (ins)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="47"/>
+        <location filename="../src/mainwindow.cpp" line="314"/>
         <source>Del node (del)</source>
         <translation>Csúcs törlése (del)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="49"/>
+        <location filename="../src/mainwindow.cpp" line="318"/>
         <source>Edit node (F2, dubclick)</source>
         <translation>Csúcs szerkesztése
 (F2, duplaklikk)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="53"/>
+        <location filename="../src/mainwindow.cpp" line="323"/>
         <source>ScaleUp Node (Ctrl +)</source>
         <translation>Csúcs növelése (Ctrl +)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="54"/>
+        <location filename="../src/mainwindow.cpp" line="324"/>
         <source>ScaleDown Node (Ctrl -)</source>
         <translation>Csúcs csökkentése (Ctrl -)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="56"/>
+        <location filename="../src/mainwindow.cpp" line="326"/>
         <source>Node color (c)</source>
         <translation>Csúcs szín (c)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="58"/>
+        <location filename="../src/mainwindow.cpp" line="330"/>
         <source>Node textcolor (t)</source>
         <translation>Csúcs szüvegszín (t)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="60"/>
+        <location filename="../src/mainwindow.cpp" line="334"/>
         <source>Add edge (a)</source>
         <translation>Él hozzáadása (a)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="62"/>
+        <location filename="../src/mainwindow.cpp" line="338"/>
         <source>Del edge (d)</source>
         <translation>Él törlése (d)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
+        <location filename="../src/mainwindow.cpp" line="342"/>
         <source>Move node
 (Ctrl cursor, drag)</source>
         <translation>Csúcs mozgatása
 (Ctrl kurzor, egér)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="66"/>
+        <location filename="../src/mainwindow.cpp" line="345"/>
         <source>Change on wholesubtree
 (Ctrl shift)</source>
         <translation>Változtatás az al-fán
 (Ctrl shift)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="68"/>
+        <location filename="../src/mainwindow.cpp" line="348"/>
         <source>Zoom in (+, scrollup)</source>
         <translation>Nagyítás (+, felgörgetés)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="70"/>
+        <location filename="../src/mainwindow.cpp" line="352"/>
         <source>Zoom out (-, scrolldown)</source>
         <translation>Kicsinítás (- legörgetés)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="72"/>
+        <location filename="../src/mainwindow.cpp" line="356"/>
         <source>Leave editing,
 edge eadd/remove (esc)</source>
         <translation>Elhagyni szerkesztést,
 él hozzáadást/törlést (esc)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="74"/>
+        <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Hint mode (f)</source>
         <translation>Csúcs választó mód (f)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="76"/>
+        <location filename="../src/mainwindow.cpp" line="364"/>
         <source>Show main toolbar
 (Ctrl m)</source>
         <translation>Fő eszköztár mutatása
 (Ctrl m)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="79"/>
+        <location filename="../src/mainwindow.cpp" line="369"/>
         <source>Insert status icons
 (Ctrl i)</source>
         <translation>Állapot ikon beszúrása
 (Ctrl i)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="104"/>
+        <location filename="../src/mainwindow.cpp" line="400"/>
         <source>Insert icon:</source>
         <translation>Ikon beszúrása:</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="107"/>
+        <location filename="../src/mainwindow.cpp" line="403"/>
         <source>&amp;Do</source>
         <translation>&amp;Csinálni</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="111"/>
+        <location filename="../src/mainwindow.cpp" line="408"/>
         <source>&amp;Trash</source>
         <translation>&amp;Kidobni</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="115"/>
+        <location filename="../src/mainwindow.cpp" line="413"/>
         <source>&amp;Refer</source>
         <translation>&amp;Elrakni</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="119"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>&amp;Blocked</source>
         <translation>&amp;Várakoztatva</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="123"/>
+        <location filename="../src/mainwindow.cpp" line="424"/>
         <source>&amp;How?</source>
         <translation>&amp;Hogyan?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="127"/>
+        <location filename="../src/mainwindow.cpp" line="429"/>
         <source>&amp;Postpone</source>
         <translation>&amp;Elhalasztva</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="131"/>
+        <location filename="../src/mainwindow.cpp" line="435"/>
         <source>&amp;Comission</source>
         <translation>&amp;Delegálva</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="441"/>
         <source>ma&amp;Ybe</source>
         <oldsource>&amp;Maybe</oldsource>
         <translation>&amp;Talán</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="168"/>
-        <location filename="mainwindow.cpp" line="191"/>
-        <location filename="mainwindow.cpp" line="311"/>
+        <location filename="../src/mainwindow.cpp" line="57"/>
+        <location filename="../src/mainwindow.cpp" line="80"/>
+        <location filename="../src/mainwindow.cpp" line="195"/>
         <source>untitled</source>
         <translation>névtelen</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="208"/>
+        <location filename="../src/mainwindow.cpp" line="97"/>
         <source>Open MindMap</source>
         <translation>Agytérkép megynyitása</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="231"/>
-        <location filename="mainwindow.cpp" line="265"/>
+        <location filename="../src/mainwindow.cpp" line="119"/>
+        <location filename="../src/mainwindow.cpp" line="148"/>
         <source>Read-only file!</source>
         <translation>Csak olvasható fájl!</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="276"/>
+        <location filename="../src/mainwindow.cpp" line="159"/>
         <source>Save MindMap as</source>
         <translation>Elmenteni az agytérképet mint</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="300"/>
         <source>The document has been modified.</source>
-        <translation>A dokumentum megváltozott.</translation>
+        <translation type="obsolete">A dokumentum megváltozott.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="301"/>
+        <location filename="../src/mainwindow.cpp" line="185"/>
         <source>Do you want to save your changes?</source>
         <translation>Szeretnéd menteni a módosításokat?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="230"/>
         <source>Export MindMap to image</source>
         <translation>Az agytérkép képként exportálása</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="232"/>
         <source>PNG image file (*.png)</source>
         <translation>PNG kép fájl (*.png)</translation>
     </message>
@@ -547,22 +558,22 @@ edge eadd/remove (esc)</source>
         <translation type="obsolete">A csúcs mozgatása.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="245"/>
         <source>About QtMindMap</source>
         <translation>A QtMindMap-ről</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="246"/>
         <source>MindMap software written in Qt.</source>
         <translation>Agytérkép program Qt-ben írva.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="364"/>
+        <location filename="../src/mainwindow.cpp" line="248"/>
         <source>Homepage:</source>
         <translation>Honlap:</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="366"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>Report bugs to:</source>
         <translation>Ide jelentsd a hibákat:</translation>
     </message>
@@ -574,12 +585,12 @@ edge eadd/remove (esc)</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="48"/>
+        <location filename="../src/main.cpp" line="46"/>
         <source>QtMindMap Error</source>
         <translation>QtMindMap hiba</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="49"/>
+        <location filename="../src/main.cpp" line="47"/>
         <source>I couldn&apos;t detect any system tray on this system.</source>
         <translation>Nem található tálca a jelenlegi rendszerben.</translation>
     </message>
@@ -587,22 +598,22 @@ edge eadd/remove (esc)</source>
 <context>
     <name>SystemTray</name>
     <message>
-        <location filename="systemtray.cpp" line="9"/>
+        <location filename="../src/systemtray.cpp" line="12"/>
         <source>Mi&amp;nimize</source>
         <translation>&amp;Tálcára</translation>
     </message>
     <message>
-        <location filename="systemtray.cpp" line="13"/>
+        <location filename="../src/systemtray.cpp" line="16"/>
         <source>Ma&amp;ximize</source>
         <translation>Teljes &amp;méret</translation>
     </message>
     <message>
-        <location filename="systemtray.cpp" line="17"/>
+        <location filename="../src/systemtray.cpp" line="20"/>
         <source>&amp;Restore</source>
         <translation>&amp;Visszaállítás</translation>
     </message>
     <message>
-        <location filename="systemtray.cpp" line="21"/>
+        <location filename="../src/systemtray.cpp" line="24"/>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>

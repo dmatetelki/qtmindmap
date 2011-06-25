@@ -48,7 +48,7 @@ void AlgorithmTests::calculateBiggestAngle()
     Edge *edge1 = new Edge(node1, node2);
     edge1->m_angle = angleOfPoints(node1->pos(), node2->pos());
 
-    QCOMPARE(edge1->getAngle(), 2 * Pi);
+    QCOMPARE(edge1->angle(), 2 * Pi);
     QCOMPARE(node1->calculateBiggestAngle(), - Pi);
     QCOMPARE(node2->calculateBiggestAngle(), double(0));
 
@@ -56,7 +56,7 @@ void AlgorithmTests::calculateBiggestAngle()
     node2->setPos(30,30);
     edge1->m_angle = angleOfPoints(node1->pos(), node2->pos()); // 45
 
-    QCOMPARE(edge1->getAngle(), 1.75 * Pi);
+    QCOMPARE(edge1->angle(), 1.75 * Pi);
     QCOMPARE(node1->calculateBiggestAngle(), - 0.75 * Pi);
     QCOMPARE(node2->calculateBiggestAngle(), 0.25 * Pi);
 
@@ -75,9 +75,9 @@ void AlgorithmTests::calculateBiggestAngle()
     Edge *edge3 = new Edge(node1, node4);
     edge3->m_angle = angleOfPoints(node1->pos(), node4->pos());
 
-    QCOMPARE(edge1->getAngle(), 2 * Pi);
-    QCOMPARE(edge2->getAngle(), Pi);
-    QCOMPARE(edge3->getAngle(), 0.5 * Pi);
+    QCOMPARE(edge1->angle(), 2 * Pi);
+    QCOMPARE(edge2->angle(), Pi);
+    QCOMPARE(edge3->angle(), 0.5 * Pi);
     QCOMPARE(node1->calculateBiggestAngle(), 0.5 * Pi);
 
     delete node1;

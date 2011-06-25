@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QSignalMapper>
 
 #include "graphwidget.h"
 
@@ -35,9 +36,6 @@ public slots:
     bool closeFile();
     void exportScene();
     void about();
-
-    // insert state icon
-    void insertPicture();
 
     // toolbars
     void showMainToolbar(const bool &show = true);
@@ -94,6 +92,7 @@ private:
     QAction *m_postpone;
     QAction *m_delegate;
     QAction *m_maybe;
+    QSignalMapper *m_signalMapper;
 };
 
 #endif // MAINWINDOW_H

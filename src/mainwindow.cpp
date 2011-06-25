@@ -180,7 +180,8 @@ bool MainWindow::closeFile()
     if (m_contentChanged)
     {
         QMessageBox msgBox(this);
-        msgBox.setText(tr("The document has been modified."));
+        msgBox.setWindowTitle(tr("Save mindmap - qtmindmap"));
+        msgBox.setText(tr("The mindmap has been modified."));
         msgBox.setInformativeText(tr("Do you want to save your changes?"));
         msgBox.setStandardButtons(QMessageBox::Save |
                                   QMessageBox::Discard |
@@ -251,51 +252,6 @@ void MainWindow::about()
     QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();
-}
-
-void MainWindow::insertPicture()
-{
-    QAction *sender = dynamic_cast<QAction*>(QObject::sender());
-
-    /// @note Why QIcon does not store it's fileName? It would be easier:
-    //    m_graphicsView->insertPicture(
-    //                dynamic_cast<QAction*>(QObject::sender())->icon().name());
-    if (sender == m_doIt)
-    {
-        m_graphicsView->insertPicture(":/applications-system.svg");
-    }
-    else if (sender == m_trash)
-    {
-        m_graphicsView->insertPicture(":/user-trash-full.svg");
-    }
-    else if (sender == m_info)
-    {
-        m_graphicsView->insertPicture(":/mail-attachment.svg");
-    }
-    else if (sender == m_blocked)
-    {
-        m_graphicsView->insertPicture(":/dialog-warning.svg");
-    }
-    else if (sender == m_question)
-    {
-        m_graphicsView->insertPicture(":/help-browser.svg");
-    }
-    else if (sender == m_postpone)
-    {
-        m_graphicsView->insertPicture(":/x-office-calendar.svg");
-    }
-    else if (sender == m_delegate)
-    {
-        m_graphicsView->insertPicture(":/system-users.svg");
-    }
-    else if (sender == m_maybe)
-    {
-        m_graphicsView->insertPicture(":/dialog-information.svg");
-    }
-    else
-    {
-        return;
-    }
 }
 
 void MainWindow::showMainToolbar(const bool &show)
@@ -438,44 +394,58 @@ void MainWindow::setUpMainToolbar()
 
 void MainWindow::setUpStatusIconToolbar()
 {
+    // map signals so actions can send icon name
+    m_signalMapper = new QSignalMapper(this);
+
     m_insertIcon = new QAction(tr("Insert icon:"), this);
     m_insertIcon->setDisabled(true);
 
     m_doIt = new QAction(QIcon(":/applications-system.svg"), tr("&Do"), this);
     m_doIt->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
-    connect(m_doIt, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_doIt, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_doIt, ":/applications-system.svg");
 
     m_trash = new QAction(QIcon(":/user-trash-full.svg"), tr("&Trash"), this);
     m_trash->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-    connect(m_trash, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_trash, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_trash, ":/user-trash-full.svg");
 
     m_info = new QAction(QIcon(":/mail-attachment.svg"), tr("&Refer"), this);
     m_info->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
-    connect(m_info, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_info, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_info, ":/mail-attachment.svg");
 
     m_blocked = new QAction(QIcon(":/dialog-warning.svg"), tr("&Blocked"),
                             this);
     m_blocked->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
-    connect(m_blocked, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_blocked, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_blocked, ":/dialog-warning.svg");
 
     m_question = new QAction(QIcon(":/help-browser.svg"), tr("&How?"), this);
     m_question->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
-    connect(m_question, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_question, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_question, ":/help-browser.svg");
 
     m_postpone = new QAction(QIcon(":/x-office-calendar.svg"), tr("&Postpone"),
                              this);
     m_postpone->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
-    connect(m_postpone, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_postpone, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_postpone, ":/x-office-calendar.svg");
 
     m_delegate = new QAction(QIcon(":/system-users.svg"), tr("&Comission"),
                              this);
     m_delegate->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-    connect(m_delegate, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_delegate, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_delegate, ":/system-users.svg");
 
     m_maybe = new QAction(QIcon(":/dialog-information.svg"), tr("ma&Ybe"),
                           this);
     m_maybe->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
-    connect(m_maybe, SIGNAL(activated()), this, SLOT(insertPicture()));
+    connect(m_maybe, SIGNAL(activated()), m_signalMapper, SLOT (map()));
+    m_signalMapper->setMapping(m_maybe, ":/dialog-information.svg");
+
+    connect(m_signalMapper, SIGNAL(mapped(const QString &)),
+            m_graphicsView, SLOT(insertPicture(const QString &)));
 
     m_ui->statusIcons_toolBar->addAction(m_insertIcon);
     m_ui->statusIcons_toolBar->addAction(m_doIt);

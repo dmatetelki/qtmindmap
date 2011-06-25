@@ -30,7 +30,6 @@ public:
     bool readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
-    void insertPicture(const QString &picture);
 
 public slots:
 
@@ -46,6 +45,9 @@ public slots:
     void removeEdge();
     void nodeLostFocus();
     void hintMode();
+
+    // bundled signals from statusIconsToolBar
+    void insertPicture(const QString &picture);
 
 protected:
 
