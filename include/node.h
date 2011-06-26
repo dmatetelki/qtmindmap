@@ -16,14 +16,20 @@ public:
     Node(GraphWidget *graphWidget = 0);
     ~Node();
 
-    void moveNode(QGraphicsSceneMouseEvent *event);
+    // add/remove edges
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);
-//    void adjustEdges();
 
-    void setBorder(const bool &hasBorder);
-    void setActive(const bool &active = true);
+    // graph traversal
+    QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
+    QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;
+    Edge * edgeTo(const Node* node) const;
+    QList<Node *> subtree() const;
+    bool isConnected(const Node *node) const;
+
+    // prop set/get
+    void setBorder(const bool &hasBorder = true);
     void setEditable(const bool &editable = true);
     void setColor(const QColor &color);
     QColor color() const { return m_color; }
@@ -31,20 +37,21 @@ public:
     QColor textColor() const { return m_textColor; }
     void setScale(const qreal &factor, const QRectF &sceneRect);
 
+    // show numbers in hint mode
     void showNumber(const int &number, const bool& show = true,
                     const bool &numberIsSpecial = false);
-    void insertPicture(const QString &picture, const int &pos = 0);
-    double calculateBiggestAngle();
+    // insert picture to the cursor's current position
+    void insertPicture(const QString &picture);
 
     // changing visibility from prot to pub
+    // so GraphWidget::keyPressEvent can call it edit during editing
     void keyPressEvent(QKeyEvent *event);
-    bool isConnected(const Node *node) const;
+
+    // calculetes the intersection of line and shape of this Node
     QPointF intersection(const QLineF &line, const bool &reverse = false) const;
 
-    QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
-    QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;
-    Edge * edgeTo(const Node* node) const;
-    QList<Node *> subtree() const;
+    // returns with the biggest angle between the edges
+    double calculateBiggestAngle() const;
 
 protected:
 
@@ -60,7 +67,7 @@ protected:
 
 private:
 
-    double doubleModulo(const double &devided, const double &devisor);
+    double doubleModulo(const double &devided, const double &devisor) const;
 
     struct EdgeElement
     {
@@ -71,7 +78,6 @@ private:
 
     QList<EdgeElement> m_edgeList;
     GraphWidget *m_graph;
-    bool m_isActive;
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;
@@ -82,7 +88,6 @@ private:
     static const double m_oneAndHalfPi;
     static const double m_twoPi;
 
-    static const QColor m_orange;
     static const QColor m_gold;
 };
 

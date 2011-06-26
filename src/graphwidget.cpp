@@ -165,7 +165,7 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
 
     // test the first node the active one
     m_activeNode = m_nodeList.first();
-    m_activeNode->setActive();
+    m_activeNode->setBorder();
     m_activeNode->setFocus();
 
     this->show();
@@ -197,8 +197,10 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
         cn.setAttribute( "bg_green", QString::number(node->color().green()));
         cn.setAttribute( "bg_blue", QString::number(node->color().blue()));
         cn.setAttribute( "text_red", QString::number(node->textColor().red()));
-        cn.setAttribute( "text_green", QString::number(node->textColor().green()));
-        cn.setAttribute( "text_blue", QString::number(node->textColor().blue()));
+        cn.setAttribute( "text_green",
+                        QString::number(node->textColor().green()));
+        cn.setAttribute( "text_blue",
+                        QString::number(node->textColor().blue()));
         nodes_root.appendChild(cn);
     }
 
@@ -260,10 +262,6 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
 
 void GraphWidget::insertNode()
 {
-    /// @note this is TERRIBLE!
-    // basically when insertNode() is called from mainToolBar, it needs to
-    // wait for a paralell nodeLostFocus() to finish...
-    // so I call ANOTHER one which takes the same amount of time...just kill me
     nodeLostFocus();
 
     if (!m_activeNode)
@@ -595,15 +593,21 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                     else if (event->key() == Qt::Key_Down) node->moveBy(0, 20);
                     else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
                     else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
+
                     contentChanged();
                 }
             }
             else // Move just the active Node.
             {
-                if (event->key() == Qt::Key_Up) m_activeNode->moveBy(0, -20);
-                else if (event->key() == Qt::Key_Down) m_activeNode->moveBy(0, 20);
-                else if (event->key() == Qt::Key_Left) m_activeNode->moveBy(-20, 0);
-                else if (event->key() == Qt::Key_Right) m_activeNode->moveBy(20, 0);
+                if (event->key() == Qt::Key_Up)
+                    m_activeNode->moveBy(0, -20);
+                else if (event->key() == Qt::Key_Down)
+                    m_activeNode->moveBy(0, 20);
+                else if (event->key() == Qt::Key_Left)
+                    m_activeNode->moveBy(-20, 0);
+                else if (event->key() == Qt::Key_Right)
+                    m_activeNode->moveBy(20, 0);
+
                 contentChanged();
             }
         }
@@ -832,7 +836,7 @@ void GraphWidget::addFirstNode()
     m_nodeList.append(node);
 
     m_activeNode = m_nodeList.first();
-    m_activeNode->setActive();
+    m_activeNode->setBorder();
 }
 
 void GraphWidget::removeAllNodes()
@@ -848,10 +852,10 @@ void GraphWidget::removeAllNodes()
 void GraphWidget::setActiveNode(Node *node)
 {
     if (m_activeNode!=0)
-        m_activeNode->setActive(false);
+        m_activeNode->setBorder(false);
 
     m_activeNode = node;
-    m_activeNode->setActive();
+    m_activeNode->setBorder();
 }
 
 // re-draw numbers
