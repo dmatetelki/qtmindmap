@@ -38,4 +38,4 @@ TRANSLATIONS += lang/qtmindmap_hu.ts \
 
 CODECFORTR    = UTF-8
 
-DESTDIR = .
+DESTDIR = usr/bin
