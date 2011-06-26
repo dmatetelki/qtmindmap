@@ -104,3 +104,18 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
     }
     return true;
 }
+
+bool ArgumentParser::isSystemTray()
+{
+    return m_isSystemTray;
+}
+
+bool ArgumentParser::isShowMinimized()
+{
+    return m_isShowMinimized;
+}
+
+QString ArgumentParser::filePath()
+{
+    return m_filePath;
+}

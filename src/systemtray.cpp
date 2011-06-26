@@ -37,3 +37,8 @@ SystemTray::SystemTray(MainWindow *mainWindow, QWidget *parent)
     m_icon = new QIcon(":/qtmindmap.svg");
     m_systemTrayIcon->setIcon(QIcon(":/qtmindmap.svg"));
 }
+
+void SystemTray::show()
+{
+    m_systemTrayIcon->show();
+}

@@ -34,10 +34,35 @@ Edge::~Edge()
     m_destNode->removeEdgeFromList(this);
 }
 
+Node * Edge::sourceNode() const
+{
+    return m_sourceNode;
+}
+
+Node * Edge::destNode() const
+{
+    return m_destNode;
+}
+
+double Edge::angle() const
+{
+    return m_angle;
+}
+
+QColor Edge::color() const
+{
+    return m_color;
+}
+
 void Edge::setColor(const QColor &color)
 {
     m_color = color;
     update();
+}
+
+qreal Edge::width() const
+{
+    return m_width;
 }
 
 void Edge::setWidth(const qreal &width)
@@ -47,6 +72,11 @@ void Edge::setWidth(const qreal &width)
 
     m_width = width;
     update();
+}
+
+bool Edge::secondary() const
+{
+    return m_secondary;
 }
 
 void Edge::setSecondary(const bool &sec)

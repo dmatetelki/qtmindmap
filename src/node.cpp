@@ -175,10 +175,20 @@ void Node::setColor(const QColor &color)
     update();
 }
 
+QColor Node::color() const
+{
+    return m_color;
+}
+
 void Node::setTextColor(const QColor &color)
 {
     m_textColor = color;
     update();
+}
+
+QColor Node::textColor() const
+{
+    return m_textColor;
 }
 
 void Node::setScale(const qreal &factor,const QRectF &sceneRect)

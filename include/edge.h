@@ -13,16 +13,16 @@ public:
     Edge(Node *sourceNode, Node *destNode);
     ~Edge();
 
-    Node *sourceNode() const { return m_sourceNode; }
-    Node *destNode() const { return m_destNode; }
-    double angle() const { return m_angle; }
+    Node *sourceNode() const;
+    Node *destNode() const;
+    double angle() const;
 
     // set/get color/width/secondary
-    QColor color() const { return m_color; }
+    QColor color() const;
     void setColor(const QColor &color);
-    qreal width() const { return m_width; }
+    qreal width() const;
     void setWidth(const qreal &width);
-    bool secondary() const  { return m_secondary; }
+    bool secondary() const;
     void setSecondary(const bool &sec = true );
 
     // re-calculates the source and endpoint.

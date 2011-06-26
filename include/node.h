@@ -33,9 +33,9 @@ public:
     void setBorder(const bool &hasBorder = true);
     void setEditable(const bool &editable = true);
     void setColor(const QColor &color);
-    QColor color() const { return m_color; }
+    QColor color() const;
     void setTextColor(const QColor &color);
-    QColor textColor() const { return m_textColor; }
+    QColor textColor() const;
     void setScale(const qreal &factor, const QRectF &sceneRect);
 
     // show numbers in hint mode

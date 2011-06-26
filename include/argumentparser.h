@@ -21,9 +21,9 @@ public:
       */
     bool parseCmdLineArgs(bool &successful);
 
-    bool isSystemTray() { return m_isSystemTray; }
-    bool isShowMinimized() { return m_isShowMinimized; }
-    QString filePath() { return m_filePath; }
+    bool isSystemTray();
+    bool isShowMinimized();
+    QString filePath();
 
 
 private:

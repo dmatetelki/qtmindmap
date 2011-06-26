@@ -16,7 +16,7 @@ public:
     explicit SystemTray(MainWindow *mainWindow, QWidget *parent = 0);
 
     // access private member
-    void show() { m_systemTrayIcon->show(); }
+    void show();
 
 private:
 
