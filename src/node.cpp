@@ -18,13 +18,17 @@ Node::Node(GraphWidget *parent) :
     m_hasBorder(false),
     m_numberIsSpecial(false),
     m_color(m_gold),
-    m_textColor(0,0,0)
+    m_textColor(0,0,0),
+    m_effect(new QGraphicsDropShadowEffect(this))
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setDefaultTextColor(QColor(0,0,0));
     setZValue(2);
+    setGraphicsEffect(m_effect);
+    m_effect->setEnabled(false);
+    m_effect->setOffset(qreal(4.0));
 }
 
 Node::~Node()
@@ -144,6 +148,8 @@ bool Node::isConnected(const Node *node) const
 void Node::setBorder(const bool &hasBorder)
 {
    m_hasBorder = hasBorder;
+   m_effect->setEnabled(hasBorder);
+
    update();
 }
 

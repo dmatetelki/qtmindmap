@@ -3,6 +3,7 @@
 
 #include <QGraphicsTextItem>
 #include <QTextCursor>
+#include <QGraphicsDropShadowEffect>
 
 #include "edge.h"
 #include "graphwidget.h"
@@ -83,6 +84,7 @@ private:
     bool m_numberIsSpecial;
     QColor m_color;
     QColor m_textColor;
+    QGraphicsDropShadowEffect *m_effect;
 
     static const double m_pi;
     static const double m_oneAndHalfPi;

@@ -90,58 +90,58 @@
         <translation>Nem lehetett elemezni az XML dokumentumot.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="228"/>
+        <location filename="../src/graphwidget.cpp" line="230"/>
         <source>Couldn&apos;t open file to write.</source>
         <translation>Nem lehetett a fájlt megnyitni írásra.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="236"/>
+        <location filename="../src/graphwidget.cpp" line="238"/>
         <source>Saved.</source>
         <translation>Elmentve.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="258"/>
+        <location filename="../src/graphwidget.cpp" line="260"/>
         <source>MindMap exported as </source>
         <translation>Az agytérkép exportálva lett, mint</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="271"/>
-        <location filename="../src/graphwidget.cpp" line="311"/>
-        <location filename="../src/graphwidget.cpp" line="356"/>
-        <location filename="../src/graphwidget.cpp" line="371"/>
-        <location filename="../src/graphwidget.cpp" line="399"/>
-        <location filename="../src/graphwidget.cpp" line="425"/>
-        <location filename="../src/graphwidget.cpp" line="461"/>
-        <location filename="../src/graphwidget.cpp" line="549"/>
-        <location filename="../src/graphwidget.cpp" line="586"/>
-        <location filename="../src/graphwidget.cpp" line="762"/>
-        <location filename="../src/graphwidget.cpp" line="805"/>
+        <location filename="../src/graphwidget.cpp" line="269"/>
+        <location filename="../src/graphwidget.cpp" line="309"/>
+        <location filename="../src/graphwidget.cpp" line="354"/>
+        <location filename="../src/graphwidget.cpp" line="377"/>
+        <location filename="../src/graphwidget.cpp" line="398"/>
+        <location filename="../src/graphwidget.cpp" line="419"/>
+        <location filename="../src/graphwidget.cpp" line="455"/>
+        <location filename="../src/graphwidget.cpp" line="543"/>
+        <location filename="../src/graphwidget.cpp" line="580"/>
+        <location filename="../src/graphwidget.cpp" line="771"/>
+        <location filename="../src/graphwidget.cpp" line="814"/>
         <source>No active node.</source>
         <translation>Nincs aktív csúcs.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="317"/>
+        <location filename="../src/graphwidget.cpp" line="315"/>
         <source>Base node cannot be deleted.</source>
         <translation>Bázis csúcs nem törölhető.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="443"/>
+        <location filename="../src/graphwidget.cpp" line="437"/>
         <source>Select node color</source>
         <translation>Csúcs szín választás</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="479"/>
+        <location filename="../src/graphwidget.cpp" line="473"/>
         <source>Select text color</source>
         <translation>Csúcs szüvegszín választás</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="514"/>
+        <location filename="../src/graphwidget.cpp" line="508"/>
         <source>Edge adding cancelled.</source>
         <oldsource>Edge adding cancelled</oldsource>
         <translation>Él hozzáadása megszakítva.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="519"/>
+        <location filename="../src/graphwidget.cpp" line="513"/>
         <source>Edge deleting cancelled.</source>
         <oldsource>Edge deleting cancelled</oldsource>
         <translation>Él törlés megszakítva.</translation>
@@ -151,32 +151,32 @@
         <translation type="obsolete">Az utolsó csúcs nem törölhető.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="491"/>
+        <location filename="../src/graphwidget.cpp" line="485"/>
         <source>Add edge: select destination node.</source>
         <translation>Él hozzáadásához válassz ki cél csúcsot.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="497"/>
+        <location filename="../src/graphwidget.cpp" line="491"/>
         <source>Delete edge: select other end-node.</source>
         <translation>Él törléséhez válaszd ki a másik csúcsot.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="769"/>
+        <location filename="../src/graphwidget.cpp" line="778"/>
         <source>Root element cannot be an edge target.</source>
         <translation>Bázis csúcs nem lehet él végpontja.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="776"/>
+        <location filename="../src/graphwidget.cpp" line="785"/>
         <source>There is already an edge between these two nodes.</source>
         <translation>Már létezik él e két csúcs között.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="785"/>
+        <location filename="../src/graphwidget.cpp" line="794"/>
         <source>The graph is acyclic, edge added as secondary edge.</source>
         <translation>A gráf aciklikus, az él másodlagosként lett hozzáadva.</translation>
     </message>
     <message>
-        <location filename="../src/graphwidget.cpp" line="811"/>
+        <location filename="../src/graphwidget.cpp" line="820"/>
         <source>There no edge between these two nodes.</source>
         <translation>Nincs él e között a két csúcs között.</translation>
     </message>
@@ -290,127 +290,127 @@
 (F2, duplaklikk)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="323"/>
+        <location filename="../src/mainwindow.cpp" line="322"/>
         <source>ScaleUp Node (Ctrl +)</source>
         <translation>Csúcs növelése (Ctrl +)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="324"/>
+        <location filename="../src/mainwindow.cpp" line="325"/>
         <source>ScaleDown Node (Ctrl -)</source>
         <translation>Csúcs csökkentése (Ctrl -)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="326"/>
+        <location filename="../src/mainwindow.cpp" line="329"/>
         <source>Node color (c)</source>
         <translation>Csúcs szín (c)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="330"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
         <source>Node textcolor (t)</source>
         <translation>Csúcs szüvegszín (t)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="334"/>
+        <location filename="../src/mainwindow.cpp" line="337"/>
         <source>Add edge (a)</source>
         <translation>Él hozzáadása (a)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="338"/>
+        <location filename="../src/mainwindow.cpp" line="341"/>
         <source>Del edge (d)</source>
         <translation>Él törlése (d)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="342"/>
+        <location filename="../src/mainwindow.cpp" line="345"/>
         <source>Move node
 (Ctrl cursor, drag)</source>
         <translation>Csúcs mozgatása
 (Ctrl kurzor, egér)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="348"/>
         <source>Change on wholesubtree
 (Ctrl shift)</source>
         <translation>Változtatás az al-fán
 (Ctrl shift)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="351"/>
         <source>Zoom in (+, scrollup)</source>
         <translation>Nagyítás (+, felgörgetés)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="352"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
         <source>Zoom out (-, scrolldown)</source>
         <translation>Kicsinítás (- legörgetés)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="356"/>
+        <location filename="../src/mainwindow.cpp" line="359"/>
         <source>Leave editing,
 edge eadd/remove (esc)</source>
         <translation>Elhagyni szerkesztést,
 él hozzáadást/törlést (esc)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="360"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Hint mode (f)</source>
         <translation>Csúcs választó mód (f)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="364"/>
+        <location filename="../src/mainwindow.cpp" line="367"/>
         <source>Show main toolbar
 (Ctrl m)</source>
         <translation>Fő eszköztár mutatása
 (Ctrl m)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="372"/>
         <source>Insert status icons
 (Ctrl i)</source>
         <translation>Állapot ikon beszúrása
 (Ctrl i)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="400"/>
+        <location filename="../src/mainwindow.cpp" line="403"/>
         <source>Insert icon:</source>
         <translation>Ikon beszúrása:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="403"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>&amp;Do</source>
         <translation>&amp;Csinálni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="408"/>
+        <location filename="../src/mainwindow.cpp" line="411"/>
         <source>&amp;Trash</source>
         <translation>&amp;Kidobni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="413"/>
+        <location filename="../src/mainwindow.cpp" line="416"/>
         <source>&amp;Refer</source>
         <translation>&amp;Elrakni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="418"/>
+        <location filename="../src/mainwindow.cpp" line="421"/>
         <source>&amp;Blocked</source>
         <translation>&amp;Várakoztatva</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="424"/>
+        <location filename="../src/mainwindow.cpp" line="427"/>
         <source>&amp;How?</source>
         <translation>&amp;Hogyan?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="429"/>
+        <location filename="../src/mainwindow.cpp" line="432"/>
         <source>&amp;Postpone</source>
         <translation>&amp;Elhalasztva</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="435"/>
+        <location filename="../src/mainwindow.cpp" line="438"/>
         <source>&amp;Comission</source>
         <translation>&amp;Delegálva</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="441"/>
+        <location filename="../src/mainwindow.cpp" line="444"/>
         <source>ma&amp;Ybe</source>
         <oldsource>&amp;Maybe</oldsource>
         <translation>&amp;Talán</translation>
@@ -432,6 +432,11 @@ edge eadd/remove (esc)</source>
         <location filename="../src/mainwindow.cpp" line="148"/>
         <source>Read-only file!</source>
         <translation>Csak olvasható fájl!</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="138"/>
+        <source>readonly </source>
+        <translation>csak olvasható </translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="159"/>

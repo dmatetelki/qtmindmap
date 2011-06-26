@@ -135,7 +135,7 @@ void MainWindow::openFile(const QString &fileName)
 
     fileInfo.isWritable() ?
          setTitle(m_fileName) :
-         setTitle(QString("readonly ").append(m_fileName));
+         setTitle(tr("readonly ").append(m_fileName));
 
     showMainToolbar();
 }
