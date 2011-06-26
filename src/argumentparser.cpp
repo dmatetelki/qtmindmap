@@ -27,7 +27,7 @@ void ArgumentParser::printUsage()
 }
 
 
-bool ArgumentParser::parseCmdLineArgs(bool &successful)
+bool ArgumentParser::parseCmdLineArgs()
 {
     QStringList cmdlineArgs = QCoreApplication::arguments();
     cmdlineArgs.removeFirst();
@@ -36,7 +36,6 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
     if (!cmdlineArgs.filter(help).isEmpty())
     {
         printUsage();
-        successful = true;
         return false;
     }
 
@@ -62,17 +61,13 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
         std::cerr << tr("Unkown options: ").toStdString()
                   << others.join(" ").toStdString() << std::endl;
         printUsage();
-        successful = false;
         return false;
     }
 
     if (others.size()==1)
     {
         if (others.first().at(0)=='-')
-        {
-            successful = false;
             return false;
-        }
 
         /// @note filecheck shall  be done elsewhere?
         m_filePath = others.first();
@@ -82,7 +77,6 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
             std::cerr << tr("File: ").toStdString() <<
                          m_filePath.toStdString() <<
                          tr(" does not exists.").toStdString() << std::endl;
-            successful = false;
             return false;
         }
         if (!fileInfo.isFile())
@@ -90,7 +84,6 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
             std::cerr << tr("File: ").toStdString() <<
                          m_filePath.toStdString() <<
                          tr(" is not a file.").toStdString() << std::endl;
-            successful = false;
             return false;
         }
         if (!fileInfo.isReadable())
@@ -98,7 +91,6 @@ bool ArgumentParser::parseCmdLineArgs(bool &successful)
             std::cerr << tr("File: ").toStdString() <<
                          m_filePath.toStdString() <<
                          tr(" is not readable.").toStdString() << std::endl;
-            successful = false;
             return false;
         }
     }

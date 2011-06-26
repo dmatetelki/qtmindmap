@@ -16,10 +16,9 @@ public:
         , m_filePath() {}
 
     /** parse QCoreApplication::arguments and put data to priv. members
-      * @param successful true if cannot continue but it is not an error
       * @return true if the program can continue
       */
-    bool parseCmdLineArgs(bool &successful);
+    bool parseCmdLineArgs();
 
     bool isSystemTray();
     bool isShowMinimized();

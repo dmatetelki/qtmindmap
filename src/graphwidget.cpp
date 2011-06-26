@@ -284,11 +284,23 @@ void GraphWidget::insertNode()
     node->setTextColor(m_activeNode->textColor());
     node->setHtml(QString(""));
     m_scene->addItem(node);
-    node->setPos(m_activeNode->sceneBoundingRect().center() +
-                 pos -
-                 node->boundingRect().center());
-    m_nodeList.append(node);
 
+    QPointF newPos(m_activeNode->sceneBoundingRect().center() +
+                   pos -
+                   node->boundingRect().center());
+    QRectF rect (scene()->sceneRect().topLeft(),
+                 scene()->sceneRect().bottomRight() -
+                 node->boundingRect().bottomRight());
+
+    if (!rect.contains(newPos))
+    {
+        delete node;
+        m_parent->statusBarMsg(tr("New node would be placed outside of the scene"));
+        return;
+    }
+
+    node->setPos(newPos);
+    m_nodeList.append(node);
     addEdge(m_activeNode, node);
 
     // set it the active Node and editable, so the user can edit it at once

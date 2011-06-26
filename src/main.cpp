@@ -1,4 +1,4 @@
-#include <stdlib.h> // EXIT_SUCCESS
+#include <stdlib.h> // EXIT_FAILURE
 #include <iostream> // cerr
 
 #include <QtGui>
@@ -32,9 +32,8 @@ int main(int argc, char *argv[])
 
     // parse args
     ArgumentParser argParser;
-    bool success;
-    if (!argParser.parseCmdLineArgs(success))
-        return success ? EXIT_SUCCESS : EXIT_FAILURE;
+    if (!argParser.parseCmdLineArgs())
+        return EXIT_FAILURE;
 
     // system tray?
     MainWindow w;

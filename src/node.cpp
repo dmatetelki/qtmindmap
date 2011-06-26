@@ -412,7 +412,6 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     case ItemPositionChange:
     {
         // Node is about to move, check borders
-
         QPointF newPos = value.toPointF();
 
         // the fence is reduced with the size of the node
