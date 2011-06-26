@@ -1,16 +1,17 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2011-05-24T11:24:26
-#
-#-------------------------------------------------
+
+#version check qt: some functions introduced in 4.6
+contains(QT_VERSION, ^4\\.[0-5]\\..*) {
+message("Cannot build Qt Creator with Qt version $${QT_VERSION}.")
+error("Use at least Qt 4.6.")
+}
 
 QT       += core gui svg xml
 
 CONFIG   += warn_on
 
-TARGET = qtmindmap
+TARGET    = qtmindmap
 
-TEMPLATE = app
+TEMPLATE  = app
 
 
 SOURCES += src/main.cpp \
@@ -28,11 +29,13 @@ HEADERS  += include/mainwindow.h \
             include/systemtray.h \
             include/argumentparser.h
 
-FORMS    += ui/mainwindow.ui
+FORMS        += ui/mainwindow.ui
 
-RESOURCES = images/qtmindmap.qrc
+RESOURCES     = images/qtmindmap.qrc
 
 TRANSLATIONS += lang/qtmindmap_hu.ts \
                 lang/qtmindmap_nb_NO.ts
 
-CODECFORTR = UTF-8
+CODECFORTR    = UTF-8
+
+DESTDIR = .
