@@ -347,8 +347,6 @@ void GraphWidget::removeNode()
 
 void GraphWidget::editNode()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (!m_activeNode)
     {
         m_parent->statusBarMsg(tr("No active node."));
@@ -494,29 +492,37 @@ void GraphWidget::removeEdge()
 
 void GraphWidget::nodeLostFocus()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_editingNode)
     {
         m_editingNode = false;
-        m_activeNode->setEditable(false);
-        m_activeNode->update();
+        if (m_activeNode)
+        {
+            m_activeNode->setEditable(false);
+            m_activeNode->update();
+        }
+        return;
     }
-    else if (m_edgeAdding)
+
+    if (m_edgeAdding)
     {
         m_edgeAdding = false;
         m_parent->statusBarMsg(tr("Edge adding cancelled."));
+        return;
     }
-    else if (m_edgeDeleting)
+
+    if (m_edgeDeleting)
     {
         m_edgeDeleting = false;
         m_parent->statusBarMsg(tr("Edge deleting cancelled."));
+        return;
     }
-    else if(m_showingNodeNumbers)
+
+    if(m_showingNodeNumbers)
     {
         m_hintNumber.clear();
         showingAllNodeNumbers(false);
         m_showingNodeNumbers = false;
+        return;
     }
 }
 
