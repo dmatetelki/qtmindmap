@@ -22,8 +22,8 @@ RDEPEND="${DEPEND}"
 src_configure() {
   eqmake4 "${S}"/qtmindmap-qtmindmap/qtmindmap.pro
 
-#   lrelease /qtmindmap-qtmindmap/lang/qtmindmap_hu.ts
-#   lrelease /qtmindmap-qtmindmap/lang/qtmindmap_nb_NO.ts
+  lrelease "${S}"/qtmindmap-qtmindmap/lang/qtmindmap_hu.ts
+  lrelease "${S}"/qtmindmap-qtmindmap/lang/qtmindmap_nb_NO.ts
 }
 
 src_install() {
@@ -32,7 +32,7 @@ src_install() {
     insinto /usr/bin
     doins qtmindmap
 
-#     insinto /usr/share/qtmindmap/i18n
-#     doins /qtmindmap-qtmindmap/lang/qtmindmap_hu.ts
-#     doins /qtmindmap-qtmindmap/lang/qtmindmap_nb_NO.ts
+    insinto /usr/share/qtmindmap/i18n
+    doins "${S}"/qtmindmap-qtmindmap/lang/qtmindmap_hu.qm
+    doins "${S}"/qtmindmap-qtmindmap/lang/qtmindmap_nb_NO.qm
 }

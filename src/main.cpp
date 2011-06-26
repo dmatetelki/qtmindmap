@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
     // translation
     QString locale = QLocale::system().name();
     QTranslator translator;
-    if (locale != "C" && !translator.load(QString("qtmindmap_") + locale))
+    if (locale != "C" && !translator.load(
+                QString("/usr/share/qtmindmap/i18n/qtmindmap_") + locale))
     {
         std::cerr << "No translation file for locale: "
                   << locale.toStdString()

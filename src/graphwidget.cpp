@@ -436,15 +436,15 @@ void GraphWidget::nodeColor()
     QColorDialog dialog(this);
     dialog.setWindowTitle(tr("Select node color"));
     dialog.setCurrentColor(m_activeNode->color());
-    if (dialog.exec())
+    if (!dialog.exec())
+        return;
+
+    QColor color = dialog.selectedColor();
+    foreach(Node *node, nodeList)
     {
-        QColor color = dialog.selectedColor();
-        foreach(Node *node, nodeList)
-        {
-            node->setColor(color);
-            foreach (Edge * edge, node->edgesToThis(false))
-                edge->setColor(color);
-        }
+        node->setColor(color);
+        foreach (Edge * edge, node->edgesToThis(false))
+            edge->setColor(color);
     }
 }
 
@@ -472,12 +472,12 @@ void GraphWidget::nodeTextColor()
     QColorDialog dialog(this);
     dialog.setWindowTitle(tr("Select text color"));
     dialog.setCurrentColor(m_activeNode->textColor());
-    if (dialog.exec())
-    {
-        QColor color = dialog.selectedColor();
-        foreach(Node *node, nodeList)
-            node->setTextColor(color);
-    }
+    if (!dialog.exec())
+        return;
+
+    QColor color = dialog.selectedColor();
+    foreach(Node *node, nodeList)
+        node->setTextColor(color);
 }
 
 void GraphWidget::addEdge()

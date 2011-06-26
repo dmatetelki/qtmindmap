@@ -100,14 +100,10 @@ void MainWindow::openFile(const QString &fileName)
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
         dialog.setDefaultSuffix("qmm");
 
-        if (dialog.exec())
-        {
-            m_fileName = dialog.selectedFiles().first();
-        }
-        else
-        {
+        if (!dialog.exec())
             return;
-        }
+
+        m_fileName = dialog.selectedFiles().first();
     }
     else
     {
@@ -162,17 +158,13 @@ bool MainWindow::saveFileAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("qmm");
 
-    if (dialog.exec())
-    {
-        m_fileName = dialog.selectedFiles().first();
-        setTitle(m_fileName);
-        saveFile();
-        return true;
-    }
-    else
-    {
-        return false; // cancelled
-    }
+    if (!dialog.exec())
+        return false;
+
+    m_fileName = dialog.selectedFiles().first();
+    setTitle(m_fileName);
+    saveFile();
+    return true;
 }
 
 bool MainWindow::closeFile()
