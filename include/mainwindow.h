@@ -31,7 +31,7 @@ public slots:
     // filemenu actions
     void newFile();
     void openFile(const QString &fileName = "");
-    void saveFile();
+    void saveFile(const bool &checkIfReadonly = true);
     bool saveFileAs();
     bool closeFile();
     void exportScene();

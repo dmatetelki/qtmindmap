@@ -136,10 +136,10 @@ void MainWindow::openFile(const QString &fileName)
     showMainToolbar();
 }
 
-void MainWindow::saveFile()
+void MainWindow::saveFile(const bool &checkIfReadonly)
 {
     QFileInfo fileInfo(m_fileName);
-    if (!fileInfo.isWritable())
+    if (checkIfReadonly && !fileInfo.isWritable())
     {
         statusBarMsg(tr("Read-only file!"));
         return;
@@ -162,8 +162,8 @@ bool MainWindow::saveFileAs()
         return false;
 
     m_fileName = dialog.selectedFiles().first();
+    saveFile(false);
     setTitle(m_fileName);
-    saveFile();
     return true;
 }
 
