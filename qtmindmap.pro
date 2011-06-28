@@ -31,11 +31,21 @@ HEADERS  += include/mainwindow.h \
 
 FORMS        += ui/mainwindow.ui
 
-RESOURCES     = images/qtmindmap.qrc
+RESOURCES += images/qtmindmap.qrc
 
-TRANSLATIONS += lang/qtmindmap_hu.ts \
-                lang/qtmindmap_nb_NO.ts
 
-CODECFORTR    = UTF-8
+# the translation hack
+include(lang/locale.pri)
 
-#DESTDIR = usr/bin
+INSTALLS += target translations desktop icon
+
+target.path = /usr/bin
+
+translations.files += .qm/i18n
+translations.path += /usr/share/qtmindmap
+
+desktop.files += qtmindmap.desktop
+desktop.path += /usr/share/applications
+
+icon.files += images/qtmindmap.svg
+icon.path += /usr/share/pixmaps
