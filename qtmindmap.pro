@@ -44,7 +44,7 @@ target.path = /usr/bin
 translations.files += .qm/i18n
 translations.path += /usr/share/qtmindmap
 
-desktop.files += qtmindmap.desktop
+desktop.files += other/qtmindmap.desktop
 desktop.path += /usr/share/applications
 
 icon.files += images/qtmindmap.svg
