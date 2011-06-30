@@ -6,6 +6,9 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QTextDocument>
 
+const QPointF Node::newNodeCenter = QPointF(4, 11.5);
+const QPointF Node::newNodeBottomRigth = QPointF(8, 23);
+
 const double Node::m_pi = 3.14159265358979323846264338327950288419717;
 const double Node::m_oneAndHalfPi = Node::m_pi * 1.5;
 const double Node::m_twoPi = Node::m_pi * 2.0;
@@ -233,14 +236,14 @@ void Node::insertPicture(const QString &picture)
     c.insertHtml(QString("<img src=").append(picture).
                  append(" width=15 height=15></img>"));
 
-    m_graph->contentChanged();
     foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+    emit nodeChanged();
 }
 
 QPointF Node::intersection(const QLineF &line, const bool &reverse) const
 {
 
-    /// @note What a shame, the following does not work,
+    /// @note What a pity, the following does not work,
     /// doing it with brute (unaccurate) force
 
     //    QPainterPath nodeShape(shape());
@@ -358,8 +361,9 @@ void Node::keyPressEvent(QKeyEvent *event)
 
         // not cursor movement: editing
         QGraphicsTextItem::keyPressEvent(event);
-        m_graph->contentChanged();
+
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+        emit nodeChanged();
     }
 
     ///@note leaving editing mode is done with esc, handled by graphwidget
@@ -432,8 +436,8 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     case ItemPositionHasChanged:
 
         // Notify parent, adjust edges that a move has happended.
-        m_graph->contentChanged();
         foreach (EdgeElement element, m_edgeList) element.edge->adjust();
+        emit nodeChanged();
         break;
 
     default:
@@ -445,7 +449,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_graph->nodeSelected(this);
+    emit nodeSelected();
 
     QGraphicsItem::mousePressEvent(event);
 }
@@ -453,7 +457,8 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
-    m_graph->editNode();
+
+    emit nodeEdited();
 }
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -464,7 +469,7 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 // notify parent so subtree can be moved too if necessary
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    m_graph->nodeMoved(event);
+    emit nodeMoved(event);
 }
 
 QPainterPath Node::shape () const
@@ -479,7 +484,8 @@ void Node::focusOutEvent(QFocusEvent *event)
 {
     Q_UNUSED(event);
     setEditable(false);
-    m_graph->nodeLostFocus();
+
+    emit nodeLostFocus();
 }
 
 // there is no such thing as modulo operator for double :P

@@ -22,11 +22,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_ui->actionAbout_QtMindMap, SIGNAL(activated()),
             this, SLOT(about()));
 
-
     // graphwidget is hided by def, new/open file will show it
     m_graphicsView = new GraphWidget(this);
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
+
+    connect(m_graphicsView, SIGNAL(contentChanged()),
+            this, SLOT(contentChanged()));
+
+    connect(m_graphicsView, SIGNAL(notification(QString)),
+            this, SLOT(statusBarMsg(QString)));
 
     // setup toolbars, don't show them
     setUpMainToolbar();
@@ -309,7 +314,7 @@ void MainWindow::setUpMainToolbar()
 
     m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
     connect(m_editNode, SIGNAL(activated()), m_graphicsView,
-            SLOT(editNode()));
+            SLOT(nodeEdited()));
 
     m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
     connect(m_scaleUpNode, SIGNAL(activated()), m_graphicsView,

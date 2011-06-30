@@ -6,3 +6,4 @@ moc_*
 qrc_*
 qtmindmap
 *.pro.user
+html/

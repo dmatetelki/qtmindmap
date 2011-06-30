@@ -40,26 +40,10 @@ GraphWidget::GraphWidget(MainWindow *parent)
 
 }
 
-void GraphWidget::nodeSelected(Node *node)
+void GraphWidget::nodeSelected()
 {
-    // leave hint mode
-    showingAllNodeNumbers(false);
-    m_showingNodeNumbers = false;
-
-    if (m_edgeAdding)
-    {
-        addEdge(m_activeNode, node);
-        m_edgeAdding = false;
-    }
-    else if (m_edgeDeleting)
-    {
-        removeEdge(m_activeNode, node);
-        m_edgeDeleting = false;
-    }
-    else
-    {
-        setActiveNode(node);
-    }
+    // if node == 0 then nodeSelected invoked after a signal from a Node
+    selectNode(dynamic_cast<Node*>(QObject::sender()));
 }
 
 void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
@@ -80,9 +64,9 @@ void GraphWidget::nodeMoved(QGraphicsSceneMouseEvent *event)
         node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
 }
 
-void GraphWidget::contentChanged(const bool &changed)
+void GraphWidget::nodeChanged()
 {
-    m_parent->contentChanged(changed);
+    emit contentChanged();
 }
 
 void GraphWidget::newScene()
@@ -105,13 +89,13 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        m_parent->statusBarMsg(tr("Couldn't read file."));
+        emit notification(tr("Couldn't read file."));
         return false;
     }
 
     if (!doc.setContent(&file))
     {
-        m_parent->statusBarMsg(tr("Couldn't parse XML file."));
+        emit notification(tr("Couldn't parse XML file."));
         file.close();
         return false;
     }
@@ -126,9 +110,8 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
         QDomElement e = nodes.item(i).toElement();
         if(!e.isNull())
         {
-            Node *node = new Node(this);
+            Node *node = nodeFactory();
             node->setHtml(e.attribute("htmlContent"));
-            m_scene->addItem(node);
             node->setPos(e.attribute("x").toFloat(),
                          e.attribute("y").toFloat());
             node->setScale(e.attribute("scale").toFloat(),sceneRect());
@@ -138,8 +121,6 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
             node->setTextColor(QColor(e.attribute("text_red").toFloat(),
                                       e.attribute("text_green").toFloat(),
                                       e.attribute("text_blue").toFloat()));
-
-            m_nodeList.append(node);
         }
     }
 
@@ -227,7 +208,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
-        m_parent->statusBarMsg(tr("Couldn't open file to write."));
+        emit notification(tr("Couldn't open file to write."));
         return;
     }
     QTextStream ts( &file );
@@ -235,7 +216,7 @@ void GraphWidget::writeContentToXmlFile(const QString &fileName)
     file.close();
 
     // show a statusBar message to the user
-    m_parent->statusBarMsg(tr("Saved."));
+    emit notification(tr("Saved."));
 }
 
 void GraphWidget::writeContentToPngFile(const QString &fileName)
@@ -257,7 +238,7 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
     img.save(fileName);
 
     // show a statusBar message to the user
-    m_parent->statusBarMsg(tr("MindMap exported as ") + fileName);
+    emit notification(tr("MindMap exported as ") + fileName);
 }
 
 void GraphWidget::insertNode()
@@ -266,7 +247,7 @@ void GraphWidget::insertNode()
 
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -278,36 +259,32 @@ void GraphWidget::insertNode()
 
     QPointF pos(length * cos(angle), length * sin(angle));
 
-    // add a new node which inherits the color and textColor
-    Node *node = new Node(this);
-    node->setColor(m_activeNode->color());
-    node->setTextColor(m_activeNode->textColor());
-    node->setHtml(QString(""));
-    m_scene->addItem(node);
-
     QPointF newPos(m_activeNode->sceneBoundingRect().center() +
-                   pos -
-                   node->boundingRect().center());
+                   pos - Node::newNodeCenter);
     QRectF rect (scene()->sceneRect().topLeft(),
-                 scene()->sceneRect().bottomRight() -
-                 node->boundingRect().bottomRight());
+                 scene()->sceneRect().bottomRight()
+                 - Node::newNodeBottomRigth);
 
     if (!rect.contains(newPos))
     {
-        delete node;
-        m_parent->statusBarMsg(tr("New node would be placed outside of the scene"));
+        emit notification(tr("New node would be placed outside of the scene"));
         return;
     }
 
+    // add a new node which inherits the color and textColor
+    Node *node = nodeFactory();
+    node->setColor(m_activeNode->color());
+    node->setTextColor(m_activeNode->textColor());
+    node->setHtml(QString(""));
     node->setPos(newPos);
-    m_nodeList.append(node);
+
     addEdge(m_activeNode, node);
 
     // set it the active Node and editable, so the user can edit it at once
     setActiveNode(node);
-    editNode();
+    nodeEdited();
 
-    contentChanged();
+    emit contentChanged();
 
     // it we are in hint mode, the numbers shall be re-calculated
     if (m_showingNodeNumbers)
@@ -318,13 +295,13 @@ void GraphWidget::removeNode()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
     if (m_activeNode == m_nodeList.first())
     {
-        m_parent->statusBarMsg(tr("Base node cannot be deleted."));
+        emit notification(tr("Base node cannot be deleted."));
         return;
     }
 
@@ -350,18 +327,18 @@ void GraphWidget::removeNode()
     }
 
     m_activeNode = 0;
-    contentChanged();
+    emit contentChanged();
 
     // it we are in hint mode, the numbers shall be re-calculated
     if (m_showingNodeNumbers)
         showNodeNumbers();
 }
 
-void GraphWidget::editNode()
+void GraphWidget::nodeEdited()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -384,7 +361,7 @@ void GraphWidget::scaleUp()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -405,7 +382,7 @@ void GraphWidget::scaleDown()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -426,7 +403,7 @@ void GraphWidget::nodeColor()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -462,7 +439,7 @@ void GraphWidget::nodeTextColor()
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -492,13 +469,13 @@ void GraphWidget::nodeTextColor()
 
 void GraphWidget::addEdge()
 {
-    m_parent->statusBarMsg(tr("Add edge: select destination node."));
+    emit notification(tr("Add edge: select destination node."));
     m_edgeAdding = true;
 }
 
 void GraphWidget::removeEdge()
 {
-    m_parent->statusBarMsg(tr("Delete edge: select other end-node."));
+    emit notification(tr("Delete edge: select other end-node."));
     m_edgeDeleting = true;
 }
 
@@ -518,14 +495,14 @@ void GraphWidget::nodeLostFocus()
     if (m_edgeAdding)
     {
         m_edgeAdding = false;
-        m_parent->statusBarMsg(tr("Edge adding cancelled."));
+        emit notification(tr("Edge adding cancelled."));
         return;
     }
 
     if (m_edgeDeleting)
     {
         m_edgeDeleting = false;
-        m_parent->statusBarMsg(tr("Edge deleting cancelled."));
+        emit notification(tr("Edge deleting cancelled."));
         return;
     }
 
@@ -558,7 +535,7 @@ void GraphWidget::insertPicture(const QString &picture)
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
@@ -595,7 +572,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
 
         if (!m_activeNode)
         {
-            m_parent->statusBarMsg(tr("No active node."));
+            emit notification(tr("No active node."));
             return;
         }
 
@@ -612,7 +589,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                     else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
                     else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
 
-                    contentChanged();
+                    emit contentChanged();
                 }
             }
             else // Move just the active Node.
@@ -626,7 +603,7 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
                 else if (event->key() == Qt::Key_Right)
                     m_activeNode->moveBy(20, 0);
 
-                contentChanged();
+                emit contentChanged();
             }
         }
         else // Move scene.
@@ -695,13 +672,13 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
 
         if (m_hintNode && m_showingNodeNumbers)
-            nodeSelected(m_hintNode);
+            selectNode(m_hintNode);
 
         break;
 
     case Qt::Key_F2:
 
-        editNode();
+        nodeEdited();
         break;
 
     case Qt::Key_Delete:
@@ -754,6 +731,45 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
     painter->drawRect(m_scene->sceneRect());
 }
 
+Node * GraphWidget::nodeFactory()
+{
+    Node *node = new Node(this);
+
+    connect(node, SIGNAL(nodeChanged()), this, SLOT(nodeChanged()));
+    connect(node, SIGNAL(nodeSelected()), this, SLOT(nodeSelected()));
+    connect(node, SIGNAL(nodeEdited()), this, SLOT(nodeEdited()));
+    connect(node, SIGNAL(nodeMoved(QGraphicsSceneMouseEvent*)),
+            this, SLOT(nodeMoved(QGraphicsSceneMouseEvent*)));
+    connect(node, SIGNAL(nodeLostFocus()), this, SLOT(nodeLostFocus()));
+
+    m_scene->addItem(node);
+    m_nodeList.append(node);
+
+    return node;
+}
+
+void GraphWidget::selectNode(Node *node)
+{
+    // leave hint mode
+    showingAllNodeNumbers(false);
+    m_showingNodeNumbers = false;
+
+    if (m_edgeAdding)
+    {
+        addEdge(m_activeNode, node);
+        m_edgeAdding = false;
+    }
+    else if (m_edgeDeleting)
+    {
+        removeEdge(m_activeNode, node);
+        m_edgeDeleting = false;
+    }
+    else
+    {
+        setActiveNode(node);
+    }
+}
+
 void GraphWidget::scaleView(qreal scaleFactor)
 {
     qreal factor = transform().scale(scaleFactor, scaleFactor).
@@ -786,20 +802,20 @@ void GraphWidget::addEdge(Node *source, Node *destination)
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
     if (destination == m_nodeList.first())
     {
-        m_parent->statusBarMsg(
+        emit notification(
                     tr("Root element cannot be an edge target."));
         return;
     }
 
     if (source->isConnected(destination))
     {
-        m_parent->statusBarMsg(
+        emit notification(
                     tr("There is already an edge between these two nodes."));
     }
     else
@@ -808,7 +824,7 @@ void GraphWidget::addEdge(Node *source, Node *destination)
         bool sec(false);
         if (!destination->edgesToThis().empty())
         {
-            m_parent->statusBarMsg(
+            emit notification(
                      tr("The graph is acyclic, edge added as secondary edge."));
             sec = true;
         }
@@ -821,7 +837,7 @@ void GraphWidget::addEdge(Node *source, Node *destination)
         edge->setSecondary(sec);
 
         m_scene->addItem(edge);
-        contentChanged();
+        emit contentChanged();
     }
 }
 
@@ -829,29 +845,26 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
 {
     if (!m_activeNode)
     {
-        m_parent->statusBarMsg(tr("No active node."));
+        emit notification(tr("No active node."));
         return;
     }
 
     if (!source->isConnected(destination))
     {
-        m_parent->statusBarMsg(tr("There no edge between these two nodes."));
+        emit notification(tr("There no edge between these two nodes."));
     }
     else
     {
         source->deleteEdge(destination);
-        contentChanged();
+        emit contentChanged();
     }
 }
 
 void GraphWidget::addFirstNode()
 {
-    Node *node = new Node(this);
+    Node *node = nodeFactory();
     node->setHtml(
                 QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
-    m_scene->addItem(node);
-
-    m_nodeList.append(node);
 
     m_activeNode = m_nodeList.first();
     m_activeNode->setBorder();
@@ -931,7 +944,7 @@ void GraphWidget::showingNodeNumbersBeginWithNumber(const int &prefix,
     }
     if (hit==1)
     {
-        nodeSelected(m_hintNode);
+        selectNode(m_hintNode);
     }
     else if (hit == 0)
     {

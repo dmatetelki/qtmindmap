@@ -12,6 +12,8 @@ class GraphWidget;
 
 class Node : public QGraphicsTextItem
 {
+    Q_OBJECT
+
 public:
 
     Node(GraphWidget *graphWidget = 0);
@@ -53,6 +55,17 @@ public:
 
     // returns with the biggest angle between the edges
     double calculateBiggestAngle() const;
+
+    static const QPointF newNodeCenter;
+    static const QPointF newNodeBottomRigth;
+
+signals:
+
+    void nodeChanged();
+    void nodeSelected();
+    void nodeEdited();
+    void nodeMoved(QGraphicsSceneMouseEvent *event);
+    void nodeLostFocus();
 
 protected:
 

@@ -20,13 +20,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+
     // instead of givin access to private m_ui
     void statusBarMsg(const QString &msg);
 
     // indicate that content has changed, modify title, save actions
     void contentChanged(const bool &changed = true);
-
-public slots:
 
     // filemenu actions
     void newFile();

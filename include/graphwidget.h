@@ -17,13 +17,6 @@ class GraphWidget : public QGraphicsView
 public:
     GraphWidget(MainWindow *parent = 0);
 
-    // node reports back it's state change
-    void nodeSelected(Node *node);
-    void nodeMoved(QGraphicsSceneMouseEvent *event);
-
-    // notify MainWindow: a node/edge has changed
-    void contentChanged(const bool &changed = true);
-
     // commands from MainWindow
     void newScene();
     void closeScene();
@@ -36,7 +29,6 @@ public slots:
     // commands from MainWindow's MainToolBar's actions
     void insertNode();
     void removeNode();
-    void editNode();
     void zoomIn();
     void zoomOut();
     void scaleUp();
@@ -45,11 +37,22 @@ public slots:
     void nodeTextColor();
     void addEdge();
     void removeEdge();
-    void nodeLostFocus();
     void hintMode();
 
     // bundled signals from statusIconsToolBar
     void insertPicture(const QString &picture);
+
+    // node reports back it's state change
+    void nodeChanged();
+    void nodeSelected();
+    void nodeEdited();
+    void nodeMoved(QGraphicsSceneMouseEvent *event);
+    void nodeLostFocus();
+
+signals:
+
+    void contentChanged();
+    void notification(const QString &msg);
 
 protected:
 
@@ -59,6 +62,10 @@ protected:
     void drawBackground(QPainter *painter, const QRectF &rect);
 
 private:
+
+    Node * nodeFactory();
+
+    void selectNode(Node *node);
 
     // zoom in/out of the view
     void scaleView(qreal scaleFactor);
