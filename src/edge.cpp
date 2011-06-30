@@ -12,7 +12,9 @@ const double Edge::m_twoPi = 2.0 * Edge::m_pi;
 const qreal Edge::m_arrowSize = 7;
 
 Edge::Edge(Node *sourceNode, Node *destNode)
-    : m_angle(-1)
+    : m_sourceNode(sourceNode)
+    , m_destNode(destNode)
+    , m_angle(-1)
     , m_color(0,0,0)
     , m_width(1)
     , m_secondary(false)
@@ -21,10 +23,6 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     setAcceptedMouseButtons(0);
     setZValue(1);
 
-    m_sourceNode = sourceNode;
-    m_destNode = destNode;
-    m_sourceNode->addEdge(this,true);
-    m_destNode->addEdge(this,false);
     adjust();
 }
 

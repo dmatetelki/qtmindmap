@@ -131,9 +131,13 @@ bool GraphWidget::readContentFromXmlFile(const QString &fileName)
         QDomElement e = edges.item(i).toElement();
         if(!e.isNull())
         {
-            Edge *edge = new Edge(
-                        m_nodeList[e.attribute("source").toInt()],
-                        m_nodeList[e.attribute("destination").toInt()]);
+            Node *source = m_nodeList[e.attribute("source").toInt()];
+            Node *destination = m_nodeList[e.attribute("destination").toInt()];
+
+            Edge *edge = new Edge(source, destination);
+            source->addEdge(edge, true);
+            destination->addEdge(edge, false);
+
             edge->setColor(QColor(e.attribute("red").toFloat(),
                                   e.attribute("green").toFloat(),
                                   e.attribute("blue").toFloat()));
@@ -829,6 +833,9 @@ void GraphWidget::addEdge(Node *source, Node *destination)
             sec = true;
         }
         Edge *edge = new Edge(source, destination);
+        source->addEdge(edge, true);
+        destination->addEdge(edge, false);
+
         edge->setColor(destination->color());
         edge->setWidth(destination->scale()*2 + 1);
 
