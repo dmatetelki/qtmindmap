@@ -812,6 +812,7 @@ void GraphWidget::addEdge(Node *source, Node *destination)
 
     if (destination == m_nodeList.first())
     {
+        setActiveNode(destination);
         emit notification(
                     tr("Root element cannot be an edge target."));
         return;
@@ -819,6 +820,7 @@ void GraphWidget::addEdge(Node *source, Node *destination)
 
     if (source->isConnected(destination))
     {
+        setActiveNode(destination);
         emit notification(
                     tr("There is already an edge between these two nodes."));
     }
@@ -842,8 +844,9 @@ void GraphWidget::addEdge(Node *source, Node *destination)
         // The Edge is secondary, because the Node already has a parent
         // (it is already a destination of another Edge)
         edge->setSecondary(sec);
-
         m_scene->addItem(edge);
+
+        setActiveNode(destination);
         emit contentChanged();
     }
 }
@@ -858,11 +861,13 @@ void GraphWidget::removeEdge(Node *source, Node *destination)
 
     if (!source->isConnected(destination))
     {
+        setActiveNode(destination);
         emit notification(tr("There no edge between these two nodes."));
     }
     else
     {
         source->deleteEdge(destination);
+        setActiveNode(destination);
         emit contentChanged();
     }
 }
@@ -893,7 +898,8 @@ void GraphWidget::setActiveNode(Node *node)
         m_activeNode->setBorder(false);
 
     m_activeNode = node;
-    m_activeNode->setBorder();
+    if (m_activeNode)
+        m_activeNode->setBorder();
 }
 
 // re-draw numbers

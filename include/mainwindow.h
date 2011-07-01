@@ -11,6 +11,11 @@ namespace Ui {
 class MainWindow;
 }
 
+/** Responsibilities:
+  * - taking care of the menu and toolbars, file operations
+  * - displaying info in statusbar
+  * - handle content change
+  */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

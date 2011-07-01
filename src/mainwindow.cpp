@@ -53,6 +53,7 @@ void MainWindow::statusBarMsg(const QString &msg)
 
 void MainWindow::contentChanged(const bool& changed)
 {
+    // only care about the transitions
     if (m_contentChanged == false && changed == true)
     {
         setWindowTitle(windowTitle().prepend("* "));
@@ -276,12 +277,14 @@ void MainWindow::quit()
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
-    m_contentChanged && !closeFile() ? event->ignore() : event->accept();
+    m_contentChanged && !closeFile() ?
+                event->ignore() :
+                event->accept();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    // incative action does not listen to signals
+    // inactive action does not listen to signals
     if (event->modifiers() & Qt::ControlModifier)
     {
         if (event->key() == Qt::Key_M)
