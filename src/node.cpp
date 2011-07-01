@@ -37,7 +37,13 @@ Node::Node(GraphWidget *parent) :
 Node::~Node()
 {
     // dtor of Edge will call removeEdgeFromList on booth nodes.
-    foreach (EdgeElement element, m_edgeList) delete element.edge;
+    foreach (EdgeElement element, m_edgeList)
+    {
+        Edge *tmp = element.edge;
+        tmp->sourceNode()->removeEdgeFromList(tmp);
+        tmp->destNode()->removeEdgeFromList(tmp);
+        delete tmp;
+    }
 }
 
 void Node::addEdge(Edge *edge, bool startsFromThisNode)
@@ -56,7 +62,10 @@ void Node::deleteEdge(Node *otherEnd)
          || (it->edge->sourceNode() == this &&
              it->edge->destNode() == otherEnd))
         {
-            delete it->edge;
+            Edge *tmp = it->edge;
+            tmp->sourceNode()->removeEdgeFromList(tmp);
+            tmp->destNode()->removeEdgeFromList(tmp);
+            delete tmp;
             return;
         }
     }

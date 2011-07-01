@@ -6,7 +6,7 @@ TRANSLATIONS = lang/qtmindmap_hu.ts \
 qmfiles = .qm/i18n/qtmindmap_hu.qm \
           .qm/i18n/qtmindmap_nb_NO.qm
 
-system(mkdir -p .qm/i18n && touch $${qmfiles})
+system(mkdir -p .qm/i18n)
 
 
 isEmpty(QMAKE_LRELEASE)
