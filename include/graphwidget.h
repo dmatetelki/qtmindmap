@@ -27,17 +27,17 @@ public:
 public slots:
 
     // commands from MainWindow's MainToolBar's actions
-    void insertNode();
-    void removeNode();
-    void zoomIn();
-    void zoomOut();
-    void scaleUp();
-    void scaleDown();
-    void nodeColor();
-    void nodeTextColor();
-    void addEdge();
-    void removeEdge();
-    void hintMode();
+    void insertNode(QKeyEvent *event = 0);
+    void removeNode(QKeyEvent *event = 0);
+    void zoomIn(QKeyEvent *event = 0);
+    void zoomOut(QKeyEvent *event = 0);
+    void scaleUp(QKeyEvent *event = 0);
+    void scaleDown(QKeyEvent *event = 0);
+    void nodeColor(QKeyEvent *event = 0);
+    void nodeTextColor(QKeyEvent *event = 0);
+    void addEdge(QKeyEvent *event = 0);
+    void removeEdge(QKeyEvent *event = 0);
+    void hintMode(QKeyEvent *event = 0);
 
     // bundled signals from statusIconsToolBar
     void insertPicture(const QString &picture);
@@ -45,7 +45,7 @@ public slots:
     // node reports back it's state change
     void nodeChanged();
     void nodeSelected();
-    void nodeEdited();
+    void nodeEdited(QKeyEvent *event = 0);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
     void nodeLostFocus();
 
@@ -67,7 +67,18 @@ private:
 
     void selectNode(Node *node);
 
-    // zoom in/out of the view
+    // keymap commands
+    void moveUp(QKeyEvent *event);
+    void moveDown(QKeyEvent *event);
+    void moveLeft(QKeyEvent *event);
+    void moveRight(QKeyEvent *event);
+    void increment(QKeyEvent *event);
+    void decrement(QKeyEvent *event);
+    void appendNumber(QKeyEvent *event);
+    void delNumber(QKeyEvent *event);
+    void applyNumber(QKeyEvent *event);
+
+    void move(const int &x, const int &y, QKeyEvent *event);
     void scaleView(qreal scaleFactor);
 
     // functions on the edges
@@ -97,8 +108,8 @@ private:
     bool m_editingNode;
     bool m_edgeAdding;
     bool m_edgeDeleting;
-    bool m_contentChanged;
-    QString m_fileName;
+
+    std::map<int, void(GraphWidget::*)(QKeyEvent *)> m_memberMap;
 
     static const QColor m_paper;
 };

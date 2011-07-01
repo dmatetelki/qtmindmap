@@ -25,7 +25,6 @@ GraphWidget::GraphWidget(MainWindow *parent)
     , m_editingNode(false)
     , m_edgeAdding(false)
     , m_edgeDeleting(false)
-    , m_contentChanged(false)
 {
     m_scene = new QGraphicsScene(this);
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -38,6 +37,69 @@ GraphWidget::GraphWidget(MainWindow *parent)
     setTransformationAnchor(AnchorUnderMouse);
     setMinimumSize(400, 400);
 
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Up, &GraphWidget::moveUp));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Down, &GraphWidget::moveDown));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Left, &GraphWidget::moveLeft));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Right, &GraphWidget::moveRight));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Plus, &GraphWidget::increment));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Minus, &GraphWidget::decrement));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_F, &GraphWidget::hintMode));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Insert, &GraphWidget::insertNode));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_0, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_1, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_2, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_3, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_4, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_5, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_6, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_7, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_8, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_9, &GraphWidget::appendNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_0, &GraphWidget::appendNumber));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_F2, &GraphWidget::nodeEdited));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Backspace, &GraphWidget::delNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Return, &GraphWidget::delNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Enter, &GraphWidget::applyNumber));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_Delete, &GraphWidget::removeNode));
+
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_A, &GraphWidget::addEdge));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_D, &GraphWidget::removeEdge));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_C, &GraphWidget::nodeColor));
+    m_memberMap.insert(std::pair<int, void(GraphWidget::*)(QKeyEvent *)>
+                       (Qt::Key_T, &GraphWidget::nodeTextColor));
 }
 
 void GraphWidget::nodeSelected()
@@ -245,8 +307,9 @@ void GraphWidget::writeContentToPngFile(const QString &fileName)
     emit notification(tr("MindMap exported as ") + fileName);
 }
 
-void GraphWidget::insertNode()
+void GraphWidget::insertNode(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     nodeLostFocus();
 
     if (!m_activeNode)
@@ -295,8 +358,9 @@ void GraphWidget::insertNode()
         showNodeNumbers();
 }
 
-void GraphWidget::removeNode()
+void GraphWidget::removeNode(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -338,8 +402,9 @@ void GraphWidget::removeNode()
         showNodeNumbers();
 }
 
-void GraphWidget::nodeEdited()
+void GraphWidget::nodeEdited(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -351,18 +416,21 @@ void GraphWidget::nodeEdited()
     m_scene->setFocusItem(m_activeNode);
 }
 
-void GraphWidget::zoomIn()
+void GraphWidget::zoomIn(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     scaleView(qreal(1.2));
 }
 
-void GraphWidget::zoomOut()
+void GraphWidget::zoomOut(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     scaleView(qreal(1 / 1.2));
 }
 
-void GraphWidget::scaleUp()
+void GraphWidget::scaleUp(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -382,8 +450,9 @@ void GraphWidget::scaleUp()
     }
 }
 
-void GraphWidget::scaleDown()
+void GraphWidget::scaleDown(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -403,8 +472,9 @@ void GraphWidget::scaleDown()
     }
 }
 
-void GraphWidget::nodeColor()
+void GraphWidget::nodeColor(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -439,8 +509,9 @@ void GraphWidget::nodeColor()
     }
 }
 
-void GraphWidget::nodeTextColor()
+void GraphWidget::nodeTextColor(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     if (!m_activeNode)
     {
         emit notification(tr("No active node."));
@@ -471,14 +542,16 @@ void GraphWidget::nodeTextColor()
         node->setTextColor(color);
 }
 
-void GraphWidget::addEdge()
+void GraphWidget::addEdge(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     emit notification(tr("Add edge: select destination node."));
     m_edgeAdding = true;
 }
 
-void GraphWidget::removeEdge()
+void GraphWidget::removeEdge(QKeyEvent *event)
 {
+    Q_UNUSED(event)
     emit notification(tr("Delete edge: select other end-node."));
     m_edgeDeleting = true;
 }
@@ -519,8 +592,10 @@ void GraphWidget::nodeLostFocus()
     }
 }
 
-void GraphWidget::hintMode()
+void GraphWidget::hintMode(QKeyEvent *event)
 {
+    Q_UNUSED(event)
+
     // vimperator-style node selection with keys.
     // show or hide the numbers if we enter/leave this mode.
     m_showingNodeNumbers = !m_showingNodeNumbers;
@@ -565,154 +640,9 @@ void GraphWidget::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    switch (event->key())
-    {
-
-    // move
-    case Qt::Key_Up:
-    case Qt::Key_Down:
-    case Qt::Key_Left:
-    case Qt::Key_Right:
-
-        if (!m_activeNode)
-        {
-            emit notification(tr("No active node."));
-            return;
-        }
-
-        if (event->modifiers() &  Qt::ControlModifier)
-        {
-            // Move whole subtree of active Node.
-            if (event->modifiers() &  Qt::ShiftModifier)
-            {
-                QList <Node *> nodeList = m_activeNode->subtree();
-                foreach(Node *node, nodeList)
-                {
-                    if (event->key() == Qt::Key_Up) node->moveBy(0, -20);
-                    else if (event->key() == Qt::Key_Down) node->moveBy(0, 20);
-                    else if (event->key() == Qt::Key_Left) node->moveBy(-20, 0);
-                    else if (event->key() == Qt::Key_Right) node->moveBy(20, 0);
-
-                    emit contentChanged();
-                }
-            }
-            else // Move just the active Node.
-            {
-                if (event->key() == Qt::Key_Up)
-                    m_activeNode->moveBy(0, -20);
-                else if (event->key() == Qt::Key_Down)
-                    m_activeNode->moveBy(0, 20);
-                else if (event->key() == Qt::Key_Left)
-                    m_activeNode->moveBy(-20, 0);
-                else if (event->key() == Qt::Key_Right)
-                    m_activeNode->moveBy(20, 0);
-
-                emit contentChanged();
-            }
-        }
-        else // Move scene.
-        {
-            QGraphicsView::keyPressEvent(event);
-        }
-        break;
-
-    case Qt::Key_Plus:
-
-        event->modifiers() & Qt::ControlModifier ?
-            scaleUp() :
-            zoomIn();
-
-        break;
-
-    case Qt::Key_Minus:
-
-        event->modifiers() & Qt::ControlModifier ?
-            scaleDown() :
-            zoomOut();
-        break;
-
-    // Hint mode: select a Node vimperator-style.
-    case Qt::Key_F:
-
-        hintMode();
-        break;
-
-    case Qt::Key_Insert:
-        insertNode();
-
-        break;
-
-    // Used in hint mode, to select node with numbers/backspace/enter.
-    case Qt::Key_0:
-    case Qt::Key_1:
-    case Qt::Key_2:
-    case Qt::Key_3:
-    case Qt::Key_4:
-    case Qt::Key_5:
-    case Qt::Key_6:
-    case Qt::Key_7:
-    case Qt::Key_8:
-    case Qt::Key_9:
-        if (!m_showingNodeNumbers)
-            break;
-
-        m_hintNumber.append(QString::number(event->key()-48));
-        showingAllNodeNumbers(false);
-        showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
-
-        break;
-
-    // Delete one letter back in hint mode.
-    case Qt::Key_Backspace:
-        if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
-            break;
-
-        m_hintNumber.remove(m_hintNumber.length()-1,1);
-        showNodeNumbers();
-        break;
-
-    // In hint mode select the suggested Node.
-    case Qt::Key_Return:
-    case Qt::Key_Enter:
-
-        if (m_hintNode && m_showingNodeNumbers)
-            selectNode(m_hintNode);
-
-        break;
-
-    case Qt::Key_F2:
-
-        nodeEdited();
-        break;
-
-    case Qt::Key_Delete:
-
-        removeNode();
-        break;
-
-    case Qt::Key_A:
-
-        addEdge();
-        break;
-
-    case Qt::Key_D:
-
-        removeEdge();
-        break;
-
-    case Qt::Key_C:
-
-        nodeColor();
-        break;
-
-    case Qt::Key_T:
-
-        nodeTextColor();
-        break;
-
-    default:
+    m_memberMap.find(event->key()) != m_memberMap.end() ?
+        (this->*m_memberMap[event->key()])(event) :
         QGraphicsView::keyPressEvent(event);
-    }
 }
 
 void GraphWidget::wheelEvent(QWheelEvent *event)
@@ -771,6 +701,100 @@ void GraphWidget::selectNode(Node *node)
     else
     {
         setActiveNode(node);
+    }
+}
+
+void GraphWidget::moveUp(QKeyEvent *event)
+{
+    move(-20,0,event);
+}
+
+void GraphWidget::moveDown(QKeyEvent *event)
+{
+    move(20,0,event);
+}
+
+void GraphWidget::moveLeft(QKeyEvent *event)
+{
+    move(0,-20,event);
+}
+
+void GraphWidget::moveRight(QKeyEvent *event)
+{
+    move(0,20,event);
+}
+
+void GraphWidget::increment(QKeyEvent *event)
+{
+    Q_UNUSED(event)
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        scaleDown() :
+        zoomOut();
+}
+
+void GraphWidget::decrement(QKeyEvent *event)
+{
+    Q_UNUSED(event)
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        scaleDown() :
+        zoomOut();
+}
+
+void GraphWidget::appendNumber(QKeyEvent *event)
+{
+    if (!m_showingNodeNumbers)
+        return;
+
+    m_hintNumber.append(QString::number(event->key()-48));
+    showingAllNodeNumbers(false);
+    showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
+}
+
+void GraphWidget::delNumber(QKeyEvent *event)
+{
+    Q_UNUSED(event)
+    if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
+        return;
+
+    m_hintNumber.remove(m_hintNumber.length()-1,1);
+    showNodeNumbers();
+}
+
+void GraphWidget::applyNumber(QKeyEvent *event)
+{
+    Q_UNUSED(event)
+    if (m_hintNode && m_showingNodeNumbers)
+        selectNode(m_hintNode);
+}
+
+void GraphWidget::move(const int &x, const int &y, QKeyEvent *event)
+{
+    if (!m_activeNode)
+    {
+        emit notification(tr("No active node."));
+        return;
+    }
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    {
+        // Move whole subtree of active Node.
+        if (QApplication::keyboardModifiers() &  Qt::ShiftModifier)
+        {
+            QList <Node *> nodeList = m_activeNode->subtree();
+            foreach(Node *node, nodeList)
+                node->moveBy(x, y);
+
+            emit contentChanged();
+        }
+        else // Move just the active Node.
+        {
+            m_activeNode->moveBy(x, y);
+            emit contentChanged();
+        }
+    }
+    else // Move scene.
+    {
+        QGraphicsView::keyPressEvent(event);
     }
 }
 
