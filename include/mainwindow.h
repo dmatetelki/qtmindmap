@@ -12,9 +12,10 @@ class MainWindow;
 }
 
 /** Responsibilities:
-  * - taking care of the menu and toolbars, file operations
-  * - displaying info in statusbar
-  * - handle content change
+  * - Menu and toolbars, file operations
+  * - Display info in statusbar
+  * - Handle content change notifications
+  * - Pass unhandled key events to GraphWidget
   */
 class MainWindow : public QMainWindow
 {

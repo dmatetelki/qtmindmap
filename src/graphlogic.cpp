@@ -2,6 +2,8 @@
 
 #include <QtXml>
 #include <QColorDialog>
+#include <QApplication>
+#include <QScrollBar>
 
 GraphLogic::GraphLogic(GraphWidget *parent)
     : QObject(parent)
@@ -14,7 +16,84 @@ GraphLogic::GraphLogic(GraphWidget *parent)
     , m_edgeAdding(false)
     , m_edgeDeleting(false)
 {
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Insert, &GraphLogic::insertNode));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Delete, &GraphLogic::removeNode));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_F2, &GraphLogic::nodeEdited));
 
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_C, &GraphLogic::nodeColor));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_T, &GraphLogic::nodeTextColor));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_A, &GraphLogic::addEdge));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_D, &GraphLogic::removeEdge));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_F, &GraphLogic::hintMode));
+
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Up, &GraphLogic::moveUp));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Down, &GraphLogic::moveDown));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Left, &GraphLogic::moveLeft));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Right, &GraphLogic::moveRight));
+
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Backspace, &GraphLogic::delNumber));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Return, &GraphLogic::applyNumber));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Enter, &GraphLogic::applyNumber));
+    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
+                       (Qt::Key_Delete, &GraphLogic::removeNode));
+}
+
+bool GraphLogic::processKeyEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        nodeLostFocus();
+        return true;
+    }
+
+    if (m_editingNode)
+    {
+        m_activeNode->keyPressEvent(event);
+        return true;
+    }
+
+    if (event->key() == Qt::Key_Plus &&
+        event->modifiers() & Qt::ControlModifier)
+    {
+        scaleUp();
+        return true;
+    }
+    if (event->key() == Qt::Key_Minus &&
+        event->modifiers() & Qt::ControlModifier)
+    {
+        scaleDown();
+        return true;
+    }
+
+    if (m_showingNodeNumbers &&
+            event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9)
+    {
+        appendNumber(event->key()-48);
+        return true;
+    }
+
+    if (m_memberMap.find(event->key()) != m_memberMap.end())
+    {
+        (this->*m_memberMap[event->key()])();
+        return true;
+    }
+
+    return false;
 }
 
 void GraphLogic::addFirstNode()
@@ -36,17 +115,6 @@ void GraphLogic::removeAllNodes()
     m_activeNode = 0;
     m_hintNode = 0;
 }
-
-void GraphLogic::setActiveNode(Node *node)
-{
-    if (m_activeNode!=0)
-        m_activeNode->setBorder(false);
-
-    m_activeNode = node;
-    if (m_activeNode)
-        m_activeNode->setBorder();
-}
-
 
 bool GraphLogic::readContentFromXmlFile(const QString &fileName)
 {
@@ -200,26 +268,16 @@ void GraphLogic::writeContentToPngFile(const QString &fileName)
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Strange that I have to set this, and scene->render() does not do this
-    m_graphWidget->scene()->setBackgroundBrush(GraphWidget::m_paper);
+    m_graphWidget->scene()->setBackgroundBrush(GraphWidget::m_paperColor);
 
     m_graphWidget->scene()->render(&painter);
-    painter.setBackground(GraphWidget::m_paper);
+    painter.setBackground(GraphWidget::m_paperColor);
     painter.end();
 
     img.save(fileName);
 
     // show a statusBar message to the user
     emit notification(tr("MindMap exported as ") + fileName);
-}
-
-bool GraphLogic::editing() const
-{
-    return m_editingNode;
-}
-
-void GraphLogic::passKey(QKeyEvent *event)
-{
-    m_activeNode->keyPressEvent(event);
 }
 
 void GraphLogic::insertNode()
@@ -272,7 +330,7 @@ void GraphLogic::insertNode()
         showNodeNumbers();
 }
 
-void GraphLogic::removeNode(const bool &subtree)
+void GraphLogic::removeNode()
 {
     if (!m_activeNode)
     {
@@ -288,7 +346,8 @@ void GraphLogic::removeNode(const bool &subtree)
 
     // remove just the active Node or it's subtree too?
     QList <Node *> nodeList;
-    if (subtree)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
         nodeList = m_activeNode->subtree();
     }
@@ -314,7 +373,7 @@ void GraphLogic::removeNode(const bool &subtree)
         showNodeNumbers();
 }
 
-void GraphLogic::scaleUp(const bool &subtree)
+void GraphLogic::nodeEdited()
 {
     if (!m_activeNode)
     {
@@ -322,7 +381,21 @@ void GraphLogic::scaleUp(const bool &subtree)
         return;
     }
 
-    if (subtree)
+    m_editingNode = true;
+    m_activeNode->setEditable();
+    m_graphWidget->scene()->setFocusItem(m_activeNode);
+}
+
+void GraphLogic::scaleUp()
+{
+    if (!m_activeNode)
+    {
+        emit notification(tr("No active node."));
+        return;
+    }
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
         QList <Node *> nodeList = m_activeNode->subtree();
         foreach(Node *node, nodeList)
@@ -334,7 +407,7 @@ void GraphLogic::scaleUp(const bool &subtree)
     }
 }
 
-void GraphLogic::scaleDown(const bool &subtree)
+void GraphLogic::scaleDown()
 {
     if (!m_activeNode)
     {
@@ -342,7 +415,8 @@ void GraphLogic::scaleDown(const bool &subtree)
         return;
     }
 
-    if (subtree)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
         QList <Node *> nodeList = m_activeNode->subtree();
         foreach(Node *node, nodeList)
@@ -354,40 +428,40 @@ void GraphLogic::scaleDown(const bool &subtree)
     }
 }
 
-void GraphLogic::setNodeColor(const QColor &color, const bool &subtree)
+void GraphLogic::nodeColor()
 {
-    QList <Node *> nodeList;
-    if (subtree)
+    if (!m_activeNode)
     {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
+        emit notification(tr("No active node."));
+        return;
     }
 
-    foreach(Node *node, nodeList)
-    {
-        node->setColor(color);
-        foreach (Edge * edge, node->edgesToThis(false))
-            edge->setColor(color);
-    }
+    // popup a color selector dialogm def color is the curr one.
+    QColorDialog dialog(m_graphWidget);
+    dialog.setWindowTitle(tr("Select node color"));
+    dialog.setCurrentColor(m_activeNode->color());
+    if (!dialog.exec())
+        return;
+
+    setNodeColor(dialog.selectedColor());
 }
 
-void GraphLogic::setNodeTextColor(const QColor &color, const bool &subtree)
+void GraphLogic::nodeTextColor()
 {
-    QList <Node *> nodeList;
-    if (subtree)
+    if (!m_activeNode)
     {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
+        emit notification(tr("No active node."));
+        return;
     }
 
-    foreach(Node *node, nodeList)
-        node->setTextColor(color);
+    // popup a color selector dialogm def color is the curr one.
+    QColorDialog dialog(m_graphWidget);
+    dialog.setWindowTitle(tr("Select text color"));
+    dialog.setCurrentColor(m_activeNode->textColor());
+    if (!dialog.exec())
+        return;
+
+    setNodeTextColor(dialog.selectedColor());
 }
 
 void GraphLogic::addEdge()
@@ -417,7 +491,6 @@ void GraphLogic::hintMode()
     showNodeNumbers();
 }
 
-
 void GraphLogic::insertPicture(const QString &picture)
 {
     if (!m_activeNode)
@@ -429,91 +502,6 @@ void GraphLogic::insertPicture(const QString &picture)
     m_activeNode->insertPicture(picture);
 }
 
-void GraphLogic::move(const int &x, const int &y, const bool &subtree)
-{
-    if (!m_activeNode)
-    {
-        emit notification(tr("No active node."));
-        return;
-    }
-
-    if (subtree)
-    {
-        QList <Node *> nodeList = m_activeNode->subtree();
-        foreach(Node *node, nodeList)
-            node->moveBy(x, y);
-
-        emit contentChanged();
-    }
-    else // Move just the active Node.
-    {
-        m_activeNode->moveBy(x, y);
-        emit contentChanged();
-    }
-}
-
-void GraphLogic::appendNumber(const int &num)
-{
-    if (!m_showingNodeNumbers)
-        return;
-
-    m_hintNumber.append(QString::number(num));
-
-    showingAllNodeNumbers(false);
-    showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
-}
-
-void GraphLogic::delNumber()
-{
-    if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
-        return;
-
-    m_hintNumber.remove(m_hintNumber.length()-1,1);
-    showNodeNumbers();
-}
-
-void GraphLogic::applyNumber()
-{
-    if (m_hintNode && m_showingNodeNumbers)
-        selectNode(m_hintNode);
-}
-
-void GraphLogic::nodeColor(const bool &subtree)
-{
-    if (!m_activeNode)
-    {
-        emit notification(tr("No active node."));
-        return;
-    }
-
-    // popup a color selector dialogm def color is the curr one.
-    QColorDialog dialog(m_graphWidget);
-    dialog.setWindowTitle(tr("Select node color"));
-    dialog.setCurrentColor(m_activeNode->color());
-    if (!dialog.exec())
-        return;
-
-    setNodeColor(dialog.selectedColor(), subtree);
-}
-
-void GraphLogic::nodeTextColor(const bool &subtree)
-{
-    if (!m_activeNode)
-    {
-        emit notification(tr("No active node."));
-        return;
-    }
-
-    // popup a color selector dialogm def color is the curr one.
-    QColorDialog dialog(m_graphWidget);
-    dialog.setWindowTitle(tr("Select text color"));
-    dialog.setCurrentColor(m_activeNode->textColor());
-    if (!dialog.exec())
-        return;
-
-    setNodeTextColor(dialog.selectedColor(), subtree);
-}
-
 void GraphLogic::nodeChanged()
 {
     emit contentChanged();
@@ -523,20 +511,6 @@ void GraphLogic::nodeSelected()
 {
     // if node == 0 then nodeSelected invoked after a signal from a Node
     selectNode(dynamic_cast<Node*>(QObject::sender()));
-}
-
-void GraphLogic::nodeEdited(QKeyEvent *event)
-{
-    Q_UNUSED(event)
-    if (!m_activeNode)
-    {
-        emit notification(tr("No active node."));
-        return;
-    }
-
-    m_editingNode = true;
-    m_activeNode->setEditable();
-    m_graphWidget->scene()->setFocusItem(m_activeNode);
 }
 
 void GraphLogic::nodeMoved(QGraphicsSceneMouseEvent *event)
@@ -556,7 +530,6 @@ void GraphLogic::nodeMoved(QGraphicsSceneMouseEvent *event)
     foreach(Node *node, nodeList)
         node->setPos(node->pos() + event->scenePos() - event->lastScenePos());
 }
-
 
 void GraphLogic::nodeLostFocus()
 {
@@ -592,6 +565,123 @@ void GraphLogic::nodeLostFocus()
         m_showingNodeNumbers = false;
         return;
     }
+}
+
+void GraphLogic::moveUp()
+{
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        move(0,-20) :
+        m_graphWidget->verticalScrollBar()->setValue(
+                    m_graphWidget->verticalScrollBar()->value()-20);
+}
+
+void GraphLogic::moveDown()
+{
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        move(0,20) :
+                m_graphWidget->verticalScrollBar()->setValue(
+                            m_graphWidget->verticalScrollBar()->value()+20);
+}
+
+void GraphLogic::moveLeft()
+{
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        move(-20,0) :
+                m_graphWidget->horizontalScrollBar()->setValue(
+                            m_graphWidget->horizontalScrollBar()->value()-20);
+}
+
+void GraphLogic::moveRight()
+{
+    QApplication::keyboardModifiers() & Qt::ControlModifier ?
+        move(20,0) :
+                m_graphWidget->horizontalScrollBar()->setValue(
+                            m_graphWidget->horizontalScrollBar()->value()+20);
+}
+
+void GraphLogic::move(const int &x, const int &y)
+{
+    if (!m_activeNode)
+    {
+        emit notification(tr("No active node."));
+        return;
+    }
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        QList <Node *> nodeList = m_activeNode->subtree();
+        foreach(Node *node, nodeList)
+            node->moveBy(x, y);
+
+        emit contentChanged();
+    }
+    else // Move just the active Node.
+    {
+        m_activeNode->moveBy(x, y);
+        emit contentChanged();
+    }
+}
+
+void GraphLogic::setNodeColor(const QColor &color)
+{
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+    {
+        node->setColor(color);
+        foreach (Edge * edge, node->edgesToThis(false))
+            edge->setColor(color);
+    }
+}
+
+void GraphLogic::setNodeTextColor(const QColor &color)
+{
+    QList <Node *> nodeList;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        nodeList = m_activeNode->subtree();
+    }
+    else
+    {
+        nodeList.push_back(m_activeNode);
+    }
+
+    foreach(Node *node, nodeList)
+        node->setTextColor(color);
+}
+
+void GraphLogic::appendNumber(const int &num)
+{
+    m_hintNumber.append(QString::number(num));
+
+    showingAllNodeNumbers(false);
+    showingNodeNumbersBeginWithNumber(m_hintNumber.toInt(), true);
+}
+
+void GraphLogic::delNumber()
+{
+    if (!m_showingNodeNumbers && m_hintNumber.isEmpty())
+        return;
+
+    m_hintNumber.remove(m_hintNumber.length()-1,1);
+    showNodeNumbers();
+}
+
+void GraphLogic::applyNumber()
+{
+    if (m_hintNode && m_showingNodeNumbers)
+        selectNode(m_hintNode);
 }
 
 Node * GraphLogic::nodeFactory()
@@ -631,6 +721,16 @@ void GraphLogic::selectNode(Node *node)
     {
         setActiveNode(node);
     }
+}
+
+void GraphLogic::setActiveNode(Node *node)
+{
+    if (m_activeNode!=0)
+        m_activeNode->setBorder(false);
+
+    m_activeNode = node;
+    if (m_activeNode)
+        m_activeNode->setBorder();
 }
 
 QList<Edge *> GraphLogic::allEdges() const

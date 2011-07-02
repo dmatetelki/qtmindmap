@@ -27,10 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
 
-    connect(m_graphicsView, SIGNAL(contentChanged()),
+    connect(m_graphicsView->graphLogic(), SIGNAL(contentChanged()),
             this, SLOT(contentChanged()));
 
-    connect(m_graphicsView, SIGNAL(notification(QString)),
+    connect(m_graphicsView->graphLogic(), SIGNAL(notification(QString)),
             this, SLOT(statusBarMsg(QString)));
 
     // setup toolbars, don't show them
@@ -120,7 +120,7 @@ void MainWindow::openFile(const QString &fileName)
     if (!fileInfo.isWritable())
         statusBarMsg(tr("Read-only file!"));
 
-    if (!m_graphicsView->readContentFromXmlFile(m_fileName))
+    if (!m_graphicsView->graphLogic()->readContentFromXmlFile(m_fileName))
     {
         m_fileName = currFilename;
         return;
@@ -151,7 +151,7 @@ void MainWindow::saveFile(const bool &checkIfReadonly)
         return;
     }
 
-    m_graphicsView->writeContentToXmlFile(m_fileName);
+    m_graphicsView->graphLogic()->writeContentToXmlFile(m_fileName);
     contentChanged(false);
 }
 
@@ -233,7 +233,8 @@ void MainWindow::exportScene()
 
      if (dialog.exec())
      {
-         m_graphicsView->writeContentToPngFile(dialog.selectedFiles().first());
+         m_graphicsView->graphLogic()->writeContentToPngFile(
+                                            dialog.selectedFiles().first());
      }
 }
 
@@ -244,9 +245,11 @@ void MainWindow::about()
     msgBox.setText(tr("MindMap software written in Qt."));
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setInformativeText(tr("Homepage:").
-                              append(" <a href=\"https://gitorious.org/qtmindmap\">https://gitorious.org/qtmindmap</a><br><br>").
-                              append(tr("Report bugs to:")).
-                              append(" <a href=\"mailto:denes.matetelki@gmail.com\">denes.matetelki@gmail.com</a>"));
+                    append(" <a href=\"https://gitorious.org/qtmindmap\">" \
+                           "https://gitorious.org/qtmindmap</a><br><br>").
+                    append(tr("Report bugs to:")).
+                    append(" <a href=\"mailto:denes.matetelki@gmail.com\">" \
+                           "denes.matetelki@gmail.com</a>"));
     QPixmap pixMap(":/qtmindmap.svg");
     msgBox.setIconPixmap(pixMap.scaled(50,50));
     msgBox.exec();
@@ -308,38 +311,38 @@ void MainWindow::setUpMainToolbar()
 
     /// @bug or a feature? no underline here
     m_addNode = new QAction(tr("Add node (ins)"), this);
-    connect(m_addNode, SIGNAL(activated()), m_graphicsView,
+    connect(m_addNode, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(insertNode()));
 
     m_delNode = new QAction(tr("Del node (del)"), this);
-    connect(m_delNode, SIGNAL(activated()), m_graphicsView,
+    connect(m_delNode, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(removeNode()));
 
     m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
-    connect(m_editNode, SIGNAL(activated()), m_graphicsView,
-            SLOT(editNode()));
+    connect(m_editNode, SIGNAL(activated()), m_graphicsView->graphLogic(),
+            SLOT(nodeEdited()));
 
     m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
-    connect(m_scaleUpNode, SIGNAL(activated()), m_graphicsView,
+    connect(m_scaleUpNode, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(scaleUp()));
     m_scaleDownNode = new QAction(tr("ScaleDown Node (Ctrl -)"), this);
-    connect(m_scaleDownNode, SIGNAL(activated()), m_graphicsView,
+    connect(m_scaleDownNode, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(scaleDown()));
 
     m_nodeColor = new QAction(tr("Node color (c)"), this);
-    connect(m_nodeColor, SIGNAL(activated()), m_graphicsView,
+    connect(m_nodeColor, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(nodeColor()));
 
     m_nodeTextColor = new QAction(tr("Node textcolor (t)"), this);
-    connect(m_nodeTextColor, SIGNAL(activated()), m_graphicsView,
+    connect(m_nodeTextColor, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(nodeTextColor()));
 
     m_addEdge = new QAction(tr("Add edge (a)"), this);
-    connect(m_addEdge, SIGNAL(activated()), m_graphicsView,
+    connect(m_addEdge, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(addEdge()));
 
     m_delEdge = new QAction(tr("Del edge (d)"), this);
-    connect(m_delEdge, SIGNAL(activated()), m_graphicsView,
+    connect(m_delEdge, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(removeEdge()));
 
     m_moveNode = new QAction(tr("Move node\n(Ctrl cursor, drag)"), this);
@@ -357,11 +360,11 @@ void MainWindow::setUpMainToolbar()
             SLOT(zoomOut()));
 
     m_esc = new QAction(tr("Leave editing,\nedge eadd/remove (esc)"), this);
-    connect(m_esc, SIGNAL(activated()), m_graphicsView,
-            SLOT(nodeLoseFocus()));
+    connect(m_esc, SIGNAL(activated()), m_graphicsView->graphLogic(),
+            SLOT(nodeLostFocus()));
 
     m_hintMode = new QAction(tr("Hint mode (f)"), this);
-    connect(m_hintMode, SIGNAL(activated()), m_graphicsView,
+    connect(m_hintMode, SIGNAL(activated()), m_graphicsView->graphLogic(),
             SLOT(hintMode()));
 
     m_showMainToolbar = new QAction(tr("Show main toolbar\n(Ctrl m)"), this);
@@ -448,7 +451,7 @@ void MainWindow::setUpStatusIconToolbar()
     m_signalMapper->setMapping(m_maybe, ":/dialog-information.svg");
 
     connect(m_signalMapper, SIGNAL(mapped(const QString &)),
-            m_graphicsView, SLOT(insertPicture(const QString &)));
+            m_graphicsView->graphLogic(), SLOT(insertPicture(const QString &)));
 
     m_ui->statusIcons_toolBar->addAction(m_insertIcon);
     m_ui->statusIcons_toolBar->addAction(m_doIt);

@@ -17,43 +17,31 @@ public:
 
     explicit GraphLogic(GraphWidget *parent = 0);
 
-    // functions on nodes
+    bool processKeyEvent(QKeyEvent *event);
     void addFirstNode();
     void removeAllNodes();
-    void setActiveNode(Node *node);
 
     bool readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
 
-    bool editing() const;
-    void passKey(QKeyEvent *event = 0);
-
-    // undo-able commands:
-    void insertNode();
-    void removeNode(const bool &subtree = false);
-    void scaleUp(const bool &subtree = false);
-    void scaleDown(const bool &subtree = false);
-    void setNodeColor(const QColor &color, const bool &subtree = false);
-    void setNodeTextColor(const QColor &color, const bool &subtree = false);
-    void addEdge();
-    void removeEdge();
-    void hintMode();
-    void insertPicture(const QString &picture);
-    void move(const int &x, const int &y, const bool &subtree = false);
-
-    void appendNumber(const int &unm);
-    void delNumber();
-    void applyNumber();
-
-    void nodeColor(const bool &subtree = false);
-    void nodeTextColor(const bool &subtree = false);
-
 public slots:
+
+    // commands from toolbars:
+    void insertNode();  // will be undoable
+    void removeNode();  // will be undoable
+    void nodeEdited();  // will be undoable
+    void scaleUp();     // will be undoable
+    void scaleDown();   // will be undoable
+    void nodeColor();
+    void nodeTextColor();
+    void addEdge();     // will be undoable
+    void removeEdge();  // will be undoable
+    void hintMode();
+    void insertPicture(const QString &picture); // will be undoable
 
     void nodeChanged();
     void nodeSelected();
-    void nodeEdited(QKeyEvent *event = 0);
     void nodeMoved(QGraphicsSceneMouseEvent *event);
     void nodeLostFocus();
 
@@ -64,9 +52,23 @@ signals:
 
 private:
 
+    void moveUp();
+    void moveDown();
+    void moveLeft();
+    void moveRight();
+
+    void move(const int &x, const int &y);      // will be undoable
+    void setNodeColor(const QColor &color);     // will be undoable
+    void setNodeTextColor(const QColor &color); // will be undoable
+
+    // hint mode
+    void appendNumber(const int &unm);
+    void delNumber();
+    void applyNumber();
+
     Node *nodeFactory();
     void selectNode(Node *node);
-
+    void setActiveNode(Node *node);
 
     // functions on the edges
     QList<Edge *> allEdges() const;
@@ -89,6 +91,9 @@ private:
     bool m_editingNode;
     bool m_edgeAdding;
     bool m_edgeDeleting;
+
+    std::map<int, void(GraphLogic::*)(void)> m_memberMap;
+
 };
 
 #endif // GRAPHLOGIC_H
