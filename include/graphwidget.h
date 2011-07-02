@@ -6,9 +6,10 @@
 #include <QKeyEvent>
 #include <QGraphicsSceneMouseEvent>
 
-#include "node.h"
+#include "graphlogic.h"
 
 class MainWindow;
+class GraphLogic;
 
 class GraphWidget : public QGraphicsView
 {
@@ -24,11 +25,14 @@ public:
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
 
+    static const QColor m_paper;
+
 public slots:
 
     // commands from MainWindow's MainToolBar's actions
     void insertNode(QKeyEvent *event = 0);
     void removeNode(QKeyEvent *event = 0);
+    void editNode(QKeyEvent *event = 0);
     void zoomIn(QKeyEvent *event = 0);
     void zoomOut(QKeyEvent *event = 0);
     void scaleUp(QKeyEvent *event = 0);
@@ -37,17 +41,14 @@ public slots:
     void nodeTextColor(QKeyEvent *event = 0);
     void addEdge(QKeyEvent *event = 0);
     void removeEdge(QKeyEvent *event = 0);
+    void nodeLoseFocus(QKeyEvent *event = 0);
     void hintMode(QKeyEvent *event = 0);
 
     // bundled signals from statusIconsToolBar
     void insertPicture(const QString &picture);
 
-    // node reports back it's state change
-    void nodeChanged();
-    void nodeSelected();
-    void nodeEdited(QKeyEvent *event = 0);
-    void nodeMoved(QGraphicsSceneMouseEvent *event);
-    void nodeLostFocus();
+    void contentChangedFromLogic();
+    void notificationFromLogic(const QString &msg);
 
 signals:
 
@@ -63,10 +64,6 @@ protected:
 
 private:
 
-    Node * nodeFactory();
-
-    void selectNode(Node *node);
-
     // keymap commands
     void moveUp(QKeyEvent *event);
     void moveDown(QKeyEvent *event);
@@ -78,40 +75,15 @@ private:
     void delNumber(QKeyEvent *event);
     void applyNumber(QKeyEvent *event);
 
-    void move(const int &x, const int &y, QKeyEvent *event);
     void scaleView(qreal scaleFactor);
 
-    // functions on the edges
-    QList<Edge *> allEdges() const;
-    void addEdge(Node *source, Node *destination);
-    void removeEdge(Node* source, Node *destination);
 
-    // functions on nodes
-    void addFirstNode();
-    void removeAllNodes();
-    void setActiveNode(Node *node);
-
-    // hint mode's nodenumber handling functions
-    void showNodeNumbers();
-    void showingAllNodeNumbers(const bool &show = true);
-    void showingNodeNumbersBeginWithNumber(const int &prefix,
-                                           const bool &show = true);
-
-
-    QList<Node *> m_nodeList;
     MainWindow *m_parent;
-    Node *m_activeNode;
     QGraphicsScene *m_scene;
-    bool m_showingNodeNumbers;
-    QString m_hintNumber;
-    Node *m_hintNode;
-    bool m_editingNode;
-    bool m_edgeAdding;
-    bool m_edgeDeleting;
-
+    GraphLogic *m_graphlogic;
     std::map<int, void(GraphWidget::*)(QKeyEvent *)> m_memberMap;
 
-    static const QColor m_paper;
+
 };
 
 #endif // GRAPHWIDGET_H

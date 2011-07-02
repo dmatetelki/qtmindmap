@@ -16,7 +16,7 @@ class Node : public QGraphicsTextItem
 
 public:
 
-    Node(GraphWidget *graphWidget = 0);
+    Node();
     ~Node();
 
     // add/remove edges
@@ -91,7 +91,7 @@ private:
     };
 
     QList<EdgeElement> m_edgeList;
-    GraphWidget *m_graph;
+//    GraphWidget *m_graph;
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;

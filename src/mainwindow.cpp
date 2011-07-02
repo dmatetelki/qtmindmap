@@ -317,7 +317,7 @@ void MainWindow::setUpMainToolbar()
 
     m_editNode = new QAction(tr("Edit node (F2, dubclick)"), this);
     connect(m_editNode, SIGNAL(activated()), m_graphicsView,
-            SLOT(nodeEdited()));
+            SLOT(editNode()));
 
     m_scaleUpNode = new QAction(tr("ScaleUp Node (Ctrl +)"), this);
     connect(m_scaleUpNode, SIGNAL(activated()), m_graphicsView,
@@ -358,7 +358,7 @@ void MainWindow::setUpMainToolbar()
 
     m_esc = new QAction(tr("Leave editing,\nedge eadd/remove (esc)"), this);
     connect(m_esc, SIGNAL(activated()), m_graphicsView,
-            SLOT(nodeLostFocus()));
+            SLOT(nodeLoseFocus()));
 
     m_hintMode = new QAction(tr("Hint mode (f)"), this);
     connect(m_hintMode, SIGNAL(activated()), m_graphicsView,
