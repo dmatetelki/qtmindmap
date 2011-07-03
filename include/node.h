@@ -23,6 +23,7 @@ public:
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
     void removeEdgeFromList(Edge *edge);
+    void removeEdges();
 
     // graph traversal
     QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;

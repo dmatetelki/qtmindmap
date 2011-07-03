@@ -4,6 +4,9 @@
 #include <QColorDialog>
 #include <QApplication>
 #include <QScrollBar>
+#include <QUndoCommand>
+
+#include "include/commands.h"
 
 GraphLogic::GraphLogic(GraphWidget *parent)
     : QObject(parent)
@@ -53,6 +56,11 @@ GraphLogic::GraphLogic(GraphWidget *parent)
                        (Qt::Key_Delete, &GraphLogic::removeNode));
 }
 
+void GraphLogic::setUndoStack(QUndoStack *stack)
+{
+    m_undoStack = stack;
+}
+
 bool GraphLogic::processKeyEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape)
@@ -99,6 +107,8 @@ bool GraphLogic::processKeyEvent(QKeyEvent *event)
 void GraphLogic::addFirstNode()
 {
     Node *node = nodeFactory();
+    m_graphWidget->scene()->addItem(node);
+    m_nodeList.append(node);
     node->setHtml(
                 QString("<img src=:/qtmindmap.svg width=50 height=50></img>"));
 
@@ -145,6 +155,8 @@ bool GraphLogic::readContentFromXmlFile(const QString &fileName)
         if(!e.isNull())
         {
             Node *node = nodeFactory();
+            m_graphWidget->scene()->addItem(node);
+            m_nodeList.append(node);
             node->setHtml(e.attribute("htmlContent"));
             node->setPos(e.attribute("x").toFloat(),
                          e.attribute("y").toFloat());
@@ -282,52 +294,16 @@ void GraphLogic::writeContentToPngFile(const QString &fileName)
 
 void GraphLogic::insertNode()
 {
-    nodeLostFocus();
-
-    if (!m_activeNode)
+    try
     {
-        emit notification(tr("No active node."));
+        QUndoCommand *insertNodeCommand = new InsertNodeCommand(this);
+        m_undoStack->push(insertNodeCommand);
+    }
+    catch (std::exception &e)
+    {
+        emit notification(e.what());
         return;
     }
-
-    // get the biggest angle between the edges of the Node.
-    double angle(m_activeNode->calculateBiggestAngle());
-
-    // let the distance between the current and new Node be 100 pixels
-    qreal length(100);
-
-    QPointF pos(length * cos(angle), length * sin(angle));
-
-    QPointF newPos(m_activeNode->sceneBoundingRect().center() +
-                   pos - Node::newNodeCenter);
-    QRectF rect (m_graphWidget->scene()->sceneRect().topLeft(),
-                 m_graphWidget->scene()->sceneRect().bottomRight()
-                 - Node::newNodeBottomRigth);
-
-    if (!rect.contains(newPos))
-    {
-        emit notification(tr("New node would be placed outside of the scene"));
-        return;
-    }
-
-    // add a new node which inherits the color and textColor
-    Node *node = nodeFactory();
-    node->setColor(m_activeNode->color());
-    node->setTextColor(m_activeNode->textColor());
-    node->setHtml(QString(""));
-    node->setPos(newPos);
-
-    addEdge(m_activeNode, node);
-
-    // set it the active Node and editable, so the user can edit it at once
-    setActiveNode(node);
-    nodeEdited();
-
-    emit contentChanged();
-
-    // it we are in hint mode, the numbers shall be re-calculated
-    if (m_showingNodeNumbers)
-        showNodeNumbers();
 }
 
 void GraphLogic::removeNode()
@@ -694,9 +670,6 @@ Node * GraphLogic::nodeFactory()
     connect(node, SIGNAL(nodeMoved(QGraphicsSceneMouseEvent*)),
             this, SLOT(nodeMoved(QGraphicsSceneMouseEvent*)));
     connect(node, SIGNAL(nodeLostFocus()), this, SLOT(nodeLostFocus()));
-
-    m_graphWidget->scene()->addItem(node);
-    m_nodeList.append(node);
 
     return node;
 }

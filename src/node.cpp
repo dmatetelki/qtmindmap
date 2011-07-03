@@ -35,16 +35,7 @@ Node::Node()
 
 Node::~Node()
 {
-    // dtor of Edge will call removeEdgeFromList on booth nodes.
-    foreach (EdgeElement element, m_edgeList)
-    {
-        Edge *tmp = element.edge;
-        tmp->sourceNode()->removeEdgeFromList(tmp);
-        tmp->destNode()->removeEdgeFromList(tmp);
-
-        /// @bug crashes sometimes
-        delete tmp;
-    }
+    removeEdges();
 }
 
 void Node::addEdge(Edge *edge, bool startsFromThisNode)
@@ -82,6 +73,19 @@ void Node::removeEdgeFromList(Edge *edge)
             m_edgeList.erase(it);
             return;
         }
+    }
+}
+
+void Node::removeEdges()
+{
+    foreach (EdgeElement element, m_edgeList)
+    {
+        Edge *tmp = element.edge;
+        tmp->sourceNode()->removeEdgeFromList(tmp);
+        tmp->destNode()->removeEdgeFromList(tmp);
+
+        /// @bug crashes sometimes
+        delete tmp;
     }
 }
 

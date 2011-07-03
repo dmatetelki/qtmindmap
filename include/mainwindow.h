@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QSignalMapper>
+#include <QUndoView>
 
 #include "graphwidget.h"
 
@@ -46,6 +47,7 @@ public slots:
     // toolbars
     void showMainToolbar(const bool &show = true);
     void showStatusIconToolbar(const bool &show = true);
+    void showUdoToolbar(const bool &show = true);
 
     // handle changed content at quit
     void quit();
@@ -55,13 +57,11 @@ protected:
     // handle changed content at exit events
     void closeEvent(QCloseEvent * event);
 
-    // show/hide toolbars, otherwise pass on the event to GraphWidget
-    void keyPressEvent(QKeyEvent *event);
-
 private:
 
-    void setUpMainToolbar();
-    void setUpStatusIconToolbar();
+    void setupMainToolbar();
+    void setupStatusIconToolbar();
+    void setupEditToolbar();
     void setTitle(const QString &title);
 
     Ui::MainWindow *m_ui;
@@ -99,6 +99,15 @@ private:
     QAction *m_delegate;
     QAction *m_maybe;
     QSignalMapper *m_signalMapper;
+
+    QUndoStack *m_undoStack;
+    QUndoView *m_undoView;
+    QAction *m_undo;
+    QAction *m_redo;
+    QAction *m_mainToolbar;
+    QAction *m_iconToolbar;
+    QAction *m_undoToolbar;
+
 };
 
 #endif // MAINWINDOW_H

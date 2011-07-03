@@ -14,7 +14,7 @@
    <string>QtMindMap</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qtmindmap.qrc">
+   <iconset resource="../images/qtmindmap.qrc">
     <normaloff>:/qtmindmap.svg</normaloff>:/qtmindmap.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -47,7 +47,13 @@
     </property>
     <addaction name="actionAbout_QtMindMap"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -74,6 +80,17 @@
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="undoToolBar">
+   <property name="windowTitle">
+    <string>undo toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
    </attribute>
   </widget>
   <action name="actionNew">
@@ -163,10 +180,20 @@
     <string>&amp;Keys</string>
    </property>
   </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="qtmindmap.qrc"/>
+  <include location="../images/qtmindmap.qrc"/>
  </resources>
  <connections/>
  <slots>

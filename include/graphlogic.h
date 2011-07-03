@@ -2,12 +2,15 @@
 #define GRAPHLOGIC_H
 
 #include <QObject>
+#include <QUndoStack>
 
 #include "node.h"
 #include "graphwidget.h"
+#include "commands.h"
 
 
 class GraphWidget;
+class InsertNodeCommand;
 
 class GraphLogic : public QObject
 {
@@ -16,6 +19,7 @@ class GraphLogic : public QObject
 public:
 
     explicit GraphLogic(GraphWidget *parent = 0);
+    void setUndoStack(QUndoStack *stack);
 
     bool processKeyEvent(QKeyEvent *event);
     void addFirstNode();
@@ -28,17 +32,17 @@ public:
 public slots:
 
     // commands from toolbars:
-    void insertNode();  // will be undoable
-    void removeNode();  // will be undoable
-    void nodeEdited();  // will be undoable
-    void scaleUp();     // will be undoable
-    void scaleDown();   // will be undoable
+    void insertNode();
+    void removeNode();  /// @todo Rewrite as an undo action
+    void nodeEdited();  /// @todo Rewrite as an undo action
+    void scaleUp();     /// @todo Rewrite as an undo action
+    void scaleDown();   /// @todo Rewrite as an undo action
     void nodeColor();
     void nodeTextColor();
-    void addEdge();     // will be undoable
-    void removeEdge();  // will be undoable
+    void addEdge();     /// @todo Rewrite as an undo action
+    void removeEdge();  /// @todo Rewrite as an undo action
     void hintMode();
-    void insertPicture(const QString &picture); // will be undoable
+    void insertPicture(const QString &picture); /// @todo Rewrite as an undo action
 
     void nodeChanged();
     void nodeSelected();
@@ -47,7 +51,7 @@ public slots:
 
 signals:
 
-    void contentChanged();
+    void contentChanged(const bool& changed = true);
     void notification(const QString &msg);
 
 private:
@@ -57,9 +61,9 @@ private:
     void moveLeft();
     void moveRight();
 
-    void move(const int &x, const int &y);      // will be undoable
-    void setNodeColor(const QColor &color);     // will be undoable
-    void setNodeTextColor(const QColor &color); // will be undoable
+    void move(const int &x, const int &y);      /// @todo Rewrite as an undo action
+    void setNodeColor(const QColor &color);     /// @todo Rewrite as an undo action
+    void setNodeTextColor(const QColor &color); /// @todo Rewrite as an undo action
 
     // hint mode
     void appendNumber(const int &unm);
@@ -93,7 +97,10 @@ private:
     bool m_edgeDeleting;
 
     std::map<int, void(GraphLogic::*)(void)> m_memberMap;
+    QUndoStack *m_undoStack;
 
+
+    friend class InsertNodeCommand;
 };
 
 #endif // GRAPHLOGIC_H

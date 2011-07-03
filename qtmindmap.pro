@@ -21,7 +21,8 @@ SOURCES += src/main.cpp \
            src/node.cpp \
            src/edge.cpp \
            src/systemtray.cpp \
-           src/argumentparser.cpp
+           src/argumentparser.cpp \
+           src/commands.cpp
 
 
 HEADERS  += include/mainwindow.h \
@@ -30,7 +31,8 @@ HEADERS  += include/mainwindow.h \
             include/node.h \
             include/edge.h \
             include/systemtray.h \
-            include/argumentparser.h
+            include/argumentparser.h \
+            include/commands.h
 
 
 FORMS        += ui/mainwindow.ui

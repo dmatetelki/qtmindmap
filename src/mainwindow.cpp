@@ -27,18 +27,21 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_graphicsView);
     m_graphicsView->hide();
 
-    connect(m_graphicsView->graphLogic(), SIGNAL(contentChanged()),
-            this, SLOT(contentChanged()));
+    connect(m_graphicsView->graphLogic(), SIGNAL(contentChanged(const bool&)),
+            this, SLOT(contentChanged(const bool&)));
 
     connect(m_graphicsView->graphLogic(), SIGNAL(notification(QString)),
             this, SLOT(statusBarMsg(QString)));
 
     // setup toolbars, don't show them
-    setUpMainToolbar();
+    setupMainToolbar();
     m_ui->mainToolBar->hide();
 
-    setUpStatusIconToolbar();
+    setupStatusIconToolbar();
     m_ui->statusIcons_toolBar->hide();
+
+    setupEditToolbar();
+    m_ui->undoToolBar->hide();
 }
 
 MainWindow::~MainWindow()
@@ -270,6 +273,13 @@ void MainWindow::showStatusIconToolbar(const bool &show)
                                      false);
 }
 
+void MainWindow::showUdoToolbar(const bool &show)
+{
+    m_ui->undoToolBar->setVisible(show ?
+                                     !m_ui->undoToolBar->isVisible() :
+                                     false);
+}
+
 void MainWindow::quit()
 {
     if (m_contentChanged && !closeFile())
@@ -285,27 +295,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
                 event->accept();
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-    // inactive action does not listen to signals
-    if (event->modifiers() & Qt::ControlModifier)
-    {
-        if (event->key() == Qt::Key_M)
-        {
-            showMainToolbar();
-            return;
-        }
-        if (event->key() == Qt::Key_I)
-        {
-            showStatusIconToolbar();
-            return;
-        }
-    }
-
-    QMainWindow::keyPressEvent(event);
-}
-
-void MainWindow::setUpMainToolbar()
+void MainWindow::setupMainToolbar()
 {
     // why can't I do this with qtcreator? (adding actions to toolbar)
 
@@ -368,7 +358,6 @@ void MainWindow::setUpMainToolbar()
             SLOT(hintMode()));
 
     m_showMainToolbar = new QAction(tr("Show main toolbar\n(Ctrl m)"), this);
-    m_showMainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
     connect(m_showMainToolbar, SIGNAL(activated()), this,
             SLOT(showMainToolbar()));
 
@@ -398,7 +387,7 @@ void MainWindow::setUpMainToolbar()
     m_ui->mainToolBar->addAction(m_showStatusIconToolbar);
 }
 
-void MainWindow::setUpStatusIconToolbar()
+void MainWindow::setupStatusIconToolbar()
 {
     // map signals so actions can send icon name
     m_signalMapper = new QSignalMapper(this);
@@ -465,11 +454,46 @@ void MainWindow::setUpStatusIconToolbar()
     m_ui->statusIcons_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 }
 
+void MainWindow::setupEditToolbar()
+{
+    m_undoStack = new QUndoStack(this);
+    m_undoView = new QUndoView(m_undoStack,this);
+    m_ui->undoToolBar->addWidget(m_undoView);
+
+    m_undo = m_undoStack->createUndoAction(this, tr("&Undo"));
+    m_undo->setShortcuts(QKeySequence::Undo);
+    m_redo = m_undoStack->createRedoAction(this, tr("&Redo"));
+    m_redo->setShortcuts(QKeySequence::Redo);
+    m_ui->menuEdit->addAction(m_undo);
+    m_ui->menuEdit->addAction(m_redo);
+
+    m_ui->menuEdit->addSeparator();
+
+    m_mainToolbar = new QAction(tr("main toolbar"), this);
+    m_mainToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+    connect(m_mainToolbar, SIGNAL(activated()),
+            this, SLOT (showMainToolbar()));
+
+    m_iconToolbar = new QAction(tr("icon toolbar"), this);
+    m_iconToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+    connect(m_iconToolbar, SIGNAL(activated()),
+            this, SLOT (showStatusIconToolbar()));
+
+    m_undoToolbar = new QAction(tr("undo toolbar"), this);
+    m_undoToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
+    connect(m_undoToolbar, SIGNAL(activated()),
+            this, SLOT (showUdoToolbar()));
+
+    m_ui->menuEdit->addAction(m_mainToolbar);
+    m_ui->menuEdit->addAction(m_iconToolbar);
+    m_ui->menuEdit->addAction(m_undoToolbar);
+
+    m_graphicsView->graphLogic()->setUndoStack(m_undoStack);
+}
+
 void MainWindow::setTitle(const QString &title)
 {
     title.isEmpty() ?
          setWindowTitle("QtMindMap") :
          setWindowTitle(QString(title).append(" - QtMindMap"));
 }
-
-
