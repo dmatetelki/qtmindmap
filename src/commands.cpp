@@ -4,6 +4,20 @@
 
 #include <math.h>
 
+
+
+const char* NoActiveNodeException::what() const throw()
+{
+    return QObject::tr("No active node.").toStdString().c_str();
+}
+
+const char* CannotPlaceNewNodeException::what() const throw()
+{
+    return QObject::tr("New node would be placed outside of the scene.").
+            toStdString().c_str();
+}
+
+
 InsertNodeCommand::InsertNodeCommand(GraphLogic *graphLogic)
     : m_graphLogic(graphLogic)
     , m_node(0)
