@@ -412,6 +412,9 @@ void GraphLogic::nodeColor()
         return;
     }
 
+    bool subtree(QApplication::keyboardModifiers() & Qt::ControlModifier &&
+                QApplication::keyboardModifiers() & Qt::ShiftModifier);
+
     // popup a color selector dialogm def color is the curr one.
     QColorDialog dialog(m_graphWidget);
     dialog.setWindowTitle(tr("Select node color"));
@@ -419,7 +422,7 @@ void GraphLogic::nodeColor()
     if (!dialog.exec())
         return;
 
-    setNodeColor(dialog.selectedColor());
+    setNodeColor(dialog.selectedColor(), subtree);
 }
 
 void GraphLogic::nodeTextColor()
@@ -430,6 +433,9 @@ void GraphLogic::nodeTextColor()
         return;
     }
 
+    bool subtree(QApplication::keyboardModifiers() & Qt::ControlModifier &&
+                QApplication::keyboardModifiers() & Qt::ShiftModifier);
+
     // popup a color selector dialogm def color is the curr one.
     QColorDialog dialog(m_graphWidget);
     dialog.setWindowTitle(tr("Select text color"));
@@ -437,7 +443,7 @@ void GraphLogic::nodeTextColor()
     if (!dialog.exec())
         return;
 
-    setNodeTextColor(dialog.selectedColor());
+    setNodeTextColor(dialog.selectedColor(), subtree);
 }
 
 void GraphLogic::addEdge()
@@ -599,11 +605,10 @@ void GraphLogic::move(const int &x, const int &y)
     }
 }
 
-void GraphLogic::setNodeColor(const QColor &color)
+void GraphLogic::setNodeColor(const QColor &color, const bool &subtree)
 {
     QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    if (subtree)
     {
         nodeList = m_activeNode->subtree();
     }
@@ -620,11 +625,10 @@ void GraphLogic::setNodeColor(const QColor &color)
     }
 }
 
-void GraphLogic::setNodeTextColor(const QColor &color)
+void GraphLogic::setNodeTextColor(const QColor &color, const bool &subtree)
 {
     QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    if (subtree)
     {
         nodeList = m_activeNode->subtree();
     }

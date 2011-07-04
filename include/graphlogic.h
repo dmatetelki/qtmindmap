@@ -62,8 +62,8 @@ private:
     void moveRight();
 
     void move(const int &x, const int &y);      /// @todo Rewrite as an undo action
-    void setNodeColor(const QColor &color);     /// @todo Rewrite as an undo action
-    void setNodeTextColor(const QColor &color); /// @todo Rewrite as an undo action
+    void setNodeColor(const QColor &color, const bool &subtree = false);     /// @todo Rewrite as an undo action
+    void setNodeTextColor(const QColor &color, const bool &subtree = false); /// @todo Rewrite as an undo action
 
     // hint mode
     void appendNumber(const int &unm);

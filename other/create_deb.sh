@@ -42,7 +42,7 @@ Version: 0.2
 Section: base
 Priority: optional
 Architecture: all
-Depends: qt (>= 4.5)
+Depends:  libqtcore4 (>= 4.6), libqtgui4 (>= 4.6), libqt4-svg (>= 4.6), libqt4-xml (>= 4.6)
 Maintainer: Dénes Mátételki <denes.matetelki@gmial.com>
 Homepage: https://gitorious.org/qtmindmap
 Description: Mindmap software in Qt." > $packagedir/DEBIAN/control
