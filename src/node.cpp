@@ -35,7 +35,7 @@ Node::Node()
 
 Node::~Node()
 {
-    removeEdges();
+    deleteEdges();
 }
 
 void Node::addEdge(Edge *edge, bool startsFromThisNode)
@@ -55,15 +55,28 @@ void Node::deleteEdge(Node *otherEnd)
              it->edge->destNode() == otherEnd))
         {
             Edge *tmp = it->edge;
-            tmp->sourceNode()->removeEdgeFromList(tmp);
-            tmp->destNode()->removeEdgeFromList(tmp);
+            tmp->sourceNode()->removeEdge(tmp);
+            tmp->destNode()->removeEdge(tmp);
             delete tmp;
             return;
         }
     }
 }
 
-void Node::removeEdgeFromList(Edge *edge)
+void Node::deleteEdges()
+{
+    foreach (EdgeElement element, m_edgeList)
+    {
+        Edge *tmp = element.edge;
+        tmp->sourceNode()->removeEdge(tmp);
+        tmp->destNode()->removeEdge(tmp);
+
+        /// @bug crashes sometimes
+        delete tmp;
+    }
+}
+
+void Node::removeEdge(Edge *edge)
 {
     for(QList<EdgeElement>::iterator it = m_edgeList.begin();
         it != m_edgeList.end(); it++)
@@ -78,15 +91,21 @@ void Node::removeEdgeFromList(Edge *edge)
 
 void Node::removeEdges()
 {
-    foreach (EdgeElement element, m_edgeList)
+    for(QList<EdgeElement>::iterator it = m_edgeList.begin();
+        it != m_edgeList.end(); it++)
     {
-        Edge *tmp = element.edge;
-        tmp->sourceNode()->removeEdgeFromList(tmp);
-        tmp->destNode()->removeEdgeFromList(tmp);
-
-        /// @bug crashes sometimes
-        delete tmp;
+        m_edgeList.erase(it);
     }
+}
+
+QList<Edge *> Node::edges() const
+{
+    QList<Edge *> list;
+
+    foreach(EdgeElement element, m_edgeList)
+        list.push_back(element.edge);
+
+    return list;
 }
 
 // edges from this Node. Exclude secondaries if needed (calc subtree)

@@ -22,10 +22,13 @@ public:
     // add/remove edges
     void addEdge(Edge *edge, bool startsFromThisNode);
     void deleteEdge(Node *otherEnd);
-    void removeEdgeFromList(Edge *edge);
+    void deleteEdges();
+    void removeEdge(Edge *edge);
     void removeEdges();
 
+
     // graph traversal
+    QList<Edge *> edges() const;
     QList<Edge *> edgesFrom(const bool &excludeSecondaries = true) const;
     QList<Edge *> edgesToThis(const bool &excludeSecondaries = true) const;
     Edge * edgeTo(const Node* node) const;

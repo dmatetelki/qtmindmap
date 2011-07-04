@@ -308,45 +308,16 @@ void GraphLogic::insertNode()
 
 void GraphLogic::removeNode()
 {
-    if (!m_activeNode)
+    try
     {
-        emit notification(tr("No active node."));
+        QUndoCommand *removeNodeCommand = new RemoveNodeCommand(this);
+        m_undoStack->push(removeNodeCommand);
+    }
+    catch (std::exception &e)
+    {
+        emit notification(e.what());
         return;
     }
-
-    if (m_activeNode == m_nodeList.first())
-    {
-        emit notification(tr("Base node cannot be deleted."));
-        return;
-    }
-
-    // remove just the active Node or it's subtree too?
-    QList <Node *> nodeList;
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    foreach(Node *node, nodeList)
-    {
-        if (m_hintNode==node)
-            m_hintNode=0;
-
-        m_nodeList.removeAll(node);
-        delete node;
-    }
-
-    m_activeNode = 0;
-    emit contentChanged();
-
-    // it we are in hint mode, the numbers shall be re-calculated
-    if (m_showingNodeNumbers)
-        showNodeNumbers();
 }
 
 void GraphLogic::nodeEdited()

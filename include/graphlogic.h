@@ -10,7 +10,9 @@
 
 
 class GraphWidget;
+
 class InsertNodeCommand;
+class RemoveNodeCommand;
 
 class GraphLogic : public QObject
 {
@@ -101,6 +103,7 @@ private:
 
 
     friend class InsertNodeCommand;
+    friend class RemoveNodeCommand;
 };
 
 #endif // GRAPHLOGIC_H
