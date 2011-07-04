@@ -9,6 +9,8 @@
 class GraphLogic;
 
 
+// exceptions:
+
 class NoActiveNodeException : public std::exception
 {
 public:
@@ -27,7 +29,20 @@ public:
     const char* what() const throw();
 };
 
+class BaseNodeCannotBeEdgeTargetException : public std::exception
+{
+public:
+    const char* what() const throw();
+};
 
+class EdgeExistsBetweenNodesException : public std::exception
+{
+public:
+    const char* what() const throw();
+};
+
+
+// commands:
 
 class InsertNodeCommand : public QUndoCommand
 {
@@ -68,6 +83,46 @@ private:
 
     QList <Node *> m_nodeList;
     QList <Edge *> m_edgeList;
+};
+
+class AddEdgeCommand : public QUndoCommand
+{
+
+public:
+
+    AddEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion);
+
+    void undo();
+    void redo();
+
+private:
+
+    GraphLogic *m_graphLogic;
+
+    Node *m_activeNode;
+    Node *m_source;
+    Node *m_destination;
+    Edge *m_edge;
+};
+
+class RemoveEdgeCommand : public QUndoCommand
+{
+
+public:
+
+    RemoveEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion);
+
+    void undo();
+    void redo();
+
+private:
+
+    GraphLogic *m_graphLogic;
+
+    Node *m_activeNode;
+    Node *m_source;
+    Node *m_destination;
+    Edge *m_edge;
 };
 
 #endif // COMMANDS_H

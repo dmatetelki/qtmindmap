@@ -13,6 +13,8 @@ class GraphWidget;
 
 class InsertNodeCommand;
 class RemoveNodeCommand;
+class AddEdgeCommand;
+class RemoveEdgeCommand;
 
 class GraphLogic : public QObject
 {
@@ -34,15 +36,15 @@ public:
 public slots:
 
     // commands from toolbars:
-    void insertNode();
-    void removeNode();  /// @todo Rewrite as an undo action
+    void insertNode();  // undo command
+    void removeNode();  // undo command
     void nodeEdited();  /// @todo Rewrite as an undo action
     void scaleUp();     /// @todo Rewrite as an undo action
     void scaleDown();   /// @todo Rewrite as an undo action
     void nodeColor();
     void nodeTextColor();
-    void addEdge();     /// @todo Rewrite as an undo action
-    void removeEdge();  /// @todo Rewrite as an undo action
+    void addEdge();
+    void removeEdge();
     void hintMode();
     void insertPicture(const QString &picture); /// @todo Rewrite as an undo action
 
@@ -78,8 +80,8 @@ private:
 
     // functions on the edges
     QList<Edge *> allEdges() const;
-    void addEdge(Node *source, Node *destination);
-    void removeEdge(Node* source, Node *destination);
+    void addEdge(Node *source, Node *destination);      // undo command
+    void removeEdge(Node* source, Node *destination);   // undo command
 
     // hint mode's nodenumber handling functions
     void showNodeNumbers();
@@ -104,6 +106,8 @@ private:
 
     friend class InsertNodeCommand;
     friend class RemoveNodeCommand;
+    friend class AddEdgeCommand;
+    friend class RemoveEdgeCommand;
 };
 
 #endif // GRAPHLOGIC_H

@@ -699,50 +699,15 @@ QList<Edge *> GraphLogic::allEdges() const
 
 void GraphLogic::addEdge(Node *source, Node *destination)
 {
-    if (!m_activeNode)
+    try
     {
-        emit notification(tr("No active node."));
+        QUndoCommand *addEdgeCommand = new AddEdgeCommand(this, source, destination);
+        m_undoStack->push(addEdgeCommand);
+    }
+    catch (std::exception &e)
+    {
+        emit notification(e.what());
         return;
-    }
-
-    if (destination == m_nodeList.first())
-    {
-        setActiveNode(destination);
-        emit notification(
-                    tr("Root element cannot be an edge target."));
-        return;
-    }
-
-    if (source->isConnected(destination))
-    {
-        setActiveNode(destination);
-        emit notification(
-                    tr("There is already an edge between these two nodes."));
-    }
-    else
-    {
-        // aviod the graph beeing acyclic. (ok, Nodes having multiple parents)
-        bool sec(false);
-        if (!destination->edgesToThis().empty())
-        {
-            emit notification(
-                     tr("The graph is acyclic, edge added as secondary edge."));
-            sec = true;
-        }
-        Edge *edge = new Edge(source, destination);
-        source->addEdge(edge, true);
-        destination->addEdge(edge, false);
-
-        edge->setColor(destination->color());
-        edge->setWidth(destination->scale()*2 + 1);
-
-        // The Edge is secondary, because the Node already has a parent
-        // (it is already a destination of another Edge)
-        edge->setSecondary(sec);
-        m_graphWidget->scene()->addItem(edge);
-
-        setActiveNode(destination);
-        emit contentChanged();
     }
 }
 

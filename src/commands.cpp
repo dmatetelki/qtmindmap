@@ -23,6 +23,17 @@ const char* CannotDeleteBaseNodeException::what() const throw()
     return QObject::tr("Base node cannot be deleted.").toStdString().c_str();
 }
 
+const char* BaseNodeCannotBeEdgeTargetException::what() const throw()
+{
+    return QObject::tr("Base node cannot be a target.").toStdString().c_str();
+}
+
+const char* EdgeExistsBetweenNodesException::what() const throw()
+{
+    return QObject::tr("There is already an edge between these two nodes.").
+            toStdString().c_str();
+}
+
 
 InsertNodeCommand::InsertNodeCommand(GraphLogic *graphLogic)
     : m_graphLogic(graphLogic)
@@ -190,4 +201,101 @@ void RemoveNodeCommand::redo()
     // it we are in hint mode, the numbers shall be re-calculated
     if (m_graphLogic->m_showingNodeNumbers)
         m_graphLogic->showNodeNumbers();
+}
+
+AddEdgeCommand::AddEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion)
+    : m_graphLogic(graphLogic)
+    , m_activeNode(m_graphLogic->m_activeNode)
+    , m_source(source)
+    , m_destination(destinaion)
+{
+    if (!m_activeNode)
+        throw NoActiveNodeException();
+
+    if (m_destination == m_graphLogic->m_nodeList.first())
+        throw BaseNodeCannotBeEdgeTargetException();
+
+
+    if (m_source->isConnected(m_destination))
+        throw EdgeExistsBetweenNodesException();
+
+    setText(QObject::tr("Edge added between \"").append(
+                m_source->toPlainText()).append(
+                QObject::tr("\" and \"").append(
+                m_destination->toPlainText()).append("\"")));
+
+
+    // aviod the graph beeing acyclic. (ok, Nodes having multiple parents)
+    bool sec(false);
+    if (!m_destination->edgesToThis().empty())
+    {
+        emit m_graphLogic->notification(
+           QObject::tr("The graph is acyclic, edge added as secondary edge."));
+        sec = true;
+    }
+
+    m_edge = new Edge(m_source, m_destination);
+    m_edge->setColor(m_destination->color());
+    m_edge->setWidth(m_destination->scale()*2 + 1);
+
+    // The Edge is secondary, because the Node already has a parent
+    // (it is already a destination of another Edge)
+    m_edge->setSecondary(sec);
+}
+
+void AddEdgeCommand::undo()
+{
+    m_source->removeEdge(m_edge);
+    m_destination->removeEdge(m_edge);
+    m_graphLogic->m_graphWidget->scene()->removeItem(m_edge);
+
+    m_graphLogic->setActiveNode(m_activeNode);
+
+    emit  m_graphLogic->contentChanged(false);
+}
+
+void AddEdgeCommand::redo()
+{
+    m_source->addEdge(m_edge, true);
+    m_destination->addEdge(m_edge, false);
+
+    m_graphLogic->m_graphWidget->scene()->addItem(m_edge);
+
+    m_graphLogic->setActiveNode(m_destination);
+    emit m_graphLogic->contentChanged();
+}
+
+RemoveEdgeCommand::RemoveEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion)
+    : m_graphLogic(graphLogic)
+    , m_activeNode(m_graphLogic->m_activeNode)
+    , m_source(source)
+    , m_destination(destinaion)
+    , m_edge(source->edgeTo(destinaion))
+{
+    setText(QObject::tr("Edge releted between \"").append(
+            m_source->toPlainText()).append(
+            QObject::tr("\" and \"").append(
+            m_destination->toPlainText()).append("\"")));
+}
+
+void RemoveEdgeCommand::undo()
+{
+    m_source->addEdge(m_edge, true);
+    m_destination->addEdge(m_edge, false);
+
+    m_graphLogic->m_graphWidget->scene()->addItem(m_edge);
+
+    m_graphLogic->setActiveNode(m_destination);
+    emit m_graphLogic->contentChanged(false);
+}
+
+void RemoveEdgeCommand::redo()
+{
+    m_source->removeEdge(m_edge);
+    m_destination->removeEdge(m_edge);
+    m_graphLogic->m_graphWidget->scene()->removeItem(m_edge);
+
+    m_graphLogic->setActiveNode(m_activeNode);
+
+    emit  m_graphLogic->contentChanged();
 }
