@@ -8,7 +8,7 @@ inherit qt4-r2
 
 DESCRIPTION="MindMap software written in Qt"
 HOMEPAGE="https://gitorious.org/qtmindmap"
-SRC_URI="http://matetelki.com/qtmindmap/qtmindmap-qtmindmap-master.tar.gz"
+SRC_URI="http://matetelki.com/qtmindmap/qtmindmap-0.2.tar.gz"
 LICENSE="GPL-2"
 
 # some functions introduced in qt 4.6

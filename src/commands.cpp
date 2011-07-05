@@ -34,6 +34,12 @@ const char* EdgeExistsBetweenNodesException::what() const throw()
             toStdString().c_str();
 }
 
+const char* EdgeDoesntExistsBetweenNodesException::what() const throw()
+{
+    return QObject::tr("There is no edge between these two nodes.").
+            toStdString().c_str();
+}
+
 
 InsertNodeCommand::InsertNodeCommand(GraphLogic *graphLogic)
     : m_graphLogic(graphLogic)
@@ -102,7 +108,6 @@ void InsertNodeCommand::redo()
 
     m_node->setPos(m_pos);
 
-//    m_graphLogic->addEdge(m_activeNode, m_node);
     m_edge->sourceNode()->addEdge(m_edge,true);
     m_edge->destNode()->addEdge(m_edge,false);
     m_graphLogic->m_graphWidget->scene()->addItem(m_edge);
@@ -209,9 +214,6 @@ AddEdgeCommand::AddEdgeCommand(GraphLogic *graphLogic, Node *source, Node *desti
     , m_source(source)
     , m_destination(destinaion)
 {
-    if (!m_activeNode)
-        throw NoActiveNodeException();
-
     if (m_destination == m_graphLogic->m_nodeList.first())
         throw BaseNodeCannotBeEdgeTargetException();
 
@@ -272,6 +274,9 @@ RemoveEdgeCommand::RemoveEdgeCommand(GraphLogic *graphLogic, Node *source, Node 
     , m_destination(destinaion)
     , m_edge(source->edgeTo(destinaion))
 {
+    if (!m_source->isConnected(m_destination))
+        throw EdgeDoesntExistsBetweenNodesException();
+
     setText(QObject::tr("Edge releted between \"").append(
             m_source->toPlainText()).append(
             QObject::tr("\" and \"").append(

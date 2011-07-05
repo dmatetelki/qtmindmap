@@ -41,6 +41,12 @@ public:
     const char* what() const throw();
 };
 
+class EdgeDoesntExistsBetweenNodesException : public std::exception
+{
+public:
+    const char* what() const throw();
+};
+
 
 // commands:
 

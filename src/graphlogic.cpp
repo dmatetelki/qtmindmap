@@ -91,6 +91,7 @@ bool GraphLogic::processKeyEvent(QKeyEvent *event)
     if (m_showingNodeNumbers &&
             event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9)
     {
+        /// @todo remove magic number
         appendNumber(event->key()-48);
         return true;
     }
@@ -713,22 +714,15 @@ void GraphLogic::addEdge(Node *source, Node *destination)
 
 void GraphLogic::removeEdge(Node *source, Node *destination)
 {
-    if (!m_activeNode)
+    try
     {
-        emit notification(tr("No active node."));
+        QUndoCommand *addEdgeCommand = new RemoveEdgeCommand(this, source, destination);
+        m_undoStack->push(addEdgeCommand);
+    }
+    catch (std::exception &e)
+    {
+        emit notification(e.what());
         return;
-    }
-
-    if (!source->isConnected(destination))
-    {
-        setActiveNode(destination);
-        emit notification(tr("There no edge between these two nodes."));
-    }
-    else
-    {
-        source->deleteEdge(destination);
-        setActiveNode(destination);
-        emit contentChanged();
     }
 }
 
