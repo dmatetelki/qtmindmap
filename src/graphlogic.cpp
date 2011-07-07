@@ -38,13 +38,13 @@ GraphLogic::GraphLogic(GraphWidget *parent)
                        (Qt::Key_F, &GraphLogic::hintMode));
 
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
-                       (Qt::Key_Up, &GraphLogic::moveUp));
+                       (Qt::Key_Up, &GraphLogic::moveNodeUp));
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
-                       (Qt::Key_Down, &GraphLogic::moveDown));
+                       (Qt::Key_Down, &GraphLogic::moveNodeDown));
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
-                       (Qt::Key_Left, &GraphLogic::moveLeft));
+                       (Qt::Key_Left, &GraphLogic::moveNodeLeft));
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
-                       (Qt::Key_Right, &GraphLogic::moveRight));
+                       (Qt::Key_Right, &GraphLogic::moveNodeRight));
 
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
                        (Qt::Key_Backspace, &GraphLogic::delNumber));
@@ -296,15 +296,39 @@ void GraphLogic::writeContentToPngFile(const QString &fileName)
     emit notification(tr("MindMap exported as ") + fileName);
 }
 
-void GraphLogic::reShowNumbers()
+Node * GraphLogic::nodeFactory()
 {
-    if (m_showingNodeNumbers)
-        showNodeNumbers();
+    Node *node = new Node(this);
+
+    connect(node, SIGNAL(nodeChanged()), this, SLOT(nodeChanged()));
+    connect(node, SIGNAL(nodeSelected()), this, SLOT(nodeSelected()));
+    connect(node, SIGNAL(nodeEdited()), this, SLOT(nodeEdited()));
+    connect(node, SIGNAL(nodeMoved(QGraphicsSceneMouseEvent*)),
+            this, SLOT(nodeMoved(QGraphicsSceneMouseEvent*)));
+    connect(node, SIGNAL(nodeLostFocus()), this, SLOT(nodeLostFocus()));
+
+    return node;
+}
+
+void GraphLogic::setActiveNode(Node *node)
+{
+    if (m_activeNode!=0)
+        m_activeNode->setBorder(false);
+
+    m_activeNode = node;
+    if (m_activeNode)
+        m_activeNode->setBorder();
 }
 
 void GraphLogic::setHintNode(Node *node)
 {
     m_hintNode = node;
+}
+
+void GraphLogic::reShowNumbers()
+{
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
 }
 
 void GraphLogic::insertNode()
@@ -571,39 +595,39 @@ void GraphLogic::nodeLostFocus()
     }
 }
 
-void GraphLogic::moveUp()
+void GraphLogic::moveNodeUp()
 {
     QApplication::keyboardModifiers() & Qt::ControlModifier ?
-        move(0,-20) :
+        moveNode(qreal(0),qreal(-20)) :
         m_graphWidget->verticalScrollBar()->setValue(
                     m_graphWidget->verticalScrollBar()->value()-20);
 }
 
-void GraphLogic::moveDown()
+void GraphLogic::moveNodeDown()
 {
     QApplication::keyboardModifiers() & Qt::ControlModifier ?
-        move(0,20) :
+        moveNode(qreal(0),qreal(20)) :
                 m_graphWidget->verticalScrollBar()->setValue(
                             m_graphWidget->verticalScrollBar()->value()+20);
 }
 
-void GraphLogic::moveLeft()
+void GraphLogic::moveNodeLeft()
 {
     QApplication::keyboardModifiers() & Qt::ControlModifier ?
-        move(-20,0) :
+        moveNode(qreal(-20),qreal(0)) :
                 m_graphWidget->horizontalScrollBar()->setValue(
                             m_graphWidget->horizontalScrollBar()->value()-20);
 }
 
-void GraphLogic::moveRight()
+void GraphLogic::moveNodeRight()
 {
     QApplication::keyboardModifiers() & Qt::ControlModifier ?
-        move(20,0) :
+        moveNode(qreal(20),qreal(0)) :
                 m_graphWidget->horizontalScrollBar()->setValue(
                             m_graphWidget->horizontalScrollBar()->value()+20);
 }
 
-void GraphLogic::move(const int &x, const int &y)
+void GraphLogic::moveNode(qreal x, qreal y)
 {
     if (!m_activeNode)
     {
@@ -611,20 +635,15 @@ void GraphLogic::move(const int &x, const int &y)
         return;
     }
 
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        QList <Node *> nodeList = m_activeNode->subtree();
-        foreach(Node *node, nodeList)
-            node->moveBy(x, y);
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_x = x;
+    context.m_y = y;
 
-        emit contentChanged();
-    }
-    else // Move just the active Node.
-    {
-        m_activeNode->moveBy(x, y);
-        emit contentChanged();
-    }
+    QUndoCommand *moveCommand = new MoveCommand(context);
+    m_undoStack->push(moveCommand);
 }
 
 void GraphLogic::setNodeColor(const QColor &color, const bool &subtree)
@@ -686,20 +705,6 @@ void GraphLogic::applyNumber()
         selectNode(m_hintNode);
 }
 
-Node * GraphLogic::nodeFactory()
-{
-    Node *node = new Node();
-
-    connect(node, SIGNAL(nodeChanged()), this, SLOT(nodeChanged()));
-    connect(node, SIGNAL(nodeSelected()), this, SLOT(nodeSelected()));
-    connect(node, SIGNAL(nodeEdited()), this, SLOT(nodeEdited()));
-    connect(node, SIGNAL(nodeMoved(QGraphicsSceneMouseEvent*)),
-            this, SLOT(nodeMoved(QGraphicsSceneMouseEvent*)));
-    connect(node, SIGNAL(nodeLostFocus()), this, SLOT(nodeLostFocus()));
-
-    return node;
-}
-
 void GraphLogic::selectNode(Node *node)
 {
     // leave hint mode
@@ -720,16 +725,6 @@ void GraphLogic::selectNode(Node *node)
     {
         setActiveNode(node);
     }
-}
-
-void GraphLogic::setActiveNode(Node *node)
-{
-    if (m_activeNode!=0)
-        m_activeNode->setBorder(false);
-
-    m_activeNode = node;
-    if (m_activeNode)
-        m_activeNode->setBorder();
 }
 
 QList<Edge *> GraphLogic::allEdges() const

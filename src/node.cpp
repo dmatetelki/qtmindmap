@@ -15,8 +15,9 @@ const double Node::m_twoPi = Node::m_pi * 2.0;
 
 const QColor Node::m_gold(255,215,0);
 
-Node::Node()
-    : m_number(-1)
+Node::Node(GraphLogic *graphLogic)
+    : m_graphLogic(graphLogic)
+    , m_number(-1)
     , m_hasBorder(false)
     , m_numberIsSpecial(false)
     , m_color(m_gold)
@@ -454,6 +455,8 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
             return newPos;
         }
 
+         /// undo call here
+
         break;
     }
     case ItemPositionHasChanged:
@@ -492,7 +495,8 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 // notify parent so subtree can be moved too if necessary
 void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit nodeMoved(event);
+    QPointF diff(event->scenePos() - event->lastScenePos());
+    m_graphLogic->moveNode(diff.x(), diff.y());
 }
 
 QPainterPath Node::shape () const

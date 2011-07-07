@@ -40,6 +40,7 @@ void GraphWidget::closeScene()
 {
     m_graphlogic->removeAllNodes();
     this->hide();
+
 }
 
 GraphLogic *GraphWidget::graphLogic() const

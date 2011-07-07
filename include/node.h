@@ -6,9 +6,11 @@
 #include <QGraphicsDropShadowEffect>
 
 #include "edge.h"
-#include "graphwidget.h"
+//#include "graphwidget.h"
+#include "graphlogic.h"
 
-class GraphWidget;
+//class GraphWidget;
+class GraphLogic;
 
 class Node : public QGraphicsTextItem
 {
@@ -16,7 +18,7 @@ class Node : public QGraphicsTextItem
 
 public:
 
-    Node();
+    Node(GraphLogic *graphLogic);
     ~Node();
 
     // add/remove edges
@@ -94,8 +96,9 @@ private:
         EdgeElement(Edge *e, bool s) : edge(e), startsFromThisNode(s) {}
     };
 
+
     QList<EdgeElement> m_edgeList;
-//    GraphWidget *m_graph;
+    GraphLogic *m_graphLogic;
     int m_number;
     bool m_hasBorder;
     bool m_numberIsSpecial;

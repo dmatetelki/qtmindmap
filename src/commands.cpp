@@ -234,3 +234,36 @@ void RemoveEdgeCommand::redo()
 
     m_context.m_graphLogic->setActiveNode(m_context.m_activeNode);
 }
+
+MoveCommand::MoveCommand(UndoContext context)
+    : m_context(context)
+{
+    setText(QObject::tr("Node \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).append("\" moved"));
+
+    // move just the active Node or it's subtree too?
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        m_nodeList = m_context.m_activeNode->subtree();
+        setText(text().append(QObject::tr(" with subtree")));
+    }
+    else
+    {
+        m_nodeList.push_back(m_context.m_activeNode);
+    }
+}
+
+void MoveCommand::undo()
+{
+    foreach(Node *node, m_nodeList)
+        node->moveBy(-m_context.m_x, -m_context.m_y);
+}
+
+void MoveCommand::redo()
+{
+    foreach(Node *node, m_nodeList)
+        node->moveBy(m_context.m_x, m_context.m_y);
+}

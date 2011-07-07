@@ -47,7 +47,7 @@ public slots:
     // toolbars
     void showMainToolbar(const bool &show = true);
     void showStatusIconToolbar(const bool &show = true);
-    void showUdoToolbar(const bool &show = true);
+    void showUndoToolbar(const bool &show = true);
 
     // handle changed content at quit
     void quit();

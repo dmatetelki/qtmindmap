@@ -223,7 +223,9 @@ bool MainWindow::closeFile()
     m_contentChanged = false;
     setTitle("");
     m_graphicsView->closeScene();
+    m_undoStack->clear();
     showMainToolbar(false);
+    showUndoToolbar(false);
     return true;
 }
 
@@ -275,7 +277,7 @@ void MainWindow::showStatusIconToolbar(const bool &show)
                                      false);
 }
 
-void MainWindow::showUdoToolbar(const bool &show)
+void MainWindow::showUndoToolbar(const bool &show)
 {
     m_ui->undoToolBar->setVisible(show ?
                                      !m_ui->undoToolBar->isVisible() :
@@ -484,7 +486,7 @@ void MainWindow::setupEditToolbar()
     m_undoToolbar = new QAction(tr("undo toolbar"), this);
     m_undoToolbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
     connect(m_undoToolbar, SIGNAL(activated()),
-            this, SLOT (showUdoToolbar()));
+            this, SLOT (showUndoToolbar()));
 
     m_ui->menuEdit->addAction(m_mainToolbar);
     m_ui->menuEdit->addAction(m_iconToolbar);

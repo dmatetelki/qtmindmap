@@ -23,7 +23,6 @@ class GraphLogic : public QObject
 public:
 
     explicit GraphLogic(GraphWidget *parent = 0);
-
     GraphWidget *graphWidget() const;
     void setUndoStack(QUndoStack *stack);
 
@@ -39,6 +38,10 @@ public:
     void setActiveNode(Node *node);
     void setHintNode(Node *node);
     void reShowNumbers();
+
+    void moveNode(qreal x, qreal y);
+
+//    void move(const QPointF &oldpos, const QPointF &newpos);  /// @todo Rewrite as an undo action
 
 public slots:
 
@@ -67,12 +70,12 @@ signals:
 
 private:
 
-    void moveUp();
-    void moveDown();
-    void moveLeft();
-    void moveRight();
+    void moveNodeUp();
+    void moveNodeDown();
+    void moveNodeLeft();
+    void moveNodeRight();
 
-    void move(const int &x, const int &y);      /// @todo Rewrite as an undo action
+
     void setNodeColor(const QColor &color, const bool &subtree = false);     /// @todo Rewrite as an undo action
     void setNodeTextColor(const QColor &color, const bool &subtree = false); /// @todo Rewrite as an undo action
 

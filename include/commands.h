@@ -15,12 +15,13 @@ struct UndoContext
     Node *m_activeNode;
     Node *m_hintNode;
     QList <Node *> *m_nodeList;
-
     QPointF m_pos;
     QColor m_color;
     Node *m_source;
     Node *m_destination;
     bool m_secondary;
+    qreal m_x;
+    qreal m_y;
 
     UndoContext(GraphLogic *graphLogic = 0,
                 Node *activeNode = 0,
@@ -30,7 +31,9 @@ struct UndoContext
                 QColor color = QColor(),
                 Node *source = 0,
                 Node *destination = 0,
-                bool secondary = false)
+                bool secondary = false,
+                qreal x = 0,
+                qreal y = 0)
         : m_graphLogic(graphLogic)
         , m_activeNode(activeNode)
         , m_hintNode(hintNode)
@@ -39,7 +42,10 @@ struct UndoContext
         , m_color(color)
         , m_source(source)
         , m_destination(destination)
-        , m_secondary(secondary) {};
+        , m_secondary(secondary)
+        , m_x(x)
+        , m_y(y)
+    {};
 };
 
 
@@ -123,6 +129,24 @@ private:
 
     Node *m_activeNode;
     Edge *m_edge;
+};
+
+class MoveCommand : public QUndoCommand
+{
+
+public:
+
+    MoveCommand(UndoContext context);
+
+    void undo();
+    void redo();
+
+private:
+
+    bool m_done;
+    UndoContext m_context;
+
+    QList <Node *> m_nodeList;
 };
 
 #endif // COMMANDS_H
