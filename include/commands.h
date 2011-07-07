@@ -49,6 +49,12 @@ struct UndoContext
 };
 
 
+/// @todo need a base class...
+enum MergeableCommandId
+{
+    MoveCommandId = 0
+};
+
 class InsertNodeCommand : public QUndoCommand
 {
 
@@ -140,6 +146,9 @@ public:
 
     void undo();
     void redo();
+
+    bool mergeWith(const QUndoCommand *command);
+    int id() const { return MoveCommandId; }
 
 private:
 

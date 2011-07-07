@@ -241,7 +241,8 @@ MoveCommand::MoveCommand(UndoContext context)
     setText(QObject::tr("Node \"").append(
                 m_context.m_activeNode == m_context.m_nodeList->first() ?
                     QObject::tr("Base node") :
-                    m_context.m_activeNode->toPlainText()).append("\" moved"));
+                    m_context.m_activeNode->toPlainText()).
+                append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y));
 
     // move just the active Node or it's subtree too?
     if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
@@ -266,4 +267,32 @@ void MoveCommand::redo()
 {
     foreach(Node *node, m_nodeList)
         node->moveBy(m_context.m_x, m_context.m_y);
+}
+
+bool MoveCommand::mergeWith(const QUndoCommand *command)
+{
+    if (command->id() != id())
+        return false;
+
+    const MoveCommand *moveCommand = static_cast<const MoveCommand *>(command);
+
+    if (m_context.m_activeNode != moveCommand->m_context.m_activeNode)
+        return false;
+
+    m_context.m_x += moveCommand->m_context.m_x;
+    m_context.m_y += moveCommand->m_context.m_y;
+
+    setText(QObject::tr("Node \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).
+            append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y));
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        setText(text().append(QObject::tr(" with subtree")));
+    }
+
+    return true;
 }
