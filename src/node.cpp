@@ -54,10 +54,7 @@ void Node::deleteEdge(Node *otherEnd)
          || (it->edge->sourceNode() == this &&
              it->edge->destNode() == otherEnd))
         {
-            Edge *tmp = it->edge;
-            tmp->sourceNode()->removeEdge(tmp);
-            tmp->destNode()->removeEdge(tmp);
-            delete tmp;
+            delete it->edge;
             return;
         }
     }
@@ -66,14 +63,7 @@ void Node::deleteEdge(Node *otherEnd)
 void Node::deleteEdges()
 {
     foreach (EdgeElement element, m_edgeList)
-    {
-        Edge *tmp = element.edge;
-        tmp->sourceNode()->removeEdge(tmp);
-        tmp->destNode()->removeEdge(tmp);
-
-        /// @bug crashes sometimes
-        delete tmp;
-    }
+        delete element.edge;
 }
 
 void Node::removeEdge(Edge *edge)

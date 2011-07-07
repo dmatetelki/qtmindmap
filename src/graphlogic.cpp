@@ -52,8 +52,11 @@ GraphLogic::GraphLogic(GraphWidget *parent)
                        (Qt::Key_Return, &GraphLogic::applyNumber));
     m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
                        (Qt::Key_Enter, &GraphLogic::applyNumber));
-    m_memberMap.insert(std::pair<int, void(GraphLogic::*)()>
-                       (Qt::Key_Delete, &GraphLogic::removeNode));
+}
+
+GraphWidget *GraphLogic::graphWidget() const
+{
+    return m_graphWidget;
 }
 
 void GraphLogic::setUndoStack(QUndoStack *stack)
@@ -293,32 +296,79 @@ void GraphLogic::writeContentToPngFile(const QString &fileName)
     emit notification(tr("MindMap exported as ") + fileName);
 }
 
+void GraphLogic::reShowNumbers()
+{
+    if (m_showingNodeNumbers)
+        showNodeNumbers();
+}
+
+void GraphLogic::setHintNode(Node *node)
+{
+    m_hintNode = node;
+}
+
 void GraphLogic::insertNode()
 {
-    try
+    // checks
+    if (!m_activeNode)
     {
-        QUndoCommand *insertNodeCommand = new InsertNodeCommand(this);
-        m_undoStack->push(insertNodeCommand);
-    }
-    catch (std::exception &e)
-    {
-        emit notification(e.what());
+        emit notification(tr("No active node."));
         return;
     }
+
+    // get the biggest angle between the edges of the Node.
+    double angle(m_activeNode->calculateBiggestAngle());
+
+    // let the distance between the current and new Node be 100 pixels
+    qreal length(100);
+
+    QPointF pos(m_activeNode->sceneBoundingRect().center() +
+                 QPointF(length * cos(angle), length * sin(angle)) -
+                 Node::newNodeCenter);
+
+    QRectF rect (m_graphWidget->scene()->sceneRect().topLeft(),
+                 m_graphWidget->scene()->sceneRect().bottomRight()
+                 - Node::newNodeBottomRigth);
+
+    if (!rect.contains(pos))
+    {
+        emit notification(tr("New node would be placed outside of the scene."));
+        return;
+    }
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_pos = pos;
+
+
+    QUndoCommand *insertNodeCommand = new InsertNodeCommand(context);
+    m_undoStack->push(insertNodeCommand);
 }
 
 void GraphLogic::removeNode()
 {
-    try
+    if (!m_activeNode)
     {
-        QUndoCommand *removeNodeCommand = new RemoveNodeCommand(this);
-        m_undoStack->push(removeNodeCommand);
-    }
-    catch (std::exception &e)
-    {
-        emit notification(e.what());
+        emit notification(tr("No active node."));
         return;
     }
+
+    if (m_activeNode == m_nodeList.first())
+    {
+        emit notification(tr("Base node cannot be deleted."));
+        return;
+    }
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_hintNode = m_hintNode;
+
+    QUndoCommand *insertNodeCommand = new RemoveNodeCommand(context);
+    m_undoStack->push(insertNodeCommand);
 }
 
 void GraphLogic::nodeEdited()
@@ -700,30 +750,57 @@ QList<Edge *> GraphLogic::allEdges() const
 
 void GraphLogic::addEdge(Node *source, Node *destination)
 {
-    try
+    if (destination == m_nodeList.first())
     {
-        QUndoCommand *addEdgeCommand = new AddEdgeCommand(this, source, destination);
-        m_undoStack->push(addEdgeCommand);
-    }
-    catch (std::exception &e)
-    {
-        emit notification(e.what());
+        emit notification(tr("Base node cannot be a target."));
         return;
     }
+
+    if (source->isConnected(destination))
+    {
+        emit notification(tr("There is already an edge between these two nodes."));
+        return;
+    }
+
+    // aviod the graph beeing acyclic. (ok, Nodes having multiple parents)
+    bool sec(false);
+    if (!destination->edgesToThis().empty())
+    {
+        emit notification(
+           QObject::tr("The graph is acyclic, edge added as secondary edge."));
+        sec = true;
+    }
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_source = source;
+    context.m_destination = destination;
+    context.m_secondary = sec;
+
+    QUndoCommand *addEdgeCommand = new AddEdgeCommand(context);
+    m_undoStack->push(addEdgeCommand);
 }
 
 void GraphLogic::removeEdge(Node *source, Node *destination)
 {
-    try
+    if (!source->isConnected(destination))
     {
-        QUndoCommand *addEdgeCommand = new RemoveEdgeCommand(this, source, destination);
-        m_undoStack->push(addEdgeCommand);
-    }
-    catch (std::exception &e)
-    {
-        emit notification(e.what());
+        emit notification(tr("There is no edge between these two nodes."));
         return;
     }
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_source = source;
+    context.m_destination = destination;
+
+    QUndoCommand *removeEdgeCommand = new RemoveEdgeCommand(context);
+    m_undoStack->push(removeEdgeCommand);
+
 }
 
 // re-draw numbers

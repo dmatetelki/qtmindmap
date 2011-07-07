@@ -28,8 +28,6 @@ GraphWidget::GraphWidget(MainWindow *parent)
     m_graphlogic = new GraphLogic(this);
 }
 
-
-
 void GraphWidget::newScene()
 {
     m_graphlogic->removeAllNodes();

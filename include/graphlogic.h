@@ -23,6 +23,8 @@ class GraphLogic : public QObject
 public:
 
     explicit GraphLogic(GraphWidget *parent = 0);
+
+    GraphWidget *graphWidget() const;
     void setUndoStack(QUndoStack *stack);
 
     bool processKeyEvent(QKeyEvent *event);
@@ -32,6 +34,11 @@ public:
     bool readContentFromXmlFile(const QString &fileName);
     void writeContentToXmlFile(const QString &fileName);
     void writeContentToPngFile(const QString &fileName);
+
+    Node *nodeFactory();
+    void setActiveNode(Node *node);
+    void setHintNode(Node *node);
+    void reShowNumbers();
 
 public slots:
 
@@ -74,9 +81,7 @@ private:
     void delNumber();
     void applyNumber();
 
-    Node *nodeFactory();
     void selectNode(Node *node);
-    void setActiveNode(Node *node);
 
     // functions on the edges
     QList<Edge *> allEdges() const;
@@ -104,10 +109,10 @@ private:
     QUndoStack *m_undoStack;
 
 
-    friend class InsertNodeCommand;
-    friend class RemoveNodeCommand;
-    friend class AddEdgeCommand;
-    friend class RemoveEdgeCommand;
+//    friend class InsertNodeCommand;
+//    friend class RemoveNodeCommand;
+//    friend class AddEdgeCommand;
+//    friend class RemoveEdgeCommand;
 };
 
 #endif // GRAPHLOGIC_H

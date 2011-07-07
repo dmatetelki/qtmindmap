@@ -156,6 +156,8 @@ void MainWindow::saveFile(const bool &checkIfReadonly)
 
     m_graphicsView->graphLogic()->writeContentToXmlFile(m_fileName);
     contentChanged(false);
+
+    m_undoStack->clear();
 }
 
 bool MainWindow::saveFileAs()

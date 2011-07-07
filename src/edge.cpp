@@ -26,6 +26,12 @@ Edge::Edge(Node *sourceNode, Node *destNode)
     adjust();
 }
 
+Edge::~Edge()
+{
+    m_sourceNode->removeEdge(this);
+    m_destNode->removeEdge(this);
+}
+
 Node * Edge::sourceNode() const
 {
     return m_sourceNode;

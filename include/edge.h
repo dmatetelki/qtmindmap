@@ -11,6 +11,7 @@ class Edge : public QGraphicsItem
 public:
 
     Edge(Node *sourceNode, Node *destNode);
+    ~Edge();
 
     Node *sourceNode() const;
     Node *destNode() const;

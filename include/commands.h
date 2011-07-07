@@ -9,63 +9,57 @@
 class GraphLogic;
 
 
-// exceptions:
-
-class NoActiveNodeException : public std::exception
+struct UndoContext
 {
-public:
-    const char* what() const throw();
+    GraphLogic *m_graphLogic;
+    Node *m_activeNode;
+    Node *m_hintNode;
+    QList <Node *> *m_nodeList;
+
+    QPointF m_pos;
+    QColor m_color;
+    Node *m_source;
+    Node *m_destination;
+    bool m_secondary;
+
+    UndoContext(GraphLogic *graphLogic = 0,
+                Node *activeNode = 0,
+                Node *hintNode = 0,
+                QList <Node *> *nodeList = 0,
+                QPointF pos = QPointF(),
+                QColor color = QColor(),
+                Node *source = 0,
+                Node *destination = 0,
+                bool secondary = false)
+        : m_graphLogic(graphLogic)
+        , m_activeNode(activeNode)
+        , m_hintNode(hintNode)
+        , m_nodeList(nodeList)
+        , m_pos(pos)
+        , m_color(color)
+        , m_source(source)
+        , m_destination(destination)
+        , m_secondary(secondary) {};
 };
 
-class CannotPlaceNewNodeException : public std::exception
-{
-public:
-    const char* what() const throw();
-};
-
-class CannotDeleteBaseNodeException : public std::exception
-{
-public:
-    const char* what() const throw();
-};
-
-class BaseNodeCannotBeEdgeTargetException : public std::exception
-{
-public:
-    const char* what() const throw();
-};
-
-class EdgeExistsBetweenNodesException : public std::exception
-{
-public:
-    const char* what() const throw();
-};
-
-class EdgeDoesntExistsBetweenNodesException : public std::exception
-{
-public:
-    const char* what() const throw();
-};
-
-
-// commands:
 
 class InsertNodeCommand : public QUndoCommand
 {
 
 public:
 
-    InsertNodeCommand(GraphLogic *graphLogic);
+    InsertNodeCommand(UndoContext context);
+    ~InsertNodeCommand();
 
     void undo();
     void redo();
 
 private:
 
-    GraphLogic *m_graphLogic;
+    bool m_done;
+    UndoContext m_context;
 
     Node *m_node;
-    QPointF m_pos;
     Node *m_activeNode;
     Edge *m_edge;
 };
@@ -75,14 +69,15 @@ class RemoveNodeCommand : public QUndoCommand
 
 public:
 
-    RemoveNodeCommand(GraphLogic *graphLogic);
+    RemoveNodeCommand(UndoContext context);
 
     void undo();
     void redo();
 
 private:
 
-    GraphLogic *m_graphLogic;
+    bool m_done;
+    UndoContext m_context;
 
     Node *m_activeNode;
     Node *m_hintNode;
@@ -96,18 +91,18 @@ class AddEdgeCommand : public QUndoCommand
 
 public:
 
-    AddEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion);
+    AddEdgeCommand(UndoContext context);
+    ~AddEdgeCommand();
 
     void undo();
     void redo();
 
 private:
 
-    GraphLogic *m_graphLogic;
+    bool m_done;
+    UndoContext m_context;
 
     Node *m_activeNode;
-    Node *m_source;
-    Node *m_destination;
     Edge *m_edge;
 };
 
@@ -116,18 +111,17 @@ class RemoveEdgeCommand : public QUndoCommand
 
 public:
 
-    RemoveEdgeCommand(GraphLogic *graphLogic, Node *source, Node *destinaion);
+    RemoveEdgeCommand(UndoContext context);
 
     void undo();
     void redo();
 
 private:
 
-    GraphLogic *m_graphLogic;
+    bool m_done;
+    UndoContext m_context;
 
     Node *m_activeNode;
-    Node *m_source;
-    Node *m_destination;
     Edge *m_edge;
 };
 
