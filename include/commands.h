@@ -22,6 +22,7 @@ struct UndoContext
     bool m_secondary;
     qreal m_x;
     qreal m_y;
+    bool m_subtree;
 
     UndoContext(GraphLogic *graphLogic = 0,
                 Node *activeNode = 0,
@@ -33,7 +34,8 @@ struct UndoContext
                 Node *destination = 0,
                 bool secondary = false,
                 qreal x = 0,
-                qreal y = 0)
+                qreal y = 0,
+                bool subtree = false)
         : m_graphLogic(graphLogic)
         , m_activeNode(activeNode)
         , m_hintNode(hintNode)
@@ -45,6 +47,7 @@ struct UndoContext
         , m_secondary(secondary)
         , m_x(x)
         , m_y(y)
+        , m_subtree(subtree)
     {};
 };
 
@@ -146,5 +149,36 @@ public:
     bool mergeWith(const QUndoCommand *command);
     int id() const;
 };
+
+class NodeColorCommand : public BaseUndoClass
+{
+
+public:
+
+    NodeColorCommand(UndoContext context);
+
+    void undo();
+    void redo();
+
+private:
+
+    QMap<Node*, QColor> m_colorMap;
+};
+
+class NodeTextColorCommand : public BaseUndoClass
+{
+
+public:
+
+    NodeTextColorCommand(UndoContext context);
+
+    void undo();
+    void redo();
+
+private:
+
+    QMap<Node*, QColor> m_colorMap;
+};
+
 
 #endif // COMMANDS_H

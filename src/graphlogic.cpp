@@ -459,7 +459,7 @@ void GraphLogic::nodeColor()
     }
 
     bool subtree(QApplication::keyboardModifiers() & Qt::ControlModifier &&
-                QApplication::keyboardModifiers() & Qt::ShiftModifier);
+                 QApplication::keyboardModifiers() & Qt::ShiftModifier);
 
     // popup a color selector dialogm def color is the curr one.
     QColorDialog dialog(m_graphWidget);
@@ -468,7 +468,15 @@ void GraphLogic::nodeColor()
     if (!dialog.exec())
         return;
 
-    setNodeColor(dialog.selectedColor(), subtree);
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_color = dialog.selectedColor();
+    context.m_subtree = subtree;
+
+    QUndoCommand *nodeColorCommand = new NodeColorCommand(context);
+    m_undoStack->push(nodeColorCommand);
 }
 
 void GraphLogic::nodeTextColor()
@@ -489,7 +497,15 @@ void GraphLogic::nodeTextColor()
     if (!dialog.exec())
         return;
 
-    setNodeTextColor(dialog.selectedColor(), subtree);
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_color = dialog.selectedColor();
+    context.m_subtree = subtree;
+
+    QUndoCommand *nodeTextColorCommand = new NodeTextColorCommand(context);
+    m_undoStack->push(nodeTextColorCommand);
 }
 
 void GraphLogic::addEdge()
@@ -644,42 +660,6 @@ void GraphLogic::moveNode(qreal x, qreal y)
 
     QUndoCommand *moveCommand = new MoveCommand(context);
     m_undoStack->push(moveCommand);
-}
-
-void GraphLogic::setNodeColor(const QColor &color, const bool &subtree)
-{
-    QList <Node *> nodeList;
-    if (subtree)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    foreach(Node *node, nodeList)
-    {
-        node->setColor(color);
-        foreach (Edge * edge, node->edgesToThis(false))
-            edge->setColor(color);
-    }
-}
-
-void GraphLogic::setNodeTextColor(const QColor &color, const bool &subtree)
-{
-    QList <Node *> nodeList;
-    if (subtree)
-    {
-        nodeList = m_activeNode->subtree();
-    }
-    else
-    {
-        nodeList.push_back(m_activeNode);
-    }
-
-    foreach(Node *node, nodeList)
-        node->setTextColor(color);
 }
 
 void GraphLogic::appendNumber(const int &num)

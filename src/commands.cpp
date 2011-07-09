@@ -13,8 +13,9 @@ BaseUndoClass::BaseUndoClass(UndoContext context)
     , m_subtree(false)
 {
     // remove just the active Node or it's subtree too?
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    if (m_context.m_subtree ||
+        (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+         QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
         m_nodeList = m_activeNode->subtree();
         m_subtree = true;
@@ -254,12 +255,16 @@ void MoveCommand::undo()
 {
     foreach(Node *node, m_nodeList)
         node->moveBy(-m_context.m_x, -m_context.m_y);
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
 }
 
 void MoveCommand::redo()
 {
     foreach(Node *node, m_nodeList)
         node->moveBy(m_context.m_x, m_context.m_y);
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
 }
 
 bool MoveCommand::mergeWith(const QUndoCommand *command)
@@ -291,4 +296,70 @@ bool MoveCommand::mergeWith(const QUndoCommand *command)
 int MoveCommand::id() const
 {
     return MoveCommandId;
+}
+
+NodeColorCommand::NodeColorCommand(UndoContext context)
+    : BaseUndoClass(context)
+{
+    setText(QObject::tr("Changing color of node: \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).append("\"").
+                append(m_subtree ? QObject::tr(" with subtree") : QString("")));
+
+    foreach(Node *node, m_nodeList)
+        m_colorMap[node] = node->color();
+}
+
+void NodeColorCommand::undo()
+{
+    foreach(Node *node, m_nodeList)
+    {
+        node->setColor(m_colorMap[node]);
+        foreach (Edge * edge, node->edgesToThis(false))
+            edge->setColor(m_colorMap[node]);
+    }
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
+}
+
+void NodeColorCommand::redo()
+{
+    foreach(Node *node, m_nodeList)
+    {
+        node->setColor(m_context.m_color);
+        foreach (Edge * edge, node->edgesToThis(false))
+            edge->setColor(m_context.m_color);
+    }
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
+}
+
+NodeTextColorCommand::NodeTextColorCommand(UndoContext context)
+    : BaseUndoClass(context)
+{
+    setText(QObject::tr("Changing textcolor of node: \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).append("\"").
+                append(m_subtree ? QObject::tr(" with subtree") : QString("")));
+
+    foreach(Node *node, m_nodeList)
+        m_colorMap[node] = node->textColor();
+}
+
+void NodeTextColorCommand::undo()
+{
+    foreach(Node *node, m_nodeList)
+        node->setTextColor(m_colorMap[node]);
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
+}
+
+void NodeTextColorCommand::redo()
+{
+    foreach(Node *node, m_nodeList)
+        node->setTextColor(m_context.m_color);
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
 }

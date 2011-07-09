@@ -49,7 +49,7 @@ public slots:
     void nodeEdited();  /// @todo Rewrite as an undo action
     void scaleUp();     /// @todo Rewrite as an undo action
     void scaleDown();   /// @todo Rewrite as an undo action
-    void nodeColor();
+    void nodeColor();   // undo command
     void nodeTextColor();
     void addEdge();
     void removeEdge();
@@ -72,10 +72,6 @@ private:
     void moveNodeDown();
     void moveNodeLeft();
     void moveNodeRight();
-
-
-    void setNodeColor(const QColor &color, const bool &subtree = false);     /// @todo Rewrite as an undo action
-    void setNodeTextColor(const QColor &color, const bool &subtree = false); /// @todo Rewrite as an undo action
 
     // hint mode
     void appendNumber(const int &unm);
@@ -108,12 +104,6 @@ private:
 
     std::map<int, void(GraphLogic::*)(void)> m_memberMap;
     QUndoStack *m_undoStack;
-
-
-//    friend class InsertNodeCommand;
-//    friend class RemoveNodeCommand;
-//    friend class AddEdgeCommand;
-//    friend class RemoveEdgeCommand;
 };
 
 #endif // GRAPHLOGIC_H
