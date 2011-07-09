@@ -39,9 +39,7 @@ public:
     void setHintNode(Node *node);
     void reShowNumbers();
 
-    void moveNode(qreal x, qreal y);
-
-//    void move(const QPointF &oldpos, const QPointF &newpos);  /// @todo Rewrite as an undo action
+    void moveNode(qreal x, qreal y); // undo command
 
 public slots:
 

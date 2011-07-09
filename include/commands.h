@@ -48,14 +48,28 @@ struct UndoContext
     {};
 };
 
-
-/// @todo need a base class...
-enum MergeableCommandId
+class BaseUndoClass : public QUndoCommand
 {
-    MoveCommandId = 0
+public:
+
+    enum MergeableCommandId
+    {
+        MoveCommandId = 0
+    };
+
+    BaseUndoClass(UndoContext context);
+
+protected:
+
+    bool m_done;
+    UndoContext m_context;
+    Node *m_activeNode;
+    QList <Node *> m_nodeList;
+    bool m_subtree;
 };
 
-class InsertNodeCommand : public QUndoCommand
+
+class InsertNodeCommand : public BaseUndoClass
 {
 
 public:
@@ -68,15 +82,11 @@ public:
 
 private:
 
-    bool m_done;
-    UndoContext m_context;
-
     Node *m_node;
-    Node *m_activeNode;
     Edge *m_edge;
 };
 
-class RemoveNodeCommand : public QUndoCommand
+class RemoveNodeCommand : public BaseUndoClass
 {
 
 public:
@@ -88,17 +98,11 @@ public:
 
 private:
 
-    bool m_done;
-    UndoContext m_context;
-
-    Node *m_activeNode;
     Node *m_hintNode;
-
-    QList <Node *> m_nodeList;
     QList <Edge *> m_edgeList;
 };
 
-class AddEdgeCommand : public QUndoCommand
+class AddEdgeCommand : public BaseUndoClass
 {
 
 public:
@@ -111,14 +115,10 @@ public:
 
 private:
 
-    bool m_done;
-    UndoContext m_context;
-
-    Node *m_activeNode;
     Edge *m_edge;
 };
 
-class RemoveEdgeCommand : public QUndoCommand
+class RemoveEdgeCommand : public BaseUndoClass
 {
 
 public:
@@ -130,14 +130,10 @@ public:
 
 private:
 
-    bool m_done;
-    UndoContext m_context;
-
-    Node *m_activeNode;
     Edge *m_edge;
 };
 
-class MoveCommand : public QUndoCommand
+class MoveCommand : public BaseUndoClass
 {
 
 public:
@@ -148,14 +144,7 @@ public:
     void redo();
 
     bool mergeWith(const QUndoCommand *command);
-    int id() const { return MoveCommandId; }
-
-private:
-
-    bool m_done;
-    UndoContext m_context;
-
-    QList <Node *> m_nodeList;
+    int id() const;
 };
 
 #endif // COMMANDS_H

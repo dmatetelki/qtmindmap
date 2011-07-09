@@ -6,16 +6,34 @@
 #include <math.h>
 
 
-InsertNodeCommand::InsertNodeCommand(UndoContext context)
+BaseUndoClass::BaseUndoClass(UndoContext context)
     : m_done(false)
     , m_context(context)
     , m_activeNode(context.m_activeNode)
+    , m_subtree(false)
+{
+    // remove just the active Node or it's subtree too?
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        m_nodeList = m_activeNode->subtree();
+        m_subtree = true;
+    }
+    else
+    {
+        m_nodeList.push_back(m_activeNode);
+    }
+}
+
+
+
+InsertNodeCommand::InsertNodeCommand(UndoContext context)
+    : BaseUndoClass(context)
 {
     setText(QObject::tr("Node added to \"").append(
             m_activeNode == m_context.m_nodeList->first() ?
-              QObject::tr("Base node") :
-              m_activeNode->toPlainText()).append("\""));
-
+                QObject::tr("Base node") :
+                m_activeNode->toPlainText()).append("\""));
 
     m_context.m_graphLogic->nodeLostFocus();
 
@@ -78,24 +96,13 @@ void InsertNodeCommand::redo()
 }
 
 RemoveNodeCommand::RemoveNodeCommand(UndoContext context)
-    : m_context(context)
-    , m_activeNode(context.m_activeNode)
+    : BaseUndoClass(context)
     , m_hintNode(context.m_hintNode)
 {
     setText(QObject::tr("Node deleted \"").append(
-                m_activeNode->toPlainText().append("\"")));
-
-    // remove just the active Node or it's subtree too?
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        m_nodeList = m_activeNode->subtree();
-        setText(text().append(QObject::tr(" with subtree")));
-    }
-    else
-    {
-        m_nodeList.push_back(m_activeNode);
-    }
+                m_activeNode->toPlainText().append("\"")).append(
+                m_subtree ?
+                        QObject::tr(" with subtree") : QString("")));
 
     // collect affected edges
     foreach(Node *node, m_nodeList)
@@ -151,9 +158,7 @@ void RemoveNodeCommand::redo()
 }
 
 AddEdgeCommand::AddEdgeCommand(UndoContext context)
-    : m_done(false)
-    , m_context(context)
-    , m_activeNode(context.m_activeNode)
+    : BaseUndoClass(context)
 {
     setText(QObject::tr("Edge added between \"").append(
                 m_context.m_source == m_context.m_nodeList->first() ?
@@ -201,8 +206,7 @@ AddEdgeCommand::~AddEdgeCommand()
 }
 
 RemoveEdgeCommand::RemoveEdgeCommand(UndoContext context)
-    : m_context(context)
-    , m_activeNode(context.m_activeNode)
+    : BaseUndoClass(context)
 {
     setText(QObject::tr("Edge deleted between \"").append(
                 m_context.m_source == m_context.m_nodeList->first() ?
@@ -236,25 +240,14 @@ void RemoveEdgeCommand::redo()
 }
 
 MoveCommand::MoveCommand(UndoContext context)
-    : m_context(context)
+    : BaseUndoClass(context)
 {
     setText(QObject::tr("Node \"").append(
                 m_context.m_activeNode == m_context.m_nodeList->first() ?
                     QObject::tr("Base node") :
                     m_context.m_activeNode->toPlainText()).
-                append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y));
-
-    // move just the active Node or it's subtree too?
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        m_nodeList = m_context.m_activeNode->subtree();
-        setText(text().append(QObject::tr(" with subtree")));
-    }
-    else
-    {
-        m_nodeList.push_back(m_context.m_activeNode);
-    }
+            append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y).
+            append(m_subtree ? QObject::tr(" with subtree") : QString("")));
 }
 
 void MoveCommand::undo()
@@ -279,6 +272,9 @@ bool MoveCommand::mergeWith(const QUndoCommand *command)
     if (m_context.m_activeNode != moveCommand->m_context.m_activeNode)
         return false;
 
+    if (m_subtree != moveCommand->m_subtree)
+        return false;
+
     m_context.m_x += moveCommand->m_context.m_x;
     m_context.m_y += moveCommand->m_context.m_y;
 
@@ -286,13 +282,13 @@ bool MoveCommand::mergeWith(const QUndoCommand *command)
                 m_context.m_activeNode == m_context.m_nodeList->first() ?
                     QObject::tr("Base node") :
                     m_context.m_activeNode->toPlainText()).
-            append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y));
-
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        setText(text().append(QObject::tr(" with subtree")));
-    }
+            append("\" moved (%1, %2)").arg(m_context.m_x).arg(m_context.m_y).
+            append(m_subtree ? QObject::tr(" with subtree") : QString("")));
 
     return true;
+}
+
+int MoveCommand::id() const
+{
+    return MoveCommandId;
 }
