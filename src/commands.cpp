@@ -363,3 +363,32 @@ void NodeTextColorCommand::redo()
 
     m_context.m_graphLogic->setActiveNode(m_activeNode);
 }
+
+ScaleNodeCommand::ScaleNodeCommand(UndoContext context)
+    : BaseUndoClass(context)
+{
+    setText(QObject::tr("Changing scale of node: \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).append("\"").
+                append(m_subtree ? QObject::tr(" with subtree") : QString("")));
+
+    foreach(Node *node, m_nodeList)
+        m_scaleMap[node] = node->scale();
+}
+
+void ScaleNodeCommand::undo()
+{
+    foreach(Node *node, m_nodeList)
+        node->setScale(m_scaleMap[node], m_context.m_graphLogic->graphWidget()->sceneRect());
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
+}
+
+void ScaleNodeCommand::redo()
+{
+    foreach(Node *node, m_nodeList)
+        node->setScale(m_context.m_scale, m_context.m_graphLogic->graphWidget()->sceneRect());
+
+    m_context.m_graphLogic->setActiveNode(m_activeNode);
+}

@@ -416,17 +416,30 @@ void GraphLogic::scaleUp()
         return;
     }
 
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        QList <Node *> nodeList = m_activeNode->subtree();
-        foreach(Node *node, nodeList)
-            node->setScale(qreal(1.2), m_graphWidget->sceneRect());
-    }
-    else
-    {
-        m_activeNode->setScale(qreal(1.2),m_graphWidget->sceneRect());
-    }
+    bool subtree(QApplication::keyboardModifiers() & Qt::ControlModifier &&
+                 QApplication::keyboardModifiers() & Qt::ShiftModifier);
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_scale = qreal(1.2);
+    context.m_subtree = subtree;
+
+    QUndoCommand *scaleNodeCommand = new ScaleNodeCommand(context);
+    m_undoStack->push(scaleNodeCommand);
+
+//    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+//        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+//    {
+//        QList <Node *> nodeList = m_activeNode->subtree();
+//        foreach(Node *node, nodeList)
+//            node->setScale(qreal(1.2), m_graphWidget->sceneRect());
+//    }
+//    else
+//    {
+//        m_activeNode->setScale(qreal(1.2),m_graphWidget->sceneRect());
+//    }
 }
 
 void GraphLogic::scaleDown()
@@ -437,17 +450,31 @@ void GraphLogic::scaleDown()
         return;
     }
 
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
-        QApplication::keyboardModifiers() & Qt::ShiftModifier)
-    {
-        QList <Node *> nodeList = m_activeNode->subtree();
-        foreach(Node *node, nodeList)
-            node->setScale(qreal(1 / 1.2),m_graphWidget->sceneRect());
-    }
-    else
-    {
-        m_activeNode->setScale(qreal(1 / 1.2),m_graphWidget->sceneRect());
-    }
+    bool subtree(QApplication::keyboardModifiers() & Qt::ControlModifier &&
+                 QApplication::keyboardModifiers() & Qt::ShiftModifier);
+
+    UndoContext context;
+    context.m_graphLogic = this;
+    context.m_nodeList = &m_nodeList;
+    context.m_activeNode = m_activeNode;
+    context.m_scale = qreal(1 / 1.2);
+    context.m_subtree = subtree;
+
+    QUndoCommand *scaleNodeCommand = new ScaleNodeCommand(context);
+    m_undoStack->push(scaleNodeCommand);
+
+
+//    if (QApplication::keyboardModifiers() & Qt::ControlModifier &&
+//        QApplication::keyboardModifiers() & Qt::ShiftModifier)
+//    {
+//        QList <Node *> nodeList = m_activeNode->subtree();
+//        foreach(Node *node, nodeList)
+//            node->setScale(qreal(1 / 1.2),m_graphWidget->sceneRect());
+//    }
+//    else
+//    {
+//        m_activeNode->setScale(qreal(1 / 1.2),m_graphWidget->sceneRect());
+//    }
 }
 
 void GraphLogic::nodeColor()

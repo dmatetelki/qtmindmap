@@ -44,13 +44,13 @@ public:
 public slots:
 
     // commands from toolbars:
-    void insertNode();  // undo command
-    void removeNode();  // undo command
-    void nodeEdited();  /// @todo Rewrite as an undo action
-    void scaleUp();     /// @todo Rewrite as an undo action
-    void scaleDown();   /// @todo Rewrite as an undo action
-    void nodeColor();   // undo command
-    void nodeTextColor();
+    void insertNode();      // undo command
+    void removeNode();      // undo command
+    void nodeEdited();      /// @todo Rewrite as an undo action
+    void scaleUp();         // undo command
+    void scaleDown();       // undo command
+    void nodeColor();       // undo command
+    void nodeTextColor();   // undo command
     void addEdge();
     void removeEdge();
     void hintMode();

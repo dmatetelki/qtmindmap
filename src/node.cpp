@@ -221,9 +221,9 @@ QColor Node::textColor() const
 void Node::setScale(const qreal &factor,const QRectF &sceneRect)
 {
     // limit scale to a reasonable size
-    if (factor * scale() < 0.4 ||
-        factor * scale() > 4 )
-        return;
+//    if (factor * scale() < 0.4 ||
+//        factor * scale() > 4 )
+//        return;
 
     // cannot scale out the Node from the scene
     if (!sceneRect.contains(pos() +

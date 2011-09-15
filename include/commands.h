@@ -23,6 +23,7 @@ struct UndoContext
     qreal m_x;
     qreal m_y;
     bool m_subtree;
+    qreal m_scale;
 
     UndoContext(GraphLogic *graphLogic = 0,
                 Node *activeNode = 0,
@@ -35,7 +36,8 @@ struct UndoContext
                 bool secondary = false,
                 qreal x = 0,
                 qreal y = 0,
-                bool subtree = false)
+                bool subtree = false,
+                qreal scale = 0)
         : m_graphLogic(graphLogic)
         , m_activeNode(activeNode)
         , m_hintNode(hintNode)
@@ -48,6 +50,7 @@ struct UndoContext
         , m_x(x)
         , m_y(y)
         , m_subtree(subtree)
+        , m_scale(scale)
     {};
 };
 
@@ -178,6 +181,21 @@ public:
 private:
 
     QMap<Node*, QColor> m_colorMap;
+};
+
+class ScaleNodeCommand : public BaseUndoClass
+{
+
+public:
+
+    ScaleNodeCommand(UndoContext context);
+
+    void undo();
+    void redo();
+
+private:
+
+    QMap<Node*, qreal> m_scaleMap;
 };
 
 
