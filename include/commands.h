@@ -60,7 +60,8 @@ public:
 
     enum MergeableCommandId
     {
-        MoveCommandId = 0
+        MoveCommandId = 0,
+        ScaleCommandId
     };
 
     BaseUndoClass(UndoContext context);
@@ -193,9 +194,8 @@ public:
     void undo();
     void redo();
 
-private:
-
-    QMap<Node*, qreal> m_scaleMap;
+    bool mergeWith(const QUndoCommand *command);
+    int id() const;
 };
 
 

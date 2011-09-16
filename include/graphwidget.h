@@ -36,6 +36,10 @@ public slots:
     void zoomIn();
     void zoomOut();
 
+signals:
+
+    void  notification(const QString &msg);
+
 protected:
 
     void keyPressEvent(QKeyEvent *event);
@@ -44,7 +48,7 @@ protected:
 
 private:
 
-    void scaleView(qreal scaleFactor);
+    void scaleView(qreal factor);
 
 
     MainWindow *m_parent;

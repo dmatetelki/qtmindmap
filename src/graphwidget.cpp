@@ -50,12 +50,12 @@ GraphLogic *GraphWidget::graphLogic() const
 
 void GraphWidget::zoomIn()
 {
-    scaleView(qreal(1.2));
+    scaleView(qreal(0.2));
 }
 
 void GraphWidget::zoomOut()
 {
-    scaleView(qreal(1 / 1.2));
+    scaleView(qreal(-0.2));
 }
 
 // MainWindow::keyPressEvent passes all keyevent to here, except
@@ -101,14 +101,15 @@ void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
     painter->drawRect(m_scene->sceneRect());
 }
 
-void GraphWidget::scaleView(qreal scaleFactor)
+void GraphWidget::scaleView(qreal factor)
 {
-    qreal factor = transform().scale(scaleFactor, scaleFactor).
-                                        mapRect(QRectF(0, 0, 1, 1)).width();
-
     // don't allow to scale up/down too much
-    if (factor < 0.2 || factor > 10)
+    qreal viewScale = transform().m11() + 1 + factor;
+    if (viewScale < qreal(1) || viewScale > qreal(10))
+    {
+        emit notification(tr("Too much zooming."));
         return;
+    }
 
-    scale(scaleFactor, scaleFactor);
+    scale(1 + factor, 1 + factor);
 }

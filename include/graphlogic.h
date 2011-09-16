@@ -64,7 +64,7 @@ public slots:
 signals:
 
     void contentChanged(const bool& changed = true);
-    void notification(const QString &msg);
+    void  notification(const QString &msg);
 
 private:
 

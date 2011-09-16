@@ -30,8 +30,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_graphicsView->graphLogic(), SIGNAL(contentChanged(const bool&)),
             this, SLOT(contentChanged(const bool&)));
 
+    connect(m_graphicsView, SIGNAL(notification(QString)),
+            this, SLOT(statusBarMsg(QString)));
+
     connect(m_graphicsView->graphLogic(), SIGNAL(notification(QString)),
             this, SLOT(statusBarMsg(QString)));
+
 
     // setup toolbars, don't show them
     setupMainToolbar();

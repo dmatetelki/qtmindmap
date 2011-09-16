@@ -37,7 +37,7 @@ HEADERS  += include/mainwindow.h \
 
 FORMS        += ui/mainwindow.ui
 
-RESOURCES += images/qtmindmap.qrc
+RESOURCES    += images/qtmindmap.qrc
 
 
 # the translation hack

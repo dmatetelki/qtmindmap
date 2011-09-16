@@ -33,16 +33,17 @@ void AlgorithmTests::calculateBiggestAngle()
 {
     MainWindow *mainWindow = new MainWindow;
     GraphWidget *graphWidget = new GraphWidget(mainWindow);
+    GraphLogic *graphLogic = new GraphLogic(graphWidget);
 
     // no edges
-    Node *node1 = new Node(graphWidget);
+    Node *node1 = new Node(graphLogic);
     node1->setPos(0,0);
     QCOMPARE(node1->calculateBiggestAngle(), Pi * 1.5);
 
 
     // one egde
     // 1
-    Node *node2 = new Node(graphWidget);
+    Node *node2 = new Node(graphLogic);
     node2->setPos(30,0);
 
     Edge *edge1 = new Edge(node1, node2);
@@ -65,12 +66,12 @@ void AlgorithmTests::calculateBiggestAngle()
     node2->setPos(30,0);
     edge1->m_angle = angleOfPoints(node1->pos(), node2->pos());
 
-    Node *node3 = new Node(graphWidget);
+    Node *node3 = new Node(graphLogic);
     node3->setPos(-30,0);
     Edge *edge2 = new Edge(node1, node3);
     edge2->m_angle = angleOfPoints(node1->pos(), node3->pos());
 
-    Node *node4 = new Node(graphWidget);
+    Node *node4 = new Node(graphLogic);
     node4->setPos(0, -30);
     Edge *edge3 = new Edge(node1, node4);
     edge3->m_angle = angleOfPoints(node1->pos(), node4->pos());
@@ -85,6 +86,7 @@ void AlgorithmTests::calculateBiggestAngle()
     delete node3;
     delete node4;
 
+    delete graphLogic;
     delete graphWidget;
     delete mainWindow;
 }

@@ -6,6 +6,7 @@ TARGET = qtmindmap_test
 
 SOURCES += src/mainwindow.cpp \
            src/graphwidget.cpp \
+           src/graphlogic.cpp \
            src/node.cpp \
            src/edge.cpp \
            src/systemtray.cpp \
@@ -14,6 +15,7 @@ SOURCES += src/mainwindow.cpp \
 
 HEADERS  += include/mainwindow.h \
             include/graphwidget.h \
+            include/graphlogic.hpp \
             include/node.h \
             include/edge.h \
             include/systemtray.h \

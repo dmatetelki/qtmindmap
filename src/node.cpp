@@ -220,24 +220,19 @@ QColor Node::textColor() const
 
 void Node::setScale(const qreal &factor,const QRectF &sceneRect)
 {
-    // limit scale to a reasonable size
-//    if (factor * scale() < 0.4 ||
-//        factor * scale() > 4 )
-//        return;
-
     // cannot scale out the Node from the scene
     if (!sceneRect.contains(pos() +
                             boundingRect().bottomRight() * scale() * factor))
         return;
 
     prepareGeometryChange();
-    QGraphicsTextItem::setScale(factor * scale());
+    QGraphicsTextItem::setScale(factor + scale());
 
     // scale edges to this Node too
     foreach(EdgeElement element, m_edgeList)
     {
         if (!element.startsFromThisNode)
-            element.edge->setWidth(element.edge->width() * factor );
+            element.edge->setWidth(element.edge->width() + factor );
 
         element.edge->adjust();
     }

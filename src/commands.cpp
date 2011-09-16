@@ -367,20 +367,18 @@ void NodeTextColorCommand::redo()
 ScaleNodeCommand::ScaleNodeCommand(UndoContext context)
     : BaseUndoClass(context)
 {
-    setText(QObject::tr("Changing scale of node: \"").append(
+    setText(QObject::tr("Node \"").append(
                 m_context.m_activeNode == m_context.m_nodeList->first() ?
                     QObject::tr("Base node") :
-                    m_context.m_activeNode->toPlainText()).append("\"").
-                append(m_subtree ? QObject::tr(" with subtree") : QString("")));
-
-    foreach(Node *node, m_nodeList)
-        m_scaleMap[node] = node->scale();
+                    m_context.m_activeNode->toPlainText()).
+            append("\" scaled (%1%)").arg(int((1+m_context.m_scale)*100)).
+            append(m_subtree ? QObject::tr(" with subtree") : QString("")));
 }
 
 void ScaleNodeCommand::undo()
 {
     foreach(Node *node, m_nodeList)
-        node->setScale(m_scaleMap[node], m_context.m_graphLogic->graphWidget()->sceneRect());
+        node->setScale(qreal(-m_context.m_scale), m_context.m_graphLogic->graphWidget()->sceneRect());
 
     m_context.m_graphLogic->setActiveNode(m_activeNode);
 }
@@ -391,4 +389,34 @@ void ScaleNodeCommand::redo()
         node->setScale(m_context.m_scale, m_context.m_graphLogic->graphWidget()->sceneRect());
 
     m_context.m_graphLogic->setActiveNode(m_activeNode);
+}
+
+bool ScaleNodeCommand::mergeWith(const QUndoCommand *command)
+{
+    if (command->id() != id())
+        return false;
+
+    const ScaleNodeCommand *scaleNodeCommand = static_cast<const ScaleNodeCommand *>(command);
+
+    if (m_context.m_activeNode != scaleNodeCommand->m_context.m_activeNode)
+        return false;
+
+    if (m_subtree != scaleNodeCommand->m_subtree)
+        return false;
+
+    m_context.m_scale += scaleNodeCommand->m_context.m_scale;
+
+    setText(QObject::tr("Node \"").append(
+                m_context.m_activeNode == m_context.m_nodeList->first() ?
+                    QObject::tr("Base node") :
+                    m_context.m_activeNode->toPlainText()).
+            append("\" scaled (%1%)").arg(int((1+m_context.m_scale)*100)).
+            append(m_subtree ? QObject::tr(" with subtree") : QString("")));
+
+    return true;
+}
+
+int ScaleNodeCommand::id() const
+{
+    return ScaleCommandId;
 }
