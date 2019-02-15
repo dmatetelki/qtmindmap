@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QRegExp>
 #include <QTranslator>
+#include <QApplication>
 
 #include "include/mainwindow.h"
 #include "include/systemtray.h"
